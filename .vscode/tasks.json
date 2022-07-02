@@ -1,0 +1,335 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "options": {
+        "env": {
+            "BUILD_DIR": "build",
+            "BUILD_NAME": "application",
+            "COMPILE_C_AS_CPP": "0",
+            "COMPILER_DEBUG": "0",
+            "COMPILER_OPT": "-Og",      // -Os
+            "COMPILER_PATH": "",
+            "COMPILER_STD_C": "gnu11",
+            "COMPILER_STD_CPP": "c++17",
+            "FUNSAPE_PATH": "none",     // "D:/Schwarz/Projects/STM32/funsapeLib/",
+            "LIBRARY_PATH": "",
+            "MCU_DEVICE_CORE_FLOAT_ABI": "",
+            "MCU_DEVICE_CORE_FPU": "",
+            "MCU_DEVICE_NAME": "STM32F103C8Tx",
+            "PROGRAMMER_BAUDRATE": "57600",
+            "PROGRAMMER_CONFIG_FILE": "${execPath}/../toolchains/avrdudess/avrdude.conf",
+            "PROGRAMMER_PORT": "COM5",
+            "PROGRAMMER_TYPE": "ST_LINK_SWD",       // arduino, ST_LINK_JTAG, ST_LINK_SWD
+            "USER_DEFINES_ASM": "",
+            "USER_DEFINES_C": "USE_HAL_DRIVER",
+            "USER_DEFINES_CPP": "USE_HAL_DRIVER",
+            "USER_FLAGS_ASM": "",
+            "USER_FLAGS_C": "-Wno-switch",
+            "USER_FLAGS_CPP": "-Wno-switch",
+            "USER_LIBS": ""
+        }
+    },
+    "tasks": [
+        {   // STM32 compile
+            "label": "STM32 compile",
+            "detail": "STM32 - Compile project",
+            "command": "make",
+            "args": [
+                {
+                    "quoting": "weak",
+                    "value": "compile"
+                },
+            ],
+            "runOptions": {
+                "instanceLimit": 1,
+                "reevaluateOnRerun": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "clear": true,
+                "close": false,
+                "echo": true,
+                "focus": true,
+                "panel": "shared",
+                "reveal": "always",
+                "revealProblems": "onProblem",
+                "showReuseMessage": true
+            },
+        },
+        {   // STM32 clean
+            "label": "STM32 clean",
+            "detail": "STM32 - Delete build file",
+            "command": "make",
+            "args": [
+                {
+                    "quoting": "weak",
+                    "value": "clean"
+                },
+            ],
+            "runOptions": {
+                "instanceLimit": 1,
+                "reevaluateOnRerun": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "clear": true,
+                "close": false,
+                "echo": true,
+                "focus": true,
+                "panel": "shared",
+                "reveal": "always",
+                "revealProblems": "onProblem",
+                "showReuseMessage": true
+            },
+        },
+        {   // STM32 clean/compile
+            "label": "STM32 clean/compile",
+            "detail": "STM32 - Recompile entire project",
+            "command": "make",
+            "args": [
+                {
+                    "quoting": "weak",
+                    "value": "cleanCompile"
+                },
+            ],
+            "runOptions": {
+                "instanceLimit": 1,
+                "reevaluateOnRerun": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "clear": true,
+                "close": false,
+                "echo": true,
+                "focus": true,
+                "panel": "shared",
+                "reveal": "always",
+                "revealProblems": "onProblem",
+                "showReuseMessage": true
+            },
+        },
+        {   // STM32 program
+            "label": "STM32 program",
+            "detail": "STM32 - Write into device",
+            "command": "make",
+            "args": [
+                {
+                    "quoting": "weak",
+                    "value": "program"
+                },
+            ],
+            "runOptions": {
+                "instanceLimit": 1,
+                "reevaluateOnRerun": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "clear": true,
+                "close": false,
+                "echo": true,
+                "focus": true,
+                "panel": "shared",
+                "reveal": "always",
+                "revealProblems": "onProblem",
+                "showReuseMessage": true
+            },
+        },
+        {   // STM32 compile/program
+            "label": "STM32 compile/program",
+            "detail": "STM32 - Compile project and write into device",
+            "command": "make",
+            "args": [
+                {
+                    "quoting": "weak",
+                    "value": "compileProgram"
+                },
+            ],
+            "runOptions": {
+                "instanceLimit": 1,
+                "reevaluateOnRerun": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "clear": true,
+                "close": false,
+                "echo": true,
+                "focus": true,
+                "panel": "shared",
+                "reveal": "always",
+                "revealProblems": "onProblem",
+                "showReuseMessage": true
+            },
+        },
+        {   // STM32 clean/compile/program
+            "label": "STM32 clean/compile/program",
+            "detail": "STM32 - Recompile project and write into device",
+            "command": "make",
+            "args": [
+                {
+                    "quoting": "weak",
+                    "value": "cleanCompileProgram"
+                },
+            ],
+            "runOptions": {
+                "instanceLimit": 1,
+                "reevaluateOnRerun": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "clear": true,
+                "close": false,
+                "echo": true,
+                "focus": true,
+                "panel": "shared",
+                "reveal": "always",
+                "revealProblems": "onProblem",
+                "showReuseMessage": true
+            },
+        },
+        {   // STM32 compile/clean/program
+            "label": "STM32 compile/clean/program",
+            "detail": "STM32 - Compile project, clean build files and write into device",
+            "command": "make",
+            "args": [
+                {
+                    "quoting": "weak",
+                    "value": "compileCleanProgram"
+                },
+            ],
+            "runOptions": {
+                "instanceLimit": 1,
+                "reevaluateOnRerun": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "clear": true,
+                "close": false,
+                "echo": true,
+                "focus": true,
+                "panel": "shared",
+                "reveal": "always",
+                "revealProblems": "onProblem",
+                "showReuseMessage": true
+            },
+        },
+        {   // STM32 clean/compile/clean/program
+            "label": "STM32 clean/compile/clean/program",
+            "detail": "STM32 - Recompile project, delete build files and write into device",
+            "command": "make",
+            "args": [
+                {
+                    "quoting": "weak",
+                    "value": "cleanCompileCleanProgram"
+                },
+            ],
+            "runOptions": {
+                "instanceLimit": 1,
+                "reevaluateOnRerun": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "clear": true,
+                "close": false,
+                "echo": true,
+                "focus": true,
+                "panel": "shared",
+                "reveal": "always",
+                "revealProblems": "onProblem",
+                "showReuseMessage": true
+            },
+        },
+        {   // STM32 flashErase
+            "label": "STM32 flashErase",
+            "detail": "STM32 - Erase device flash memory",
+            "command": "make",
+            "args": [
+                {
+                    "quoting": "weak",
+                    "value": "flashErase"
+                },
+            ],
+            "runOptions": {
+                "instanceLimit": 1,
+                "reevaluateOnRerun": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "clear": true,
+                "close": false,
+                "echo": true,
+                "focus": true,
+                "panel": "shared",
+                "reveal": "always",
+                "revealProblems": "onProblem",
+                "showReuseMessage": true
+            },
+        },
+        {   // STM32 do Nothing
+            "label": "STM32 Do Nothing",
+            "detail": "STM32 - Do nothing. Use to evaluate makefile variables",
+            "command": "make",
+            "args": [
+                {
+                    "quoting": "weak",
+                    "value": "doNothing"
+                },
+            ],
+            "runOptions": {
+                "instanceLimit": 1,
+                "reevaluateOnRerun": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "clear": true,
+                "close": false,
+                "echo": true,
+                "focus": true,
+                "panel": "shared",
+                "reveal": "always",
+                "revealProblems": "onProblem",
+                "showReuseMessage": true
+            },
+        },
+    ]
+}

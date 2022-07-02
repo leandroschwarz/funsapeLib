@@ -1,0 +1,98 @@
+{
+    "folders": [
+        {
+            "name": "Project files",
+            "path": "."
+        }
+    ],
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": []
+    },
+    "settings": {
+        "files.exclude": {
+            "_hide/": false,
+            ".mxproject": false,
+            ".vscode/": false,
+            "*.code-workspace": false,
+            "*.ioc": false,
+            "*.pdsprj": false,
+            "*.pdsprj*workspace": false,
+            "build/": false,
+            "startup_stm32f*.s": false,
+            "STM32F*_FLASH.ld": false
+        },
+        "git.ignoreLimitWarning": true,
+        "json.format.enable": false,
+        "hexdump.btnEnabled": true,
+        "hexdump.charEncoding": "utf-8",
+        "hexdump.littleEndian": true,
+        "hexdump.nibbles": 4,
+        "hexdump.showAddress": true,
+        "hexdump.showAscii": true,
+        "hexdump.showInspector": true,
+        "hexdump.showOffset": true,
+        "hexdump.sizeDisplay": 5242880,
+        "hexdump.sizeWarning": 5242880,
+        "hexdump.uppercase": true,
+        "hexdump.width": 16,
+        "cSpell.enabled": true,
+        "cSpell.ignoreWords": [
+            "adc",
+            "eeprom",
+            "funsape",
+            "hexdump",
+            "mosi",
+            "mxproject",
+            "pdsprj",
+            "spi",
+            "uart",
+            "usart"
+        ],
+        "cSpell.language": "pt-br",
+        "cSpell.showAutocompleteSuggestions": false,
+        "cSpell.userWords": [
+            "ahbclk",
+            "gpio",
+            "gpioa",
+            "gpiob",
+            "gpioc",
+            "gpiod",
+            "gpioe",
+            "gpiof",
+            "gpiog",
+            "hadc",
+            "hal",
+            "hclk",
+            "hdma",
+            "hspi",
+            "htim",
+            "huart",
+            "pclk",
+            "rcc",
+            "xck"
+        ],
+        "cSpell.words": [
+            "callback",
+            "calibration",
+            "divider",
+            "half",
+            "init",
+            "logger",
+            "microcontroller",
+            "mode",
+            "nibbles",
+            "oscillator",
+            "rising",
+            "start",
+            "synchronous",
+            "type"
+        ],
+        "todo-tree.tree.disableCompactFolders": true,
+        "todo-tree.tree.scanMode": "workspace only",
+        "todo-tree.tree.showBadges": true,
+        "cSpell.enableFiletypes": [
+            "!c"
+        ]
+    }
+}

@@ -1,0 +1,183 @@
+{
+    "configurations": [
+        {
+            "name": "STM32F030x8 toolchain",
+            "compilerArgs": [
+                "mcpu=cortex-m0",
+                "-mthumb"
+            ],
+            "compilerPath": "${execPath}/../toolchains/GNU Tools ARM Embedded/10.3-2021.10/bin/arm-none-eabi-g++.exe",
+            "cppStandard": "c++17",
+            "cStandard": "gnu11",
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "STM32F030x8",
+                "USE_HAL_DRIVER",
+                "USE_FUNSAPE_LIB"
+            ],
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "intelliSenseMode": "gcc-arm"
+        },
+        {
+            "name": "STM32F051x8 toolchain",
+            "compilerArgs": [
+                "mcpu=cortex-m0",
+                "-mthumb"
+            ],
+            "compilerPath": "${execPath}/../toolchains/GNU Tools ARM Embedded/10.3-2021.10/bin/arm-none-eabi-g++.exe",
+            "cppStandard": "c++17",
+            "cStandard": "gnu11",
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "STM32F051x8",
+                "USE_HAL_DRIVER",
+                "USE_FUNSAPE_LIB"
+            ],
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "intelliSenseMode": "gcc-arm"
+        },
+        {
+            "name": "STM32F091xC toolchain",
+            "compilerArgs": [
+                "mcpu=cortex-m0",
+                "-mthumb"
+            ],
+            "compilerPath": "${execPath}/../toolchains/GNU Tools ARM Embedded/10.3-2021.10/bin/arm-none-eabi-g++.exe",
+            "cppStandard": "c++17",
+            "cStandard": "gnu11",
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "STM32F091xC",
+                "USE_HAL_DRIVER",
+                "USE_FUNSAPE_LIB"
+            ],
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "intelliSenseMode": "gcc-arm"
+        },
+        {
+            "name": "STM32F103x8 toolchain",
+            "compilerArgs": [
+                "mcpu=cortex-m3",
+                "-mthumb"
+            ],
+            "compilerPath": "${execPath}/../toolchains/GNU Tools ARM Embedded/10.3-2021.10/bin/arm-none-eabi-g++.exe",
+            "cppStandard": "c++17",
+            "cStandard": "gnu11",
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "STM32F103xB",
+                "USE_HAL_DRIVER",
+                "USE_FUNSAPE_LIB"
+            ],
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "intelliSenseMode": "gcc-arm"
+        },
+        {
+            "name": "STM32F103xB toolchain",
+            "compilerArgs": [
+                "mcpu=cortex-m3",
+                "-mthumb"
+            ],
+            "compilerPath": "${execPath}/../toolchains/GNU Tools ARM Embedded/10.3-2021.10/bin/arm-none-eabi-g++.exe",
+            "cppStandard": "c++17",
+            "cStandard": "gnu11",
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "STM32F103xB",
+                "USE_HAL_DRIVER",
+                "USE_FUNSAPE_LIB"
+            ],
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "intelliSenseMode": "gcc-arm"
+        },
+        {
+            "name": "STM32F103xE toolchain",
+            "compilerArgs": [
+                "mcpu=cortex-m3",
+                "-mthumb"
+            ],
+            "compilerPath": "${execPath}/../toolchains/GNU Tools ARM Embedded/10.3-2021.10/bin/arm-none-eabi-g++.exe",
+            "cppStandard": "c++17",
+            "cStandard": "gnu11",
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "STM32F103xE",
+                "USE_HAL_DRIVER",
+                "USE_FUNSAPE_LIB"
+            ],
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "intelliSenseMode": "gcc-arm"
+        },
+        {
+            "name": "STM32F407xG toolchain",
+            "compilerArgs": [
+                "mcpu=cortex-m4",
+                "-mthumb"
+            ],
+            "compilerPath": "${execPath}/../toolchains/GNU Tools ARM Embedded/10.3-2021.10/bin/arm-none-eabi-g++.exe",
+            "cppStandard": "c++17",
+            "cStandard": "gnu11",
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "STM32F407xG",
+                "USE_HAL_DRIVER",
+                "USE_FUNSAPE_LIB"
+            ],
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "intelliSenseMode": "gcc-arm"
+        },
+        {
+            "name": "STM32L053x8 toolchain",
+            "compilerArgs": [
+                "mcpu=cortex-m3",
+                "-mthumb"
+            ],
+            "compilerPath": "${execPath}/../toolchains/GNU Tools ARM Embedded/10.3-2021.10/bin/arm-none-eabi-g++.exe",
+            "cppStandard": "c++17",
+            "cStandard": "gnu11",
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "STM32L053x8",
+                "USE_HAL_DRIVER",
+                "USE_FUNSAPE_LIB"
+            ],
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "intelliSenseMode": "gcc-arm"
+        }
+    ],
+    "enableConfigurationSquiggles": true,
+    "env": {},
+    "version": 4
+}
