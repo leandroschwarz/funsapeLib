@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"name": "Project",
+			"path": "."
+		},
+		{
+			"name": "FunSAPE Library",
+			"path": "../funsapeLib"
+		}
+	],
+	"settings": {
+		"files.associations": {
+		},
+		"astyle.cmd_options": [
+			"--max-code-length=200",
+		],
+	}
+}

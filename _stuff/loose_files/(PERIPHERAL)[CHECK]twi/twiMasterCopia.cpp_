@@ -1,0 +1,229 @@
+/* =============================================================================
+ * Project:		GPSDE++ AVR Library
+ * File name:	twiMaster.cpp
+ * Module:		TWI Interface Module for GPDSE++ Library project
+ * Authors:		Leandro Schwarz
+ *				Hazael dos Santos Batista
+ *				Fábio Cabral Pacheco
+ * Build:		1002
+ * Date:		June 14, 2018
+ * ========================================================================== */
+
+// =============================================================================
+// Dependencies
+// =============================================================================
+
+#include "twiMaster.hpp"
+#if __TWI_MASTER_HPP != 1002
+#	error [twiMaster.cpp] Error 102 - Build mismatch on header and source code files.
+#endif
+
+// =============================================================================
+// File exclusive - Constants
+// =============================================================================
+
+/* NONE */
+
+
+// =============================================================================
+// File exclusive - New data types
+// =============================================================================
+
+/* NONE */
+
+// =============================================================================
+// File exclusive - Macro-functions
+// =============================================================================
+
+/* NONE */
+
+// =============================================================================
+// Global variables
+// =============================================================================
+
+TwiMaster twiMaster;
+
+// =============================================================================
+// Class constructors
+// =============================================================================
+
+TwiMaster::TwiMaster()
+{
+	// Clear flags
+	this->lastTransOK_ = false;
+	this->state_ = TWI_NO_STATE;
+
+	return;
+}
+
+// =============================================================================
+// Class public methods
+// =============================================================================
+
+void TwiMaster::setClockSpeed(uint32_t clockSpeed)
+{
+	uint32_t aux32 = 0;
+	uint8_t aux8 = 0;
+
+	aux32 = (uint32_t)systemStatus.getCpuClock() / (uint32_t)clockSpeed;
+
+	if (aux32 <= 526) {					// Prescaler 1
+		aux8 = (uint8_t)((aux32 - 16) / 2);
+		clrBit(TWSR, TWPS1);
+		clrBit(TWSR, TWPS0);
+	} else if (aux32 <= 2056) {			// Prescaler 4
+		aux8 = (uint8_t)((aux32 - 16) / 8);
+		clrBit(TWSR, TWPS1);
+		setBit(TWSR, TWPS0);
+	} else if (aux32 <= 8176) {			// Prescaler 16
+		aux8 = (uint8_t)((aux32 - 16) / 32);
+		setBit(TWSR, TWPS1);
+		clrBit(TWSR, TWPS0);
+	} else if (aux32 <= 32656) {			// Prescaler 64
+		aux8 = (uint8_t)((aux32 - 16) / 128);
+		setBit(TWSR, TWPS1);
+		setBit(TWSR, TWPS0);
+	} else {
+		return;
+	}
+	TWBR = aux8;
+	TWDR = 0xFF;									// Release SDA
+	TWCR = 1 << TWEN;			// Activate TWI interface
+
+	return;
+}
+
+void TwiMaster::sendData(uint8_t deviceAddress, twiOperation_t readWrite, uint8_t *message, uint8_t messageSize)
+{
+	uint8_t i;
+
+	while (this->isBusy())
+		;	// Wait until TWI is ready for next transmission.
+
+	this->bufferData_[0] = (deviceAddress << 1) | readWrite;
+	this->bufferSize_ = messageSize + 1;
+	if (readWrite == TWI_WRITE) {
+		for (i = 0; i < messageSize; i++) {
+			this->bufferData_[i + 1] = message[i];
+		}
+	}
+
+	this->lastTransOK_ = false;
+	this->state_ = TWI_NO_STATE;
+	TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWINT) | (1 << TWSTA);
+	if (readWrite == TWI_READ) {
+		this->readFromBuffer(message, messageSize);
+	}
+
+	while (this->isBusy())
+		;	// Wait until TWI is ready for next transmission.
+
+	return;
+}
+
+bool TwiMaster::sendData(uint8_t deviceAddress, twiOperation_t readWrite, uint8_t reg, uint8_t *message,
+						 uint8_t messageSize)
+{
+	return true;
+}
+
+
+void TwiMaster::interruptHandler(void)
+{
+	static uint8_t twiBufferPointer;
+
+	switch (TWSR & 0xFC) {
+	case TWI_START:				// START has been transmitted
+	case TWI_REP_START:			// Repeated START has been transmitted
+		twiBufferPointer = 0;	// Set buffer pointer to the TWI Address location
+	case TWI_MTX_ADR_ACK:		// SLA+W has been transmitted and ACK received
+	case TWI_MTX_DATA_ACK:		// Data byte has been transmitted and ACK received
+		if (twiBufferPointer < this->bufferSize_) {
+			TWDR = this->bufferData_[twiBufferPointer++];
+			TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWINT);
+		} else {			// Send STOP after last byte
+			this->lastTransOK_ = true;	// Set status bits to completed successfully
+			TWCR = (1 << TWEN) | (1 << TWINT) | (1 << TWSTO);
+		}
+		break;
+	case TWI_MRX_DATA_ACK:		// Data byte has been received and ACK transmitted
+		this->bufferData_[twiBufferPointer++] = TWDR;
+	case TWI_MRX_ADR_ACK:		// SLA+R has been transmitted and ACK received
+		if (twiBufferPointer < (this->bufferSize_ - 1)) {	// Detect the last byte to NACK it
+			TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWINT) | (1 << TWEA);
+		} else {				// Send NACK after next reception
+			TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWINT);
+		}
+		break;
+	case TWI_MRX_DATA_NACK:		// Data byte has been received and NACK transmitted
+		this->bufferData_[twiBufferPointer] = TWDR;
+		this->lastTransOK_ = true;	// Set status bits to completed successfully
+		TWCR = (1 << TWEN) | (1 << TWINT) | (1 << TWSTO);
+		break;
+	case TWI_ARB_LOST:			// Arbitration lost
+		TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWINT) | (1 << TWSTA);
+		break;
+	case TWI_MTX_ADR_NACK:		// SLA+W has been transmitted and NACK received
+	case TWI_MRX_ADR_NACK:		// SLA+R has been transmitted and NACK received
+	case TWI_MTX_DATA_NACK:		// Data byte has been transmitted and NACK received
+	case TWI_BUS_ERROR:			// Bus error due to an illegal START or STOP condition
+	default:
+		this->state_ = (twiState_e)TWSR;		// Store TWSR and automatically sets clears noErrors bit
+		TWCR = (1 << TWEN);		// Reset TWI Interface
+		break;
+	}
+}
+
+// =============================================================================
+// Class private methods
+// =============================================================================
+
+bool TwiMaster::isBusy(void)
+{
+	if (isBitSet(TWCR, TWIE)) {
+		return true;
+	}
+	return false;
+}
+
+void TwiMaster::readFromBuffer(uint8_t *message, uint8_t messageSize)
+{
+	uint8_t i;
+
+	while (this->isBusy())
+		;	// Wait until TWI is ready for next transmission
+	if (this->lastTransOK_) {				// Last transmission competed successfully
+		for (i = 0; i < messageSize; i++) {	// Copy data from Transceiver buffer
+			message[i] = this->bufferData_[i + 1];
+		}
+	}
+
+	return;
+}
+
+// =============================================================================
+// Class protected methods
+// =============================================================================
+
+/* NONE */
+
+// =============================================================================
+// General public functions definitions
+// =============================================================================
+
+/* NONE */
+
+// =============================================================================
+// Public functions definitions
+// =============================================================================
+
+/* NONE */
+
+// =============================================================================
+// Interruption handlers
+// =============================================================================
+
+ISR(TWI_vect)
+{
+	twiMaster.interruptHandler();
+}

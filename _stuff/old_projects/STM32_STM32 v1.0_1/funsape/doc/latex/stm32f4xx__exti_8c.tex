@@ -1,0 +1,91 @@
+\hypertarget{stm32f4xx__exti_8c}{}\section{\+\_\+hide/\+M\+P\+U/\+S\+T\+M32\+F4/stm32f4xx\+\_\+exti.c File Reference}
+\label{stm32f4xx__exti_8c}\index{\+\_\+hide/\+M\+P\+U/\+S\+T\+M32\+F4/stm32f4xx\+\_\+exti.\+c@{\+\_\+hide/\+M\+P\+U/\+S\+T\+M32\+F4/stm32f4xx\+\_\+exti.\+c}}
+
+
+This file provides firmware functions to manage the following functionalities of the E\+X\+T\+I peripheral\+:  
+
+
+{\ttfamily \#include \char`\"{}stm32f4xx\+\_\+exti.\+h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___e_x_t_i_ga4451b67e337fc341394ee695273798af}{}\#define {\bfseries E\+X\+T\+I\+\_\+\+L\+I\+N\+E\+N\+O\+N\+E}~((uint32\+\_\+t)0x00000)  /$\ast$ No interrupt selected $\ast$/\label{group___e_x_t_i_ga4451b67e337fc341394ee695273798af}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{group___e_x_t_i___group1_ga07072e339cb9ecb9cd9d4b94afc9f317}{E\+X\+T\+I\+\_\+\+De\+Init} (void)
+\begin{DoxyCompactList}\small\item\em Deinitializes the E\+X\+T\+I peripheral registers to their default reset values. \end{DoxyCompactList}\item 
+void \hyperlink{group___e_x_t_i___group1_ga8c9ce6352a3a2dfc8fc9287cb24c6501}{E\+X\+T\+I\+\_\+\+Init} (\hyperlink{struct_e_x_t_i___init_type_def}{E\+X\+T\+I\+\_\+\+Init\+Type\+Def} $\ast$E\+X\+T\+I\+\_\+\+Init\+Struct)
+\begin{DoxyCompactList}\small\item\em Initializes the E\+X\+T\+I peripheral according to the specified parameters in the E\+X\+T\+I\+\_\+\+Init\+Struct. \end{DoxyCompactList}\item 
+void \hyperlink{group___e_x_t_i___group1_ga86b9e662d18a2f829999cfb26aa7ca20}{E\+X\+T\+I\+\_\+\+Struct\+Init} (\hyperlink{struct_e_x_t_i___init_type_def}{E\+X\+T\+I\+\_\+\+Init\+Type\+Def} $\ast$E\+X\+T\+I\+\_\+\+Init\+Struct)
+\begin{DoxyCompactList}\small\item\em Fills each E\+X\+T\+I\+\_\+\+Init\+Struct member with its reset value. \end{DoxyCompactList}\item 
+void \hyperlink{group___e_x_t_i___group1_ga897e8ea59f40a19e047fb9994876fc9b}{E\+X\+T\+I\+\_\+\+Generate\+S\+W\+Interrupt} (uint32\+\_\+t E\+X\+T\+I\+\_\+\+Line)
+\begin{DoxyCompactList}\small\item\em Generates a Software interrupt on selected E\+X\+T\+I line. \end{DoxyCompactList}\item 
+Flag\+Status \hyperlink{group___e_x_t_i___group2_ga0ce06e6b312592df149800d63218cffa}{E\+X\+T\+I\+\_\+\+Get\+Flag\+Status} (uint32\+\_\+t E\+X\+T\+I\+\_\+\+Line)
+\begin{DoxyCompactList}\small\item\em Checks whether the specified E\+X\+T\+I line flag is set or not. \end{DoxyCompactList}\item 
+void \hyperlink{group___e_x_t_i___group2_ga8e07aaaa286dea4803605d5968850a92}{E\+X\+T\+I\+\_\+\+Clear\+Flag} (uint32\+\_\+t E\+X\+T\+I\+\_\+\+Line)
+\begin{DoxyCompactList}\small\item\em Clears the E\+X\+T\+I's line pending flags. \end{DoxyCompactList}\item 
+I\+T\+Status \hyperlink{group___e_x_t_i___group2_gaf7b51519062ae42fd27ee689cab364aa}{E\+X\+T\+I\+\_\+\+Get\+I\+T\+Status} (uint32\+\_\+t E\+X\+T\+I\+\_\+\+Line)
+\begin{DoxyCompactList}\small\item\em Checks whether the specified E\+X\+T\+I line is asserted or not. \end{DoxyCompactList}\item 
+void \hyperlink{group___e_x_t_i___group2_ga3652a7e682728b310c124e7e974d1468}{E\+X\+T\+I\+\_\+\+Clear\+I\+T\+Pending\+Bit} (uint32\+\_\+t E\+X\+T\+I\+\_\+\+Line)
+\begin{DoxyCompactList}\small\item\em Clears the E\+X\+T\+I's line pending bits. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This file provides firmware functions to manage the following functionalities of the E\+X\+T\+I peripheral\+: 
+
+\begin{DoxyAuthor}{Author}
+M\+C\+D Application Team 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+V1.\+0.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+30-\/\+September-\/2011
+\begin{DoxyItemize}
+\item Initialization and Configuration
+\item Interrupts and flags management
+\end{DoxyItemize}
+\end{DoxyDate}
+\begin{DoxyVerb}*  
+*          ===================================================================
+*                                     EXTI features
+*          ===================================================================
+*    
+*          External interrupt/event lines are mapped as following:
+*            1- All available GPIO pins are connected to the 16 external 
+*               interrupt/event lines from EXTI0 to EXTI15.
+*            2- EXTI line 16 is connected to the PVD Output
+*            3- EXTI line 17 is connected to the RTC Alarm event
+*            4- EXTI line 18 is connected to the USB OTG FS Wakeup from suspend event                                    
+*            5- EXTI line 19 is connected to the Ethernet Wakeup event
+*            6- EXTI line 20 is connected to the USB OTG HS (configured in FS) Wakeup event 
+*            7- EXTI line 21 is connected to the RTC Tamper and Time Stamp events                                               
+*            8- EXTI line 22 is connected to the RTC Wakeup event
+*        
+*          ===================================================================
+*                                 How to use this driver
+*          ===================================================================  
+*              
+*          In order to use an I/O pin as an external interrupt source, follow
+*          steps below:
+*            1- Configure the I/O in input mode using GPIO_Init()
+*            2- Select the input source pin for the EXTI line using SYSCFG_EXTILineConfig()
+*            3- Select the mode(interrupt, event) and configure the trigger 
+*               selection (Rising, falling or both) using EXTI_Init()
+*            4- Configure NVIC IRQ channel mapped to the EXTI line using NVIC_Init()
+*   
+*  @note  SYSCFG APB clock must be enabled to get write access to SYSCFG_EXTICRx
+*         registers using RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+*          
+*  \end{DoxyVerb}
+
+
+\begin{DoxyAttention}{Attention}
+
+\end{DoxyAttention}
+T\+H\+E P\+R\+E\+S\+E\+N\+T F\+I\+R\+M\+W\+A\+R\+E W\+H\+I\+C\+H I\+S F\+O\+R G\+U\+I\+D\+A\+N\+C\+E O\+N\+L\+Y A\+I\+M\+S A\+T P\+R\+O\+V\+I\+D\+I\+N\+G C\+U\+S\+T\+O\+M\+E\+R\+S W\+I\+T\+H C\+O\+D\+I\+N\+G I\+N\+F\+O\+R\+M\+A\+T\+I\+O\+N R\+E\+G\+A\+R\+D\+I\+N\+G T\+H\+E\+I\+R P\+R\+O\+D\+U\+C\+T\+S I\+N O\+R\+D\+E\+R F\+O\+R T\+H\+E\+M T\+O S\+A\+V\+E T\+I\+M\+E. A\+S A R\+E\+S\+U\+L\+T, S\+T\+M\+I\+C\+R\+O\+E\+L\+E\+C\+T\+R\+O\+N\+I\+C\+S S\+H\+A\+L\+L N\+O\+T B\+E H\+E\+L\+D L\+I\+A\+B\+L\+E F\+O\+R A\+N\+Y D\+I\+R\+E\+C\+T, I\+N\+D\+I\+R\+E\+C\+T O\+R C\+O\+N\+S\+E\+Q\+U\+E\+N\+T\+I\+A\+L D\+A\+M\+A\+G\+E\+S W\+I\+T\+H R\+E\+S\+P\+E\+C\+T T\+O A\+N\+Y C\+L\+A\+I\+M\+S A\+R\+I\+S\+I\+N\+G F\+R\+O\+M T\+H\+E C\+O\+N\+T\+E\+N\+T O\+F S\+U\+C\+H F\+I\+R\+M\+W\+A\+R\+E A\+N\+D/\+O\+R T\+H\+E U\+S\+E M\+A\+D\+E B\+Y C\+U\+S\+T\+O\+M\+E\+R\+S O\+F T\+H\+E C\+O\+D\+I\+N\+G I\+N\+F\+O\+R\+M\+A\+T\+I\+O\+N C\+O\+N\+T\+A\+I\+N\+E\+D H\+E\+R\+E\+I\+N I\+N C\+O\+N\+N\+E\+C\+T\+I\+O\+N W\+I\+T\+H T\+H\+E\+I\+R P\+R\+O\+D\+U\+C\+T\+S.
+
+\subsubsection*{\begin{center}\copyright{} C\+O\+P\+Y\+R\+I\+G\+H\+T 2011 S\+T\+Microelectronics\end{center} }

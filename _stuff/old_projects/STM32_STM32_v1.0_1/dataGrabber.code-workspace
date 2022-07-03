@@ -1,0 +1,34 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"main.h": "c",
+			"stm32f1xx_hal.h": "c",
+			"usb_device.h": "c",
+			"usbd_def.h": "c",
+			"*.txt": "c",
+			"stm32f1xx_hal_conf.h": "c",
+			"stm32f1xx.h": "c",
+			"usbd_cdc_if.h": "c",
+			"usbd_cdc.h": "c",
+			"usbd_ioreq.h": "c",
+			"usbd_core.h": "c",
+			"usbd_conf.h": "c",
+			"usbd_ctlreq.h": "c",
+			"stm32f1xx_hal_rcc.h": "c",
+			"stm32f1xx_hal_def.h": "c",
+			"stm32f103xe.h": "c",
+			"core_cm3.h": "c",
+			"stdint.h": "c",
+			"cmsis_version.h": "c",
+			"dryhalspi.h": "c"
+		},
+		"astyle.cmd_options": [
+			"--max-code-length=200",
+		],
+	}
+}

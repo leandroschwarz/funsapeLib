@@ -1,0 +1,25 @@
+Error 1 - Header file ($headerFile) is missing or corrupted!
+Error 2 - Build mismatch between ($currentFile) and ($headerFile) header files!
+Error 3 - Microcontroller already defined!
+Error 4 - Microcontroller not defined!
+Error 5 - Unable to identify platform!
+Error 6 - Microcontroller unsupported!
+Error 7 - Project configuration file (funsapeLibProjectConfig.hpp) is missing or corrupted!
+Error 8 - Build mismatch between project configuration file (funsapeLibProjectConfig.hpp) and global definitions file (funsapeLibGlobalDefines.hpp)!
+Error 9 - Global definitions file (funsapeLibGlobalDefines.hpp) is missing or corrupted!
+Error 10 - Build mismatch between ($currentHeaderFile) and global definitions file (funsapeLibGlobalDefines.hpp)!
+Error 11 - Platform unsupported!
+Error 12 - Required module ($moduleHeaderFile) is missing or corrupted!
+Error 13 - Build mismatch between source ($currentSourceFile) and header ($includedHeaderFile) files!
+Error 14 - Build mismatch between ($currentFile) header file and ($moduleHeaderFile) module!
+Error 15 - Template implementation ($tempImpHeader) header file is corrupted or missing!
+Error 16 - Build mismatch between template implementation ($tempImpHeader) and ($currentHeaderFile) header files!
+
+
+
+Mark levels
+0	No Marks
+1	Main file only
+2	Main file + devices
+3	Main file + devices + peripheral
+4	Main file + devices + peripheral + util

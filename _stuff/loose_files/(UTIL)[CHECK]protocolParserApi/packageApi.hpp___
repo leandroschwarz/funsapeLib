@@ -1,0 +1,258 @@
+/* =============================================================================
+ * Project:		GPSDE++ AVR Library
+ * File name:	packageApi.hpp
+ * Module:		API package parser for GPDSE++ AVR Library project
+ * Author:		Leandro Schwarz
+ * Build:		__BUILD_MACRO_TO_BE_CHANGED__
+ * Date:		__DATE_MACRO_TO_BE_CHANGED__
+ * ========================================================================== */
+
+// =============================================================================
+// File build
+// =============================================================================
+
+#ifndef __PACKAGE_API_HPP
+#define __PACKAGE_API_HPP				__BUILD_MACRO_TO_BE_CHANGED__
+
+// =============================================================================
+// System file dependencies
+// =============================================================================
+
+#include <gpdseAvrGlobalDefines.hpp>
+#if __GPDSE_AVR_GLOBAL_DEFINES_HPP != __BUILD_MACRO_TO_BE_CHANGED__
+#	error	Global definitions file (gpdseAvrGlobalDefines) must be build __BUILD_MACRO_TO_BE_CHANGED__.
+#endif
+
+// =============================================================================
+// Undefining previous definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Constant definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Macro-functions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// New data types - Single variables
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// New data types - Enumerations (logic values)
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// New data types - Enumerations (small and finite lists)
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// New data types - Enumerations (large or expansible lists)
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// New data types - Enumerations (algebraic operated list elements)
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// New data types - Enumerations (bitwise operated flags)
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Extern global variables
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// PackageApi - Class declaration
+// =============================================================================
+
+class PackageApi
+{
+	// -------------------------------------------------------------------------
+	// New data types
+	// -------------------------------------------------------------------------
+
+private:
+	enum state_e {
+		STATE_START_DELIMITER = 0,
+		STATE_ID,
+		STATE_DESTINATION_ADDRESS,
+		STATE_SOURCE_ADDRESS,
+		STATE_PAYLOAD_SIZE,
+		STATE_PAYLOAD_DATA,
+		STATE_CHECKSUM,
+		STATE_READY
+	};
+
+	// -------------------------------------------------------------------------
+	// Operators overloading
+	// -------------------------------------------------------------------------
+
+public:
+	friend PackageApi::state_e &operator++(PackageApi::state_e &auxEnum);
+	friend PackageApi::state_e operator++(PackageApi::state_e &auxEnum, int auxInt);
+	friend PackageApi::state_e &operator--(PackageApi::state_e &auxEnum);
+	friend PackageApi::state_e operator--(PackageApi::state_e &auxEnum, int auxInt);
+
+	// -------------------------------------------------------------------------
+	// Constructors
+	// -------------------------------------------------------------------------
+
+public:
+	PackageApi(uint8_t payloadMaxSize = 255, bool useEscapeChar = false);
+
+	// -------------------------------------------------------------------------
+	// Methods
+	// -------------------------------------------------------------------------
+
+public:
+	//     /////////////////////////   CONFIG   /////////////////////////     //
+	bool configCharSet(uint8_t startDelimiter);
+	bool configCharSet(uint8_t startDelimiter, uint8_t escapeChar, uint8_t escapeXor);
+	bool configCharSet(uint8_t startDelimiter, uint8_t escapeChar, uint8_t escapeXor, uint8_t * othersChars, uint8_t othersSize);
+	error_e getLastError(void);
+
+	//     ///////////////////////////   RX   ///////////////////////////     //
+	bool rxAddData(uint8_t data);
+	void rxFreePackage(void);
+	bool rxGetDestinationAddress(uint8_t * destAddress);
+	bool rxGetId(uint8_t * id);
+	bool rxGetPayload(uint8_t * payloadData, uint8_t * payloadSize, uint8_t maxChars);
+	bool rxGetSourceAddress(uint8_t * sourcAddress);
+	bool rxIsReady(void);
+
+	//     ///////////////////////////   TX   ///////////////////////////     //
+	bool txCreatePackage(uint8_t * packageData, uint16_t * packageSize, uint16_t maxChars);
+	bool txSetDestinationAddress(uint8_t destAddress);
+	bool txSetId(uint8_t id, bool autoIncrement);
+	bool txSetPayload(uint8_t * payload, uint8_t size);
+	bool txSetSourceAddress(uint8_t sourcAddress);
+
+private:
+	bool _checkInitialized(void);
+	bool _rxProcessEscapeCharacter(void);
+	bool _rxProcessFrameFormat(void);
+	bool _rxProcessNextState(void);
+	bool _rxProcessRawAddData(void);
+	void _rxResetPackage(void);
+	bool _txAddData(uint8_t data);
+	bool _txEncodePackage(void);
+
+	// -------------------------------------------------------------------------
+	// Properties
+	// -------------------------------------------------------------------------
+
+private:
+	//     ///////////////////     INITIALIZATION     ///////////////////     //
+	bool _initialized							: 1;
+
+	// Data members - General information
+	error_e		_lastError;
+	uint16_t	_rawMaxSize						: 10;
+	uint8_t		_payloadMaxSize;
+	// Data members - Start delimiter and escape options
+	bool		_configEscapeEnabled			: 1;
+	uint8_t		_configEscapeCharacter;
+	uint8_t		_configEscapeXorDecoded;
+	uint8_t		_configEscapeCharSize			: 5;
+	uint8_t		* _configEscapeCharData;
+	uint8_t		_configStartDelimiter;
+	// Reset data members - Ingoing package data
+	uint8_t		_rxRawChecksum;
+	uint8_t		* _rxRawData;
+	bool		_rxRawEscape					: 1;
+	uint16_t	_rxRawIndex						: 10;
+	bool		_rxRawReady						: 1;
+	uint16_t	_rxRawSize						: 10;
+	state_e		_rxRawState;
+	uint8_t		_rxDecodedAuxData;
+	uint8_t		_rxDecodedDestAddress;
+	uint8_t		_rxDecodedId;
+	uint8_t		* _rxDecodedPayloadData;
+	uint8_t		_rxDecodedPayloadIndex;
+	uint8_t		_rxDecodedPayloadSize;
+	uint8_t		_rxDecodedSourAddress;
+	// Data members - Outgoing package data
+	uint8_t		* _txRawData;
+	uint16_t	_txRawIndex						: 10;
+	uint16_t	_txRawSize						: 10;
+	uint8_t		_txDecodedDestAddress;
+	uint8_t		_txDecodedId;
+	bool		_txDecodedIdAutoIncrement		: 1;
+	uint8_t		* _txDecodedPayloadData;
+	uint8_t		_txDecodedPayloadIndex;
+	uint8_t		_txDecodedPayloadSize;
+	uint8_t		_txDecodedSourAddress;
+
+}; // class PackageApi
+
+// =============================================================================
+// PackageApi - Class overloading operators
+// =============================================================================
+
+inline PackageApi::state_e &operator++(PackageApi::state_e &auxEnum)
+{
+	auxEnum = (auxEnum == PackageApi::STATE_READY) ? PackageApi::STATE_START_DELIMITER : PackageApi::state_e(auxEnum + 1);
+	return auxEnum;
+}
+
+inline PackageApi::state_e operator++(PackageApi::state_e &auxEnum, int auxInt)
+{
+	PackageApi::state_e auxEnum2(auxEnum);
+	++auxEnum;
+	return auxEnum2;
+}
+
+inline PackageApi::state_e &operator--(PackageApi::state_e &auxEnum)
+{
+	auxEnum = (auxEnum == PackageApi::STATE_START_DELIMITER) ? PackageApi::STATE_READY : PackageApi::state_e(auxEnum - 1);
+	return auxEnum;
+}
+
+inline PackageApi::state_e operator--(PackageApi::state_e &auxEnum, int auxInt)
+{
+	PackageApi::state_e auxEnum2(auxEnum);
+	--auxEnum;
+	return auxEnum2;
+}
+
+// =============================================================================
+// PackageApi - Class inline function definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// General public functions declarations
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// General inline functions definitions
+// =============================================================================
+
+// NONE
+
+#endif // __PACKAGE_API_HPP

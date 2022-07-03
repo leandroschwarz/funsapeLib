@@ -1,0 +1,45 @@
+Módulos
+=======
+
+1. ECG (Conversor A/D)
+2. PPG (MAX30102)
+3. RESP (MPU9250)
+4. Cartão SD
+5. Bluetooth
+6. Display LCD
+7. Encoder
+8. RTC
+9. USB
+
+Programas Exemplo
+=================
+
+1. dataGrabber_Part_1
+---------------------
+
+Utiliza o encoder (Módulo 7) e o display LCD (Módulo 8) para implementar um sistema básico de menus para o usuário.
+
+2. dataGrabber_Part_2
+---------------------
+
+Acrescentar o conversor A/D (Módulo 1) e o cartão SD (Módulo 4) para gravar os sinais de ECG no cartão SD. Opcional: implementar o RTC (Módulo 8) paracriar o arquivo com a data e hora correta.
+
+3. dataGrabber_Part_3
+---------------------
+
+Acrescentar o MAX30102 (Módulo 2) para gravar os dados do sinal de PPG no cartão SD.
+
+4. dataGrabber_Part_4
+---------------------
+
+Acrescentar o MPU9250 (Módulo 3) para gravar os dados do sinal de RESP no cartão SD. Avaliar a necessidade da compactação dos dados para reduzir o tempo de escrita no cartão SD.
+
+5. dataGrabber_Part_5
+---------------------
+
+Acrescentar a comunicação com o Bluetooth (Módulo 5).
+
+6. dataGrabber_Part_6
+---------------------
+
+Acrescentar a comunicação com a USB (Módulo 9).

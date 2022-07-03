@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.json": "jsonc",
+			"usbd_cdc_if.h": "c",
+			"usbd_cdc.h": "c",
+			"usbd_ioreq.h": "c",
+			"usbd_core.h": "c",
+			"usbd_conf.h": "c",
+			"main.h": "c"
+		}
+	}
+}

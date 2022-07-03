@@ -1,0 +1,124 @@
+
+#include "main.h"
+#include "gpio.h"
+
+void setupGpio(void)
+{
+	// -------------------------------------------------------------------------
+	// GPIO ports clock enable -------------------------------------------------
+
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+	__HAL_RCC_GPIOB_CLK_ENABLE();
+	__HAL_RCC_GPIOC_CLK_ENABLE();
+	__HAL_RCC_GPIOD_CLK_ENABLE();
+	__HAL_RCC_GPIOE_CLK_ENABLE();
+
+	// -------------------------------------------------------------------------
+	// Set port as analog inputs -----------------------------------------------
+
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+	// PB0, PB1, PB5, PB9
+	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_5 | GPIO_PIN_9;
+	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	// PC8, PC9
+	GPIO_InitStruct.Pin = GPIO_PIN_8 | GPIO_PIN_9;
+	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+	// -------------------------------------------------------------------------
+	// Set port as digital inputs ----------------------------------------------
+
+	// PA1 (BT_ST)
+	GPIO_InitStruct.Pin = BT_ST_Pin;
+	GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	// PB2 (BOOT1)
+	GPIO_InitStruct.Pin = BOOT1_Pin;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	// PD7 (ENC_B)
+	GPIO_InitStruct.Pin = ENC_B_Pin;
+	GPIO_InitStruct.Pull = GPIO_PULLUP;
+	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+	// -------------------------------------------------------------------------
+	// Set port as digital outputs (PP) ----------------------------------------
+
+	// PA0 (BT_EN), PA4 (SPI1_CS_MPU4)
+	GPIO_InitStruct.Pin = BT_EN_Pin | SPI1_CS_MPU4_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_WritePin(GPIOA, BT_EN_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOA, SPI1_CS_MPU4_Pin, GPIO_PIN_SET);
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	// PB12 (SPI2_CS_SD)
+	GPIO_InitStruct.Pin = SPI2_CS_SD_Pin;
+	HAL_GPIO_WritePin(GPIOB, SPI2_CS_SD_Pin, GPIO_PIN_SET);
+	HAL_GPIO_Init(SPI2_CS_SD_GPIO_Port, &GPIO_InitStruct);
+	// PC10 (SPI1_CS_MPU3), PC11 (SPI1_CS_MPU2), PC12 (SPI1_CS_MPU1), PC13 (NLED)
+	GPIO_InitStruct.Pin = SPI1_CS_MPU3_Pin | SPI1_CS_MPU2_Pin |
+			SPI1_CS_MPU1_Pin | NLED_Pin;
+	HAL_GPIO_WritePin(GPIOC, GPIO_InitStruct.Pin, GPIO_PIN_SET);
+	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+	// PD0 (TFT_RD), PD1 (TFT_WR), PD2 (TFT_RS), PD3 (TFT_CS), PD4 (TFT_RST)
+	GPIO_InitStruct.Pin = TFT_RD_Pin | TFT_WR_Pin | TFT_RS_Pin | TFT_CS_Pin
+			| TFT_RST_Pin;
+	HAL_GPIO_WritePin(GPIOD, TFT_RD_Pin | TFT_WR_Pin | TFT_RS_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOD, TFT_CS_Pin | TFT_RST_Pin, GPIO_PIN_SET);
+	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+	// PE[15:0] (TFT_DATA[15:0])
+	GPIO_InitStruct.Pin = TFT_DATA0_Pin | TFT_DATA1_Pin | TFT_DATA2_Pin |
+			TFT_DATA3_Pin | TFT_DATA4_Pin | TFT_DATA5_Pin | TFT_DATA6_Pin |
+			TFT_DATA7_Pin | TFT_DATA8_Pin | TFT_DATA9_Pin | TFT_DATA10_Pin |
+			TFT_DATA11_Pin | TFT_DATA12_Pin | TFT_DATA13_Pin | TFT_DATA14_Pin |
+			TFT_DATA15_Pin ;
+	HAL_GPIO_WritePin(GPIOE, GPIO_InitStruct.Pin, GPIO_PIN_RESET);
+	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+	// -------------------------------------------------------------------------
+	// Set port as digital outputs (OD) ----------------------------------------
+
+	// PC6 (DEBUG7), PC7 (DEBUG8)
+	GPIO_InitStruct.Pin = DEBUG7_Pin | DEBUG8_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+	GPIO_InitStruct.Pull = GPIO_PULLUP;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_WritePin(GPIOC, GPIO_InitStruct.Pin, GPIO_PIN_RESET);
+	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+	// PC10 (DEBUG1), PC11 (DEBUG2), PC12 (DEBUG3), PC13 (DEBUG4),
+	//     PC14 (DEBUG5), PC15 (DEBUG6)
+	GPIO_InitStruct.Pin = DEBUG1_Pin | DEBUG2_Pin | DEBUG3_Pin | DEBUG4_Pin
+			| DEBUG5_Pin | DEBUG6_Pin;
+	HAL_GPIO_WritePin(GPIOD, GPIO_InitStruct.Pin, GPIO_PIN_RESET);
+	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+	// -------------------------------------------------------------------------
+	// Set port as external interrupt ------------------------------------------
+
+	// PB8 (DS1307_SWO)
+	GPIO_InitStruct.Pin = DS1307_SWO_Pin;
+	GPIO_InitStruct.Pull = GPIO_PULLUP;
+	GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	// PD5 (ENC_A), PD6 (ENC_BTN)
+	GPIO_InitStruct.Pin = ENC_A_Pin | ENC_BTN_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+	// NVIC
+	HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+
+	// -------------------------------------------------------------------------
+	// Set port as alternate function ------------------------------------------
+
+	// PA8 (RCC_MCO)
+	GPIO_InitStruct.Pin = RCC_MCO_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+	// Return successfully
+	return;
+}

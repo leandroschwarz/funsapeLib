@@ -1,0 +1,73 @@
+\hypertarget{group___m_l_e_r_r_o_r}{}\section{M\+L\+E\+R\+R\+O\+R}
+\label{group___m_l_e_r_r_o_r}\index{M\+L\+E\+R\+R\+O\+R@{M\+L\+E\+R\+R\+O\+R}}
+
+
+Motion Library -\/ Error definitions. Definition of the error codes used within the M\+P\+L and returned to the user. Every function tries to return a meaningful error code basing on the occuring error condition. The error code is numeric.  
+
+
+\subsection*{Files}
+\begin{DoxyCompactItemize}
+\item 
+file \hyperlink{mltypes_8h}{mltypes.\+h}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Motion Library -\/ Error definitions. Definition of the error codes used within the M\+P\+L and returned to the user. Every function tries to return a meaningful error code basing on the occuring error condition. The error code is numeric. 
+
+The available error codes and their associated values are\+:
+\begin{DoxyItemize}
+\item (0) I\+N\+V\+\_\+\+S\+U\+C\+C\+E\+S\+S
+\item (32) I\+N\+V\+\_\+\+E\+R\+R\+O\+R
+\item (22 / E\+I\+N\+V\+A\+L) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+I\+N\+V\+A\+L\+I\+D\+\_\+\+P\+A\+R\+A\+M\+E\+T\+E\+R
+\item (1 / E\+P\+E\+R\+M) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+F\+E\+A\+T\+U\+R\+E\+\_\+\+N\+O\+T\+\_\+\+E\+N\+A\+B\+L\+E\+D
+\item (36) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+F\+E\+A\+T\+U\+R\+E\+\_\+\+N\+O\+T\+\_\+\+I\+M\+P\+L\+E\+M\+E\+N\+T\+E\+D
+\item (38) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+D\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+T\+A\+R\+T\+E\+D
+\item (39) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+D\+M\+P\+\_\+\+S\+T\+A\+R\+T\+E\+D
+\item (40) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+N\+O\+T\+\_\+\+O\+P\+E\+N\+E\+D
+\item (41) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+O\+P\+E\+N\+E\+D
+\item (19 / E\+N\+O\+D\+E\+V) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+I\+N\+V\+A\+L\+I\+D\+\_\+\+M\+O\+D\+U\+L\+E
+\item (12 / E\+N\+O\+M\+E\+M) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+M\+E\+M\+O\+R\+Y\+\_\+\+E\+X\+A\+U\+S\+T\+E\+D
+\item (44) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+D\+I\+V\+I\+D\+E\+\_\+\+B\+Y\+\_\+\+Z\+E\+R\+O
+\item (45) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+A\+S\+S\+E\+R\+T\+I\+O\+N\+\_\+\+F\+A\+I\+L\+U\+R\+E
+\item (46) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+F\+I\+L\+E\+\_\+\+O\+P\+E\+N
+\item (47) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+A\+D
+\item (48) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+F\+I\+L\+E\+\_\+\+W\+R\+I\+T\+E
+\item (49) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+I\+N\+V\+A\+L\+I\+D\+\_\+\+C\+O\+N\+F\+I\+G\+U\+R\+A\+T\+I\+O\+N
+\item (52) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+S\+E\+R\+I\+A\+L\+\_\+\+C\+L\+O\+S\+E\+D
+\item (53) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+S\+E\+R\+I\+A\+L\+\_\+\+O\+P\+E\+N\+\_\+\+E\+R\+R\+O\+R
+\item (54) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+S\+E\+R\+I\+A\+L\+\_\+\+R\+E\+A\+D
+\item (55) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+S\+E\+R\+I\+A\+L\+\_\+\+W\+R\+I\+T\+E
+\item (56) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+S\+E\+R\+I\+A\+L\+\_\+\+D\+E\+V\+I\+C\+E\+\_\+\+N\+O\+T\+\_\+\+R\+E\+C\+O\+G\+N\+I\+Z\+E\+D
+\item (57) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+S\+M\+\_\+\+T\+R\+A\+N\+S\+I\+T\+I\+O\+N
+\item (58) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+S\+M\+\_\+\+I\+M\+P\+R\+O\+P\+E\+R\+\_\+\+S\+T\+A\+T\+E
+\item (62) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+F\+I\+F\+O\+\_\+\+O\+V\+E\+R\+F\+L\+O\+W
+\item (63) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+F\+I\+F\+O\+\_\+\+F\+O\+O\+T\+E\+R
+\item (64) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+F\+I\+F\+O\+\_\+\+R\+E\+A\+D\+\_\+\+C\+O\+U\+N\+T
+\item (65) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+F\+I\+F\+O\+\_\+\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A
+\item (72) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+M\+E\+M\+O\+R\+Y\+\_\+\+S\+E\+T
+\item (82) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+L\+O\+G\+\_\+\+M\+E\+M\+O\+R\+Y\+\_\+\+E\+R\+R\+O\+R
+\item (83) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+L\+O\+G\+\_\+\+O\+U\+T\+P\+U\+T\+\_\+\+E\+R\+R\+O\+R
+\item (92) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+O\+S\+\_\+\+B\+A\+D\+\_\+\+P\+T\+R
+\item (93) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+O\+S\+\_\+\+B\+A\+D\+\_\+\+H\+A\+N\+D\+L\+E
+\item (94) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+O\+S\+\_\+\+C\+R\+E\+A\+T\+E\+\_\+\+F\+A\+I\+L\+E\+D
+\item (95) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+O\+S\+\_\+\+L\+O\+C\+K\+\_\+\+F\+A\+I\+L\+E\+D
+\item (102) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+C\+O\+M\+P\+A\+S\+S\+\_\+\+D\+A\+T\+A\+\_\+\+O\+V\+E\+R\+F\+L\+O\+W
+\item (103) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+C\+O\+M\+P\+A\+S\+S\+\_\+\+D\+A\+T\+A\+\_\+\+U\+N\+D\+E\+R\+F\+L\+O\+W
+\item (104) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+C\+O\+M\+P\+A\+S\+S\+\_\+\+D\+A\+T\+A\+\_\+\+N\+O\+T\+\_\+\+R\+E\+A\+D\+Y
+\item (105) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+C\+O\+M\+P\+A\+S\+S\+\_\+\+D\+A\+T\+A\+\_\+\+E\+R\+R\+O\+R
+\item (107) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+C\+A\+L\+I\+B\+R\+A\+T\+I\+O\+N\+\_\+\+L\+O\+A\+D
+\item (108) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+C\+A\+L\+I\+B\+R\+A\+T\+I\+O\+N\+\_\+\+S\+T\+O\+R\+E
+\item (109) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+C\+A\+L\+I\+B\+R\+A\+T\+I\+O\+N\+\_\+\+L\+E\+N
+\item (110) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+C\+A\+L\+I\+B\+R\+A\+T\+I\+O\+N\+\_\+\+C\+H\+E\+C\+K\+S\+U\+M
+\item (111) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+A\+C\+C\+E\+L\+\_\+\+D\+A\+T\+A\+\_\+\+O\+V\+E\+R\+F\+L\+O\+W
+\item (112) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+A\+C\+C\+E\+L\+\_\+\+D\+A\+T\+A\+\_\+\+U\+N\+D\+E\+R\+F\+L\+O\+W
+\item (113) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+A\+C\+C\+E\+L\+\_\+\+D\+A\+T\+A\+\_\+\+N\+O\+T\+\_\+\+R\+E\+A\+D\+Y
+\item (114) I\+N\+V\+\_\+\+E\+R\+R\+O\+R\+\_\+\+A\+C\+C\+E\+L\+\_\+\+D\+A\+T\+A\+\_\+\+E\+R\+R\+O\+R
+\end{DoxyItemize}
+
+The available warning codes and their associated values are\+:
+\begin{DoxyItemize}
+\item (115) I\+N\+V\+\_\+\+W\+A\+R\+N\+I\+N\+G\+\_\+\+M\+O\+T\+I\+O\+N\+\_\+\+R\+A\+C\+E
+\item (116) I\+N\+V\+\_\+\+W\+A\+R\+N\+I\+N\+G\+\_\+\+Q\+U\+A\+T\+\_\+\+T\+R\+A\+S\+H\+E\+D 
+\end{DoxyItemize}

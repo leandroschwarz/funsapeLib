@@ -1,0 +1,13 @@
+-IC:/Program Files (x86)/GNU Tools ARM Embedded/7 2017-q4-major/arm-none-eabi/include
+-IDrivers/CMSIS/Device/ST/STM32L0xx/Include
+-IDrivers/CMSIS/Include
+-IDrivers/STM32L0xx_HAL_Driver/Inc
+-Igpdse/stubs
+-Igpdse
+-Igpdse/devices
+-Igpdse/util
+-IInc
+-IMiddlewares/Third_Party/FatFs/src
+-DSTM32L053xx
+-D__GNUC__
+-D__riscv

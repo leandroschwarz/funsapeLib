@@ -1,0 +1,24 @@
+{
+	"folders": [
+		{
+			"name": "dataGrabber Project Files",
+			"path": "."
+		},
+		{
+			"path": ".vscode"
+		}
+	],
+	"settings": {
+		"files.associations": {
+		},
+		"astyle.cmd_options": [
+			"--max-code-length=200",
+		],
+		"editor.codeActionsOnSave": {},
+		"latex-workshop.intellisense.bibtexJSON.replace": {
+		
+		},
+		"stm32-for-vscode.openOCDPath": false,
+		"stm32-for-vscode.armToolchainPath": false
+	}
+}

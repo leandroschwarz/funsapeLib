@@ -1,0 +1,163 @@
+\hypertarget{class_debug}{}\section{Debug Class Reference}
+\label{class_debug}\index{Debug@{Debug}}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+Error \hyperlink{class_debug_adb93838d76af88c237258cd00aedfe80}{get\+Last\+Error} (void)
+\item 
+uint32\+\_\+t \hyperlink{class_debug_a60fbbe4c199b56dfae68e7526d91b3f5}{get\+Mark\+Level} (void)
+\item 
+bool \hyperlink{class_debug_abfb75d6b7e3bd6d85d913da76947e380}{init} (U\+A\+R\+T\+\_\+\+Handle\+Type\+Def $\ast$handler\+\_\+p, bool hide\+Success\+\_\+p=true, bool stop\+On\+Error\+\_\+p=true, uint32\+\_\+t mark\+Level\+\_\+p=0)
+\item 
+bool \hyperlink{class_debug_a04f4e373b5d3394f74e9d49ace127213}{set\+Time\+Out} (uint16\+\_\+t time\+Out\+\_\+p)
+\item 
+void \hyperlink{class_debug_a6b46a015817a6390299343c02e87feb5}{log\+Mark} (uint8\+\_\+t $\ast$file\+\_\+p, uint16\+\_\+t line\+\_\+p, uint8\+\_\+t $\ast$identifier\+\_\+p)
+\item 
+void \hyperlink{class_debug_afea3e51b37deb4a9526b5b69147d37f0}{log\+Message} (uint16\+\_\+t error\+Code\+\_\+p, uint8\+\_\+t $\ast$file\+\_\+p, uint16\+\_\+t line\+\_\+p)
+\item 
+void \hyperlink{class_debug_ab7fd4df22274d1bdf633e3ddeeb010ca}{print\+Message} (char $\ast$message\+\_\+p)
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_debug_a94b1d288f081599cd11dd27bd0cfe397}{}U\+A\+R\+T\+\_\+\+Handle\+Type\+Def $\ast$ {\bfseries \+\_\+message\+Handler}\label{class_debug_a94b1d288f081599cd11dd27bd0cfe397}
+
+\item 
+\hypertarget{class_debug_aa1e7174cd8f15119f0297ed593cc1e4b}{}bool {\bfseries \+\_\+hide\+Success\+Messages}\+: 1\label{class_debug_aa1e7174cd8f15119f0297ed593cc1e4b}
+
+\item 
+\hypertarget{class_debug_ab9f586cb506c0db844639b5880c79dd7}{}bool {\bfseries \+\_\+initialized}\+: 1\label{class_debug_ab9f586cb506c0db844639b5880c79dd7}
+
+\item 
+\hypertarget{class_debug_a20388132f852e4a63e772b7e4ab36d79}{}Error {\bfseries \+\_\+last\+Error}\label{class_debug_a20388132f852e4a63e772b7e4ab36d79}
+
+\item 
+\hypertarget{class_debug_a5a2c49156955657e8fbffdb6b3e6de2a}{}uint32\+\_\+t {\bfseries \+\_\+mark\+Level}\label{class_debug_a5a2c49156955657e8fbffdb6b3e6de2a}
+
+\item 
+\hypertarget{class_debug_a9b262e781bc93ae0a0b1248078d829d5}{}bool {\bfseries \+\_\+stop\+On\+First\+Error}\+: 1\label{class_debug_a9b262e781bc93ae0a0b1248078d829d5}
+
+\item 
+\hypertarget{class_debug_affea20dbf350e48ff577244a577689c4}{}uint16\+\_\+t {\bfseries \+\_\+time\+Out}\label{class_debug_affea20dbf350e48ff577244a577689c4}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_debug_adb93838d76af88c237258cd00aedfe80}{}\index{Debug@{Debug}!get\+Last\+Error@{get\+Last\+Error}}
+\index{get\+Last\+Error@{get\+Last\+Error}!Debug@{Debug}}
+\subsubsection[{get\+Last\+Error}]{\setlength{\rightskip}{0pt plus 5cm}Error Debug\+::get\+Last\+Error (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{class_debug_adb93838d76af88c237258cd00aedfe80}
+\begin{DoxyReturn}{Returns}
+Error 
+\end{DoxyReturn}
+\hypertarget{class_debug_a60fbbe4c199b56dfae68e7526d91b3f5}{}\index{Debug@{Debug}!get\+Mark\+Level@{get\+Mark\+Level}}
+\index{get\+Mark\+Level@{get\+Mark\+Level}!Debug@{Debug}}
+\subsubsection[{get\+Mark\+Level}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t Debug\+::get\+Mark\+Level (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{class_debug_a60fbbe4c199b56dfae68e7526d91b3f5}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\hypertarget{class_debug_abfb75d6b7e3bd6d85d913da76947e380}{}\index{Debug@{Debug}!init@{init}}
+\index{init@{init}!Debug@{Debug}}
+\subsubsection[{init}]{\setlength{\rightskip}{0pt plus 5cm}bool Debug\+::init (
+\begin{DoxyParamCaption}
+\item[{U\+A\+R\+T\+\_\+\+Handle\+Type\+Def $\ast$}]{handler\+\_\+p, }
+\item[{bool}]{hide\+Success\+\_\+p = {\ttfamily true}, }
+\item[{bool}]{stop\+On\+Error\+\_\+p = {\ttfamily true}, }
+\item[{uint32\+\_\+t}]{mark\+Level\+\_\+p = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)}\label{class_debug_abfb75d6b7e3bd6d85d913da76947e380}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em handler\+\_\+p} & \\
+\hline
+\mbox{\tt in}  & {\em hide\+Success\+\_\+p} & \\
+\hline
+\mbox{\tt in}  & {\em stop\+On\+Error\+\_\+p} & \\
+\hline
+\mbox{\tt in}  & {\em mark\+Level\+\_\+p} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true 
+
+false 
+\end{DoxyReturn}
+\hypertarget{class_debug_a6b46a015817a6390299343c02e87feb5}{}\index{Debug@{Debug}!log\+Mark@{log\+Mark}}
+\index{log\+Mark@{log\+Mark}!Debug@{Debug}}
+\subsubsection[{log\+Mark}]{\setlength{\rightskip}{0pt plus 5cm}void Debug\+::log\+Mark (
+\begin{DoxyParamCaption}
+\item[{uint8\+\_\+t $\ast$}]{file\+\_\+p, }
+\item[{uint16\+\_\+t}]{line\+\_\+p, }
+\item[{uint8\+\_\+t $\ast$}]{identifier\+\_\+p}
+\end{DoxyParamCaption}
+)}\label{class_debug_a6b46a015817a6390299343c02e87feb5}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em file\+\_\+p} & \\
+\hline
+\mbox{\tt in}  & {\em line\+\_\+p} & \\
+\hline
+\mbox{\tt in}  & {\em identifier\+\_\+p} & \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_debug_afea3e51b37deb4a9526b5b69147d37f0}{}\index{Debug@{Debug}!log\+Message@{log\+Message}}
+\index{log\+Message@{log\+Message}!Debug@{Debug}}
+\subsubsection[{log\+Message}]{\setlength{\rightskip}{0pt plus 5cm}void Debug\+::log\+Message (
+\begin{DoxyParamCaption}
+\item[{uint16\+\_\+t}]{error\+Code\+\_\+p, }
+\item[{uint8\+\_\+t $\ast$}]{file\+\_\+p, }
+\item[{uint16\+\_\+t}]{line\+\_\+p}
+\end{DoxyParamCaption}
+)}\label{class_debug_afea3e51b37deb4a9526b5b69147d37f0}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em error\+Code\+\_\+p} & \\
+\hline
+\mbox{\tt in}  & {\em file\+\_\+p} & \\
+\hline
+\mbox{\tt in}  & {\em line\+\_\+p} & \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_debug_ab7fd4df22274d1bdf633e3ddeeb010ca}{}\index{Debug@{Debug}!print\+Message@{print\+Message}}
+\index{print\+Message@{print\+Message}!Debug@{Debug}}
+\subsubsection[{print\+Message}]{\setlength{\rightskip}{0pt plus 5cm}void Debug\+::print\+Message (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{message\+\_\+p}
+\end{DoxyParamCaption}
+)}\label{class_debug_ab7fd4df22274d1bdf633e3ddeeb010ca}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em message\+\_\+p} & \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_debug_a04f4e373b5d3394f74e9d49ace127213}{}\index{Debug@{Debug}!set\+Time\+Out@{set\+Time\+Out}}
+\index{set\+Time\+Out@{set\+Time\+Out}!Debug@{Debug}}
+\subsubsection[{set\+Time\+Out}]{\setlength{\rightskip}{0pt plus 5cm}bool Debug\+::set\+Time\+Out (
+\begin{DoxyParamCaption}
+\item[{uint16\+\_\+t}]{time\+Out\+\_\+p}
+\end{DoxyParamCaption}
+)}\label{class_debug_a04f4e373b5d3394f74e9d49ace127213}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em time\+Out\+\_\+p} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true 
+
+false 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+util/funsape\+Lib\+Debug.\+hpp\item 
+util/funsape\+Lib\+Debug.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,97 @@
+\hypertarget{misc_8h}{}\section{\+\_\+hide/\+M\+P\+U/misc.h File Reference}
+\label{misc_8h}\index{\+\_\+hide/\+M\+P\+U/misc.\+h@{\+\_\+hide/\+M\+P\+U/misc.\+h}}
+
+
+This file contains all the functions prototypes for the miscellaneous firmware library functions (add-\/on to C\+M\+S\+I\+S functions).  
+
+
+{\ttfamily \#include \char`\"{}stm32f4xx.\+h\char`\"{}}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{struct_n_v_i_c___init_type_def}{N\+V\+I\+C\+\_\+\+Init\+Type\+Def}
+\begin{DoxyCompactList}\small\item\em N\+V\+I\+C Init Structure definition. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___m_i_s_c___vector___table___base_ga8be8181cc3e5d42f6204af306ab50f80}{}\#define {\bfseries N\+V\+I\+C\+\_\+\+Vect\+Tab\+\_\+\+R\+A\+M}~((uint32\+\_\+t)0x20000000)\label{group___m_i_s_c___vector___table___base_ga8be8181cc3e5d42f6204af306ab50f80}
+
+\item 
+\hypertarget{group___m_i_s_c___vector___table___base_gafbf92fd28a1090b2aa49732ebd5704b5}{}\#define {\bfseries N\+V\+I\+C\+\_\+\+Vect\+Tab\+\_\+\+F\+L\+A\+S\+H}~((uint32\+\_\+t)0x08000000)\label{group___m_i_s_c___vector___table___base_gafbf92fd28a1090b2aa49732ebd5704b5}
+
+\item 
+\#define {\bfseries I\+S\+\_\+\+N\+V\+I\+C\+\_\+\+V\+E\+C\+T\+T\+A\+B}(V\+E\+C\+T\+T\+A\+B)
+\item 
+\hypertarget{group___m_i_s_c___system___low___power_ga10748d2b2875afd122f6476864ad6cae}{}\#define {\bfseries N\+V\+I\+C\+\_\+\+L\+P\+\_\+\+S\+E\+V\+O\+N\+P\+E\+N\+D}~((uint8\+\_\+t)0x10)\label{group___m_i_s_c___system___low___power_ga10748d2b2875afd122f6476864ad6cae}
+
+\item 
+\hypertarget{group___m_i_s_c___system___low___power_gaeec2d10922fa9ec5e65398667b303253}{}\#define {\bfseries N\+V\+I\+C\+\_\+\+L\+P\+\_\+\+S\+L\+E\+E\+P\+D\+E\+E\+P}~((uint8\+\_\+t)0x04)\label{group___m_i_s_c___system___low___power_gaeec2d10922fa9ec5e65398667b303253}
+
+\item 
+\hypertarget{group___m_i_s_c___system___low___power_ga368dc13a9c762a307c07cfa2e3ef59ad}{}\#define {\bfseries N\+V\+I\+C\+\_\+\+L\+P\+\_\+\+S\+L\+E\+E\+P\+O\+N\+E\+X\+I\+T}~((uint8\+\_\+t)0x02)\label{group___m_i_s_c___system___low___power_ga368dc13a9c762a307c07cfa2e3ef59ad}
+
+\item 
+\#define {\bfseries I\+S\+\_\+\+N\+V\+I\+C\+\_\+\+L\+P}(L\+P)
+\item 
+\#define \hyperlink{group___m_i_s_c___preemption___priority___group_gaeac0cf537f65d17bc19aee2410b2b60e}{N\+V\+I\+C\+\_\+\+Priority\+Group\+\_\+0}~((uint32\+\_\+t)0x700)
+\item 
+\#define \hyperlink{group___m_i_s_c___preemption___priority___group_ga89bf0bf9e70f1a372a541b1b8d7493aa}{N\+V\+I\+C\+\_\+\+Priority\+Group\+\_\+1}~((uint32\+\_\+t)0x600)
+\item 
+\#define \hyperlink{group___m_i_s_c___preemption___priority___group_ga505002e8b76aef65499ca371e40ec8b4}{N\+V\+I\+C\+\_\+\+Priority\+Group\+\_\+2}~((uint32\+\_\+t)0x500)
+\item 
+\#define \hyperlink{group___m_i_s_c___preemption___priority___group_ga49bdbee77d4a70339d63c80462d49b4d}{N\+V\+I\+C\+\_\+\+Priority\+Group\+\_\+3}~((uint32\+\_\+t)0x400)
+\item 
+\#define \hyperlink{group___m_i_s_c___preemption___priority___group_gaf9020c585da2a299328f0b06dee391a2}{N\+V\+I\+C\+\_\+\+Priority\+Group\+\_\+4}~((uint32\+\_\+t)0x300)
+\item 
+\#define {\bfseries I\+S\+\_\+\+N\+V\+I\+C\+\_\+\+P\+R\+I\+O\+R\+I\+T\+Y\+\_\+\+G\+R\+O\+U\+P}(G\+R\+O\+U\+P)
+\item 
+\hypertarget{group___m_i_s_c___preemption___priority___group_gaf30fd8f5960c2e28a772d8f16bb156dd}{}\#define {\bfseries I\+S\+\_\+\+N\+V\+I\+C\+\_\+\+P\+R\+E\+E\+M\+P\+T\+I\+O\+N\+\_\+\+P\+R\+I\+O\+R\+I\+T\+Y}(P\+R\+I\+O\+R\+I\+T\+Y)~((P\+R\+I\+O\+R\+I\+T\+Y) $<$ 0x10)\label{group___m_i_s_c___preemption___priority___group_gaf30fd8f5960c2e28a772d8f16bb156dd}
+
+\item 
+\hypertarget{group___m_i_s_c___preemption___priority___group_ga010705bc997dcff935b965b372cba61d}{}\#define {\bfseries I\+S\+\_\+\+N\+V\+I\+C\+\_\+\+S\+U\+B\+\_\+\+P\+R\+I\+O\+R\+I\+T\+Y}(P\+R\+I\+O\+R\+I\+T\+Y)~((P\+R\+I\+O\+R\+I\+T\+Y) $<$ 0x10)\label{group___m_i_s_c___preemption___priority___group_ga010705bc997dcff935b965b372cba61d}
+
+\item 
+\hypertarget{group___m_i_s_c___preemption___priority___group_ga1184bbb97d758385f98ab40dd5e5af59}{}\#define {\bfseries I\+S\+\_\+\+N\+V\+I\+C\+\_\+\+O\+F\+F\+S\+E\+T}(O\+F\+F\+S\+E\+T)~((O\+F\+F\+S\+E\+T) $<$ 0x000\+F\+F\+F\+F\+F)\label{group___m_i_s_c___preemption___priority___group_ga1184bbb97d758385f98ab40dd5e5af59}
+
+\item 
+\hypertarget{group___m_i_s_c___sys_tick__clock__source_ga545c387ce43db90f15faad5f354f890d}{}\#define {\bfseries Sys\+Tick\+\_\+\+C\+L\+K\+Source\+\_\+\+H\+C\+L\+K\+\_\+\+Div8}~((uint32\+\_\+t)0x\+F\+F\+F\+F\+F\+F\+F\+B)\label{group___m_i_s_c___sys_tick__clock__source_ga545c387ce43db90f15faad5f354f890d}
+
+\item 
+\hypertarget{group___m_i_s_c___sys_tick__clock__source_ga8a885ce2632ad4c35e229bb7c6e60191}{}\#define {\bfseries Sys\+Tick\+\_\+\+C\+L\+K\+Source\+\_\+\+H\+C\+L\+K}~((uint32\+\_\+t)0x00000004)\label{group___m_i_s_c___sys_tick__clock__source_ga8a885ce2632ad4c35e229bb7c6e60191}
+
+\item 
+\#define {\bfseries I\+S\+\_\+\+S\+Y\+S\+T\+I\+C\+K\+\_\+\+C\+L\+K\+\_\+\+S\+O\+U\+R\+C\+E}(S\+O\+U\+R\+C\+E)
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{group___m_i_s_c_gadfb1f34f803ce54c976643db8c484442}{N\+V\+I\+C\+\_\+\+Priority\+Group\+Config} (uint32\+\_\+t N\+V\+I\+C\+\_\+\+Priority\+Group)
+\begin{DoxyCompactList}\small\item\em Configures the priority grouping\+: pre-\/emption priority and subpriority. \end{DoxyCompactList}\item 
+void \hyperlink{group___m_i_s_c_ga4ab373ed0870c06fca5eb51d639adf41}{N\+V\+I\+C\+\_\+\+Init} (\hyperlink{struct_n_v_i_c___init_type_def}{N\+V\+I\+C\+\_\+\+Init\+Type\+Def} $\ast$N\+V\+I\+C\+\_\+\+Init\+Struct)
+\begin{DoxyCompactList}\small\item\em Initializes the N\+V\+I\+C peripheral according to the specified parameters in the N\+V\+I\+C\+\_\+\+Init\+Struct. \end{DoxyCompactList}\item 
+void \hyperlink{group___m_i_s_c_ga1145208ad70edfc2fab19b8b8ef1b1a1}{N\+V\+I\+C\+\_\+\+Set\+Vector\+Table} (uint32\+\_\+t N\+V\+I\+C\+\_\+\+Vect\+Tab, uint32\+\_\+t Offset)
+\begin{DoxyCompactList}\small\item\em Sets the vector table location and Offset. \end{DoxyCompactList}\item 
+void \hyperlink{group___m_i_s_c_gae21011c5232f5b8f366acbecd12a1d4a}{N\+V\+I\+C\+\_\+\+System\+L\+P\+Config} (uint8\+\_\+t Low\+Power\+Mode, Functional\+State New\+State)
+\begin{DoxyCompactList}\small\item\em Selects the condition for the system to enter low power mode. \end{DoxyCompactList}\item 
+void \hyperlink{group___m_i_s_c_ga2777d255bb06ad62bb6372a9db1ff385}{Sys\+Tick\+\_\+\+C\+L\+K\+Source\+Config} (uint32\+\_\+t Sys\+Tick\+\_\+\+C\+L\+K\+Source)
+\begin{DoxyCompactList}\small\item\em Configures the Sys\+Tick clock source. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This file contains all the functions prototypes for the miscellaneous firmware library functions (add-\/on to C\+M\+S\+I\+S functions). 
+
+\begin{DoxyAuthor}{Author}
+M\+C\+D Application Team 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+V1.\+0.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+30-\/\+September-\/2011 
+\end{DoxyDate}
+\begin{DoxyAttention}{Attention}
+
+\end{DoxyAttention}
+T\+H\+E P\+R\+E\+S\+E\+N\+T F\+I\+R\+M\+W\+A\+R\+E W\+H\+I\+C\+H I\+S F\+O\+R G\+U\+I\+D\+A\+N\+C\+E O\+N\+L\+Y A\+I\+M\+S A\+T P\+R\+O\+V\+I\+D\+I\+N\+G C\+U\+S\+T\+O\+M\+E\+R\+S W\+I\+T\+H C\+O\+D\+I\+N\+G I\+N\+F\+O\+R\+M\+A\+T\+I\+O\+N R\+E\+G\+A\+R\+D\+I\+N\+G T\+H\+E\+I\+R P\+R\+O\+D\+U\+C\+T\+S I\+N O\+R\+D\+E\+R F\+O\+R T\+H\+E\+M T\+O S\+A\+V\+E T\+I\+M\+E. A\+S A R\+E\+S\+U\+L\+T, S\+T\+M\+I\+C\+R\+O\+E\+L\+E\+C\+T\+R\+O\+N\+I\+C\+S S\+H\+A\+L\+L N\+O\+T B\+E H\+E\+L\+D L\+I\+A\+B\+L\+E F\+O\+R A\+N\+Y D\+I\+R\+E\+C\+T, I\+N\+D\+I\+R\+E\+C\+T O\+R C\+O\+N\+S\+E\+Q\+U\+E\+N\+T\+I\+A\+L D\+A\+M\+A\+G\+E\+S W\+I\+T\+H R\+E\+S\+P\+E\+C\+T T\+O A\+N\+Y C\+L\+A\+I\+M\+S A\+R\+I\+S\+I\+N\+G F\+R\+O\+M T\+H\+E C\+O\+N\+T\+E\+N\+T O\+F S\+U\+C\+H F\+I\+R\+M\+W\+A\+R\+E A\+N\+D/\+O\+R T\+H\+E U\+S\+E M\+A\+D\+E B\+Y C\+U\+S\+T\+O\+M\+E\+R\+S O\+F T\+H\+E C\+O\+D\+I\+N\+G I\+N\+F\+O\+R\+M\+A\+T\+I\+O\+N C\+O\+N\+T\+A\+I\+N\+E\+D H\+E\+R\+E\+I\+N I\+N C\+O\+N\+N\+E\+C\+T\+I\+O\+N W\+I\+T\+H T\+H\+E\+I\+R P\+R\+O\+D\+U\+C\+T\+S.
+
+\subsubsection*{\begin{center}\copyright{} C\+O\+P\+Y\+R\+I\+G\+H\+T 2011 S\+T\+Microelectronics\end{center} }

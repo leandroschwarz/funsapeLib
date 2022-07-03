@@ -1,0 +1,110 @@
+/******************************************************
+*				LCD Library							  *
+*	Supported hardware:		2x16 LCD	              *
+*	Author:					Ajay Bhargav	          *
+******************************************************/
+#include "lcd.h"
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	LCD Initialization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+void lcd_init(void)
+{
+	wrt_cmd(0X38);
+	wrt_cmd(0X0C);
+	wrt_cmd(0X01);
+	wrt_cmd(0X06);
+}
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**** Cheacking the busy flag of LCD
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+void busy()
+{
+	flag=1;
+	rs=0;
+	rw=1;
+	while(flag!=0)
+	{
+		en=0;
+		en=1;
+	}
+}
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	Writing command to LCD 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+void wrt_cmd(bit_8 val)
+{
+	busy();
+	LCD_PORT=val;
+	rs=0;
+	rw=0;
+	en=1;
+	en=0;
+}
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	Writing string to LCD
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+void wrt_string(bit_8 *string)
+{
+	busy();
+	while(*string)
+		wrt_data(*string++);
+}
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	Writing data to LCD
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+void wrt_data(bit_8 ch)
+{
+	busy();
+	LCD_PORT = ch;
+	rs=1;
+	rw=0;
+	en=1;
+	en=0;
+}
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	Writing 8-bit Value to LCD
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+void wrt_value(bit_8 x)
+{
+	bit_8 temp;
+	temp = x/0x10;
+	if(temp>9)
+		return;
+	else
+		wrt_data(temp+0x30);
+	temp = x%0x10;
+	if(temp>9)
+		return;
+	else
+		wrt_data(temp+0x30);
+}
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	Bringing Cursor to (X,Y) location of LCD
+		X -> 1,2
+		Y -> 1,16
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+void cursorxy(bit_8 x, bit_8 y)
+{
+	if((x<1||x>2)&&(y<1||y>16))
+	{
+		x=1;
+		y=1;
+	}
+	if(x == 1)
+		wrt_cmd(0x7F+y);
+	else
+		wrt_cmd(0xBF+y);
+}

@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"main.h": "c",
+			"stddef.h": "c",
+			"stm32l0xx_hal.h": "c",
+			"stdint.h": "c"
+		}
+	}
+}

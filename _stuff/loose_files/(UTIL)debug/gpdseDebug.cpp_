@@ -1,0 +1,160 @@
+
+
+#include <gpdseDebug.hpp>
+#include <stdio.h>
+
+void dbgFunctionEntering(dbgFunction_e strCode)
+{
+	printf_P(PSTR("F => "));
+	printf_P(dbgFunctionTable[strCode]);
+	printf_P(PSTR("\r"));
+}
+
+void dbgFunctionReturning(debugFunction_e strCode, uint16_t returnCode)
+{
+	printf_P(PSTR("Return from function: %d\r"), returnCode);
+}
+
+void dbgFunctionResuming(debugStrings_e strCode)
+{
+	printf_P(PSTR("Resuming function: "));
+	printf_P(debugDemiFatFsTable[strCode]);
+	printf_P(PSTR("\r"));
+}
+
+void dbgPointReaching(uint32_t pointCode)
+{
+	printf_P(PSTR("Reached point: %d\r"), pointCode);
+}
+
+
+
+
+
+
+
+
+
+const char dbgDffsConstructor[] PROGMEM = "change_bitmap()";
+const char dbgDffsDestructor[] PROGMEM = "change_bitmap()";
+const char dbgDffsMount[] PROGMEM = "change_bitmap()";
+const char dbgDffsFileOpen[] PROGMEM = "change_bitmap()";
+const char dbgDffsFileClose[] PROGMEM = "change_bitmap()";
+const char dbgDffsFileSync[] PROGMEM = "change_bitmap()";
+const char dbgDffsFileRead[] PROGMEM = "change_bitmap()";
+const char dbgDffsFileWrite[] PROGMEM = "change_bitmap()";
+const char dbgDffsDirectoryOpen[] PROGMEM = "change_bitmap()";
+const char dbgDffsDirectoryClose[] PROGMEM = "change_bitmap()";
+const char dbgDffsDirectoryRead[] PROGMEM = "change_bitmap()";
+
+
+
+
+
+
+
+
+const char dbgDffsChangeBitmap[] PROGMEM = "change_bitmap()";
+const char dbgDffsCheckFs[] PROGMEM = "check_fs()";
+const char dbgDffsChkChr[] PROGMEM = "chk_chr()";
+const char dbgDffsChkLock[] PROGMEM = "chk_lock()";
+const char dbgDffsClearLock[] PROGMEM = "clear_lock()";
+const char dbgDffsClmtClust[] PROGMEM = "clmt_clust()";
+const char dbgDffsClst2Sect[] PROGMEM = "clst2sect()";
+const char dbgDffsCmpLfn[] PROGMEM = "cmp_lfn()";
+const char dbgDffsCreateChain[] PROGMEM = "create_chain()";
+const char dbgDffsCreateName[] PROGMEM = "create_name()";
+const char dbgDffsCreateXdir[] PROGMEM = "create_xdir()";
+const char dbgDffsDbc1st[] PROGMEM = "dbc_1st()";
+const char dbgDffsDbc2nd[] PROGMEM = "dbc_2nd()";
+const char dbgDffsDecLock[] PROGMEM = "dec_lock()";
+const char dbgDffsDirAlloc[] PROGMEM = "dir_alloc()";
+const char dbgDffsDirClear[] PROGMEM = "dir_clear()";
+const char dbgDffsDirFind[] PROGMEM = "dir_find()";
+const char dbgDffsDirNext[] PROGMEM = "dir_next()";
+const char dbgDffsDirRead[] PROGMEM = "dir_read()";
+const char dbgDffsDirRegister[] PROGMEM = "dir_register()";
+const char dbgDffsDirRemove[] PROGMEM = "dir_remove()";
+const char dbgDffsDirSdi[] PROGMEM = "dir_sdi()";
+const char dbgDffsEnqLock[] PROGMEM = "enq_lock()";
+const char dbgDffsFChDir[] PROGMEM = "f_chdir()";
+const char dbgDffsFChDrive[] PROGMEM = "f_chdrive()";
+const char dbgDffsFChMod[] PROGMEM = "f_chmod()";
+const char dbgDffsFClose[] PROGMEM = "f_close()";
+const char dbgDffsFCloseDir[] PROGMEM = "f_closedir()";
+const char dbgDffsFExpand[] PROGMEM = "f_expand()";
+const char dbgDffsFFdisk[] PROGMEM = "f_fdisk()";
+const char dbgDffsFFindFirst[] PROGMEM = "f_findfirst()";
+const char dbgDffsFFindNext[] PROGMEM = "f_findnext()";
+const char dbgDffsFForward[] PROGMEM = "f_forward()";
+const char dbgDffsFGetCwd[] PROGMEM = "f_getcwd()";
+const char dbgDffsFGetFree[] PROGMEM = "f_getfree()";
+const char dbgDffsFGetLabel[] PROGMEM = "f_getlabel()";
+const char dbgDffsFgets[] PROGMEM = "f_gets()";
+const char dbgDffsFillFirstFrag[] PROGMEM = "fill_first_frag()";
+const char dbgDffsFillLastFrag[] PROGMEM = "fill_last_frag()";
+const char dbgDffsFindBitmap[] PROGMEM = "find_bitmap()";
+const char dbgDffsFindVolume[] PROGMEM = "find_volume()";
+const char dbgDffsFLseek[] PROGMEM = "f_lseek()";
+const char dbgDffsFMkDir[] PROGMEM = "f_mkdir()";
+const char dbgDffsFMkFs[] PROGMEM = "f_mkfs()";
+const char dbgDffsFMount[] PROGMEM = "f_mount()";
+const char dbgDffsFollowPath[] PROGMEM = "follow_path()";
+const char dbgDffsFOpen[] PROGMEM = "f_open()";
+const char dbgDffsFOpenDir[] PROGMEM = "f_opendir()";
+const char dbgDffsFPrintf[] PROGMEM = "f_printf()";
+const char dbgDffsFPutc[] PROGMEM = "f_putc()";
+const char dbgDffsFPuts[] PROGMEM = "f_puts()";
+const char dbgDffsFRead[] PROGMEM = "f_read()";
+const char dbgDffsFReadDir[] PROGMEM = "f_readdir()";
+const char dbgDffsFRename[] PROGMEM = "f_rename()";
+const char dbgDffsFSetCp[] PROGMEM = "f_setcp()";
+const char dbgDffsFSetLabel[] PROGMEM = "f_setlabel()";
+const char dbgDffsFStat[] PROGMEM = "f_stat()";
+const char dbgDffsFSync[] PROGMEM = "f_sync()";
+const char dbgDffsFTruncate[] PROGMEM = "f_truncate()";
+const char dbgDffsFUnlink[] PROGMEM = "f_unlink()";
+const char dbgDffsFUtime[] PROGMEM = "f_utime()";
+const char dbgDffsFWrite[] PROGMEM = "f_write()";
+const char dbgDffsGenNunName[] PROGMEM = "gen_numname()";
+const char dbgDffsGetAchar[] PROGMEM = "get_achar()";
+const char dbgDffsGetFat[] PROGMEM = "get_fat()";
+const char dbgDffsGetFileInfo[] PROGMEM = "get_fileinfo()";
+const char dbgDffsGetLdNumber[] PROGMEM = "get_ldnumber()";
+const char dbgDffsGetXfileInfo[] PROGMEM = "get_xfileinfo()";
+const char dbgDffsIncLock[] PROGMEM = "inc_lock()";
+const char dbgDffsInitAllocInfo[] PROGMEM = "init_alloc_info()";
+const char dbgDffsLdClust[] PROGMEM = "ld_clust()";
+const char dbgDffsLdDword[] PROGMEM = "ld_dword()";
+const char dbgDffsLdQword[] PROGMEM = "ld_qword()";
+const char dbgDffsLdWord[] PROGMEM = "ld_word()";
+const char dbgDffsLoadObjXdir[] PROGMEM = "load_obj_xdir()";
+const char dbgDffsLoadXdir[] PROGMEM = "load_xdir()";
+const char dbgDffsLockFs[] PROGMEM = "lock_fs()";
+const char dbgDffsMemCmp[] PROGMEM = "mem_cmp()";
+const char dbgDffsMemCpy[] PROGMEM = "mem_cpy()";
+const char dbgDffsMemSet[] PROGMEM = "mem_set()";
+const char dbgDffsMoveWindow[] PROGMEM = "move_window()";
+const char dbgDffsPatternMatching[] PROGMEM = "pattern_matching()";
+const char dbgDffsPickFln[] PROGMEM = "pick_lfn()";
+const char dbgDffsPutcBfd[] PROGMEM = "putc_bfd()";
+const char dbgDffsPutcFlush[] PROGMEM = "putc_flush()";
+const char dbgDffsPutcInit[] PROGMEM = "putc_init()";
+const char dbgDffsPutFat[] PROGMEM = "put_fat()";
+const char dbgDffsPutFln[] PROGMEM = "put_lfn()";
+const char dbgDffsPutUtf[] PROGMEM = "put_utf()";
+const char dbgDffsRemoveChain[] PROGMEM = "remove_chain()";
+const char dbgDffsStClust[] PROGMEM = "st_clust()";
+const char dbgDffsStDword[] PROGMEM = "st_dword()";
+const char dbgDffsStoreXdir[] PROGMEM = "store_xdir()";
+const char dbgDffsStQword[] PROGMEM = "st_qword()";
+const char dbgDffsStWord[] PROGMEM = "st_word()";
+const char dbgDffsSumSfn[] PROGMEM = "sum_sfn()";
+const char dbgDffsSyncFs[] PROGMEM = "sync_fs()";
+const char dbgDffsSyncWindow[] PROGMEM = "sync_window()";
+const char dbgDffsTchar2Uni[] PROGMEM = "tchar2uni()";
+const char dbgDffsUnlockFs[] PROGMEM = "unlock_fs()";
+const char dbgDffsValidate[] PROGMEM = "validate()";
+const char dbgDffsXdirSum[] PROGMEM = "xdir_sum()";
+const char dbgDffsXnameSum[] PROGMEM = "xname_sum()";
+const char dbgDffsXsum32[] PROGMEM = "xsum32()";

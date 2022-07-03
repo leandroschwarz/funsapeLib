@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "C:\\Schwarz\\Projetos\\FunSAPE_ARM++_Library"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"usb_device.h": "c",
+			"usbd_def.h": "c",
+			"usbd_conf.h": "c"
+		}
+	}
+}

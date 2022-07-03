@@ -1,0 +1,1439 @@
+/* =============================================================================
+ * Project:			FunSAPE++ Embedded Library
+ * File name:		funsapeLibNmeaParser.cpp
+ * Module:			NMEA sentence parser for FunSAPE++ Embedded Library project
+ * Authors:			__AUTHORS_TO_REPLACE__
+ * Build:			__BUILD_TO_REPLACE__
+ * Last edition:	__DATE_TO_REPLACE__
+ * ========================================================================== */
+
+// =============================================================================
+// System file dependencies
+// =============================================================================
+
+#include "funsapeLibNmeaParser.hpp"
+#if __FUNSAPE_LIB_NMEA_PARSER_HPP != __BUILD_TO_REPLACE__
+#	error	[funsapeLibNmeaParser.cpp] Build mismatch on header and source code files.
+#endif
+
+// =============================================================================
+// File exclusive - Constants
+// =============================================================================
+
+#define NMEA_PARSER_BUFFER_SIZE_MIN				25
+#define NMEA_PARSER_BUFFER_SIZE_MAX				200
+
+#define NMEA_PARSER_TALKERS_LIST_SIZE			95
+#define NMEA_PARSER_SENTENCES_LIST_SIZE			64
+
+// =============================================================================
+// File exclusive - New data types
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// File exclusive - Macro-functions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Global variables
+// =============================================================================
+
+static const char nmeaTalkerList[NMEA_PARSER_TALKERS_LIST_SIZE][3] = {
+//	 01    02    03    04    05    06    07    08    09    10
+	"AB", "AD", "AG", "AI", "AN", "AP", "AR", "AS", "AT", "AX",
+	"BI", "BN", "CA", "CD", "CR", "CS", "CT", "CV", "CX", "DE",
+	"DF", "DP", "DU", "EC", "EI", "EP", "ER", "FD", "FE", "FR",
+	"FS", "GA", "GB", "GI", "GL", "GN", "GP", "GQ", "HC", "HD",
+	"HE", "HF", "HN", "HS", "II", "IN", "JA", "JB", "JC", "JD",
+	"JE", "JF", "JG", "JH", "LC", "MX", "NL", "NV", "RA", "RB",
+	"RC", "RI", "SA", "SC", "SD", "SG", "SN", "SS", "TC", "TI",
+	"U1", "U2", "U3", "U4", "U5", "U6", "U7", "U8", "U9", "UP",
+	"VA", "VD", "VM", "VR", "VS", "VT", "VW", "WD", "WI", "WL",
+	"YX", "ZA", "ZC", "ZQ", "ZV"
+};
+
+static const char nmeaSentencesList[NMEA_PARSER_SENTENCES_LIST_SIZE][4] = {
+//	 001    002    003    004    005    006    007    008    009    010
+	"AAM", "ALM", "APA", "APB", "ASD", "BEC", "BOD", "BWC", "BWR", "BWW",
+	"DBT", "DCN", "DPT", "DTM", "FSI", "GGA", "GLC", "GLL", "GRS", "GSA",
+	"GST", "GSV", "GXA", "HDG", "HDT", "HSC", "LCD", "MSK", "MSS", "MTA",
+	"MTW", "MWD", "MWV", "OLN", "OSD", "R00", "RMA", "RMB", "RMC", "ROT",
+	"RPM", "RSA", "RSD", "RTE", "SFI", "STN", "TRF", "TTM", "VBW", "VDR",
+	"VHW", "VLW", "VPW", "VTG", "WCV", "WNC", "WPL", "XDR", "XTC", "XTE",
+	"XTR", "ZDA", "ZFO", "ZTG"
+};
+
+// =============================================================================
+// Static functions declarations
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Class constructors
+// =============================================================================
+
+NmeaParser::NmeaParser(uint8_t sentenceMaxSize, bool checksumEnabled)
+{
+	// Reset data members
+	this->_initialized					= false;
+	this->_clearToReceiveData			= false;
+	this->_readyToProcessData			= false;
+	this->_newDataAvailable				= false;
+	this->_callbackFunctionEnable		= false;
+	this->_sentenceMaxSize				= 0;
+	this->_checksumEnabled				= false;
+	this->_dataReadyCallbackFunction	= NULL;
+	this->_fieldLength					= 0;
+	this->_sentenceIndex				= 0;
+	this->_sentenceLength				= 0;
+	this->_sentenceData					= NULL;
+	this->_lastError					= ERROR_NONE;
+	this->_decodedSentenceType			= NMEA_SENTENCE_TYPE_UNKNOWN;
+	this->_decodedTalkerId				= NMEA_TALKER_ID_UNKNOWN;
+
+	// Check for errors - Buffer size too small
+	if (sentenceMaxSize < NMEA_PARSER_BUFFER_SIZE_MIN) {
+		this->_lastError = ERROR_BUFFER_SIZE_TOO_SMALL;
+		return;
+	}
+	// Check for error - Buffer size too large
+	if (sentenceMaxSize > NMEA_PARSER_BUFFER_SIZE_MAX) {
+		this->_lastError = ERROR_BUFFER_SIZE_TOO_LARGE;
+		return;
+	}
+
+	// Allocate memory
+	this->_sentenceData = (uint8_t *)calloc(sentenceMaxSize, sizeof(uint8_t));
+	// Was memory allocation successful?
+	if (this->_sentenceData == NULL) {					// No, register the error
+		this->_lastError = ERROR_MEMORY_ALLOCATION;
+		return;
+	}
+
+	// Update data members
+	this->_sentenceMaxSize = sentenceMaxSize;
+	this->_checksumEnabled = checksumEnabled;
+	this->_initialized = true;
+
+	// Return successfully
+	this->_lastError = ERROR_NONE;
+	return;
+}
+
+NmeaParser::~NmeaParser()
+{
+	// Is there memory allocated to the buffer?
+	if (this->_sentenceData != NULL) {					// Yes, so deallocate it!
+		free(this->_sentenceData);
+	}
+
+	// Reset data members
+	this->_initialized					= false;
+	this->_clearToReceiveData			= false;
+	this->_readyToProcessData			= false;
+	this->_newDataAvailable				= false;
+	this->_callbackFunctionEnable		= false;
+	this->_sentenceMaxSize				= 0;
+	this->_checksumEnabled				= true;
+	this->_dataReadyCallbackFunction	= NULL;
+	this->_fieldLength					= 0;
+	this->_sentenceIndex				= 0;
+	this->_sentenceLength				= 0;
+	this->_sentenceData					= NULL;
+	this->_lastError					= ERROR_NONE;
+	this->_decodedSentenceType			= NMEA_SENTENCE_TYPE_UNKNOWN;
+	this->_decodedTalkerId				= NMEA_TALKER_ID_UNKNOWN;
+	this->_state						= NMEA_STATE_IDLE;
+
+	// Return successfully
+	this->_lastError = ERROR_NONE;
+	return;
+}
+
+// =============================================================================
+// Class public methods
+// =============================================================================
+
+bool NmeaParser::cancelProcess(void)
+{
+	// Check for erros - initialization
+	if (!this->_initialized) {
+		this->_lastError = ERROR_NOT_INITIALIZED;
+		return false;
+	}
+
+	// Cancels the entire process and fluses all data
+	this->_clearToReceiveData = false;
+	this->_newDataAvailable = false;
+	this->_readyToProcessData = false;
+	this->_sentenceIndex = 0;
+	this->_sentenceLength = 0;
+	this->_fieldLength = 0;
+	this->_state = NMEA_STATE_IDLE;
+
+	// Returns successfully
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+error_e NmeaParser::getLastError(void)
+{
+	// Returns requested data
+	return this->_lastError;
+}
+
+nmeaTalkerId_e NmeaParser::getTalkerId(void)
+{
+	// Returns requested data
+	return this->_decodedTalkerId;
+}
+
+nmeaSentenceType_e NmeaParser::getSentenceType(void)
+{
+	// Returns requested data
+	return this->_decodedSentenceType;
+}
+
+
+bool NmeaParser::isClearToReceiveData(void)
+{
+	return this->_clearToReceiveData;
+}
+
+bool NmeaParser::isNewDataReady(void)
+{
+	return this->_newDataAvailable;
+}
+
+bool NmeaParser::isReadyToProcessData(void)
+{
+	return this->_readyToProcessData;
+}
+
+bool NmeaParser::pushData(uint8_t data)
+{
+	// Check for errors - initialization
+	if (!this->_initialized) {
+		this->_lastError = ERROR_NOT_INITIALIZED;
+		return false;
+	}
+	// Check for error - a complete sentence is awaiting
+	if (this->_readyToProcessData) {
+		this->_lastError = ERROR_PACKAGE_AWAITING;
+		return false;
+	}
+	// Check for erros - not ready to receive data
+	if (!this->_clearToReceiveData) {
+		this->_lastError = ERROR_NOT_READY;
+		return false;
+	}
+	// Check for erros - internal buffer is full
+	if (this->_sentenceLength == this->_sentenceMaxSize) {
+		this->_lastError = ERROR_BUFFER_FULL;
+		return false;
+	}
+
+	// Read, verify and store data
+	if (this->_sentenceLength == 0) {	// First, check if a new sentence is beginning
+		// Data must be a start delimiter $ (0x24) or a start encapsulation ! (0x21)
+		if ((data == '$') || (data == '!')) {	// It is, so stores data
+			this->_fieldLength = 0;
+			this->_sentenceData[this->_sentenceLength++] = data;
+			this->_state = NMEA_STATE_GETTING_TALKER;
+		}										// Otherwise, just ignore data
+	} else {							// Data is in the middle of a sentence
+		switch (data) {
+
+		// Data is a start delimiter - Ops, it shouldn't happen, so, reset the process
+		case 0x21:						// ! - Start of encapsulation sentence delimiter
+		case 0x24:						// $ - Start delimiter
+			this->_sentenceLength = 0;
+			this->_fieldLength = 0;
+			this->_sentenceData[this->_sentenceLength++] = data;
+			this->_state = NMEA_STATE_GETTING_TALKER;
+			this->_lastError = ERROR_TEMP_00;							// FIXME Change to correct error code
+			return false;
+
+		// Checksum delimiter
+		case 0x2A:						// * - Checksum delimiter
+			if (this->_sentenceLength < 8) {
+				this->_lastError = ERROR_TEMP_01;						// FIXME Change to correct error code
+				return false;
+			}
+			this->_sentenceData[this->_sentenceLength++] = data;
+			this->_fieldLength = 0;
+			this->_state = NMEA_STATE_GETTING_CHECKSUM;
+			break;
+
+		// Field delimiter
+		case 0x2C:						// , - Field delimiter
+			if ((this->_state != NMEA_STATE_GETTING_SENTENCE_TYPE) && (this->_state != NMEA_STATE_GETTING_DATA)) {
+				this->_lastError = ERROR_TEMP_03;						// FIXME Change to correct error code
+				return false;
+			}
+			this->_sentenceData[this->_sentenceLength++] = data;
+			this->_fieldLength = 0;
+			this->_state = NMEA_STATE_GETTING_DATA;
+			break;
+
+		// Carriage return
+		case 0x0D:						// <CR> - Carriage Return
+			if ((this->_state != NMEA_STATE_GETTING_TERMINATOR_CR) && (this->_state != NMEA_STATE_GETTING_DATA)) {
+				this->_lastError = ERROR_TEMP_04;						// FIXME Change to correct error code
+				return false;
+			}
+			this->_sentenceData[this->_sentenceLength++] = data;
+			this->_state = NMEA_STATE_GETTING_TERMINATOR_LF;
+			break;
+
+		// Line feed
+		case 0x0A:						// <LF> - Line feed (end delimiter)
+			if (this->_state != NMEA_STATE_GETTING_TERMINATOR_LF) {
+				this->_lastError = ERROR_TEMP_05;						// FIXME Change to correct error code
+				return false;
+			}
+			this->_sentenceData[this->_sentenceLength++] = data;
+			this->_state = NMEA_STATE_FRAME_COMPLETE;
+			this->_clearToReceiveData = false;
+			this->_readyToProcessData = true;
+			break;
+
+		case 0x5C:						// \ - TAG block delimiter
+			// TODO Don't know what to do, for now, just ignoring this character
+			break;
+
+		case 0x5E:						// ^ - Code delimiter for HEX representation of (ASCII) characters
+			// TODO Don't know what to do, for now, just ignoring this character
+			break;
+
+		case 0x7E:						// ~ - Reserved
+			// TODO Don't know what to do, for now, just ignoring this character
+			break;
+
+		// Other valid characters
+		case 0x20:						// Other valid characters
+		case 0x22 ... 0x23:				// Other valid characters
+		case 0x25 ... 0x29:				// Other valid characters
+		case 0x2B:						// Other valid characters
+		case 0x2D ... 0x5B:				// Other valid characters
+		case 0x5D:						// Other valid characters
+		case 0x5F ... 0x7D:				// Other valid characters
+			if ((this->_state == NMEA_STATE_GETTING_TALKER) || (this->_state == NMEA_STATE_GETTING_SENTENCE_TYPE)) {
+				if ((data >= 'a') && (data <= 'z')) {	// If lowercase
+					data -= 0x20;							// Transform to uppercase
+				}
+			}
+			this->_sentenceData[this->_sentenceLength++] = data;
+			this->_fieldLength++;
+			if ((this->_state == NMEA_STATE_GETTING_TALKER) && (this->_fieldLength == 2)) {
+				this->_state = NMEA_STATE_GETTING_SENTENCE_TYPE;
+				this->_fieldLength = 0;
+			} else if ((this->_state == NMEA_STATE_GETTING_CHECKSUM) && (this->_fieldLength == 2)) {
+				this->_state = NMEA_STATE_GETTING_TERMINATOR_CR;
+				this->_fieldLength = 0;
+			}
+			break;
+
+		case 0x00 ... 0x09:				// Invalid characters
+		case 0x0B ... 0x0C:				// Invalid characters
+		case 0x0E ... 0x1F:				// Invalid characters:
+		case 0x7F ... 0xFF:				// Invalid characters
+			this->_lastError = ERROR_TEMP_06;						// FIXME Change to correct error code
+			return false;
+//			this->_lastError = ERROR_CHARACTER_INVALID;
+		}
+	}
+
+	// Return successfully
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+bool NmeaParser::setDataReadyCallback(void callbackFunction(void))
+{
+	// Checking to see if user wants to disable the callback funcion call
+	if (callbackFunction == NULL) {						// Disable callback
+		this->_dataReadyCallbackFunction = NULL;
+		this->_callbackFunctionEnable = false;
+	} else {											// Enable callback
+		this->_dataReadyCallbackFunction = callbackFunction;
+		this->_callbackFunctionEnable = true;
+	}
+
+	// Return successfully
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+bool NmeaParser::startToDecodeData(void)
+{
+	char auxString[4];
+
+	// Initialize variables
+	this->_decodedTalkerId				= NMEA_TALKER_ID_UNKNOWN;
+	this->_decodedSentenceType			= NMEA_SENTENCE_TYPE_UNKNOWN;
+
+	// Check for errors - initialization
+	if (!this->_initialized) {
+		this->_lastError = ERROR_NOT_INITIALIZED;
+		return false;
+	}
+	// Check for erros - not ready to decode
+	if (!this->_readyToProcessData) {
+		this->_lastError = ERROR_NOT_READY;
+		return false;
+	}
+
+	// Prepare to decode data
+	this->_readyToProcessData = false;
+
+	// Step 1 - Retrieve the Talker ID
+	if (this->_sentenceData[1] == 'P') {			// Proprietary message
+		this->_decodedTalkerId = NMEA_TALKER_ID_PROPRIETARY;
+		this->_lastError = ERROR_TEMP_07;			// FIXME Change to correct error code
+		return false;
+	} else {
+		auxString[0] = this->_sentenceData[1];
+		auxString[1] = this->_sentenceData[2];
+		auxString[2] = '\0';
+		for (uint8_t i = 0; i < NMEA_PARSER_TALKERS_LIST_SIZE; i++) {
+			if (strcmp(auxString, nmeaTalkerList[i]) == 0) {	// Match
+				this->_decodedTalkerId = (nmeaTalkerId_e)(i + 1);
+				break;
+			}
+		}
+	}
+	if (this->_decodedTalkerId == NMEA_TALKER_ID_UNKNOWN) {
+		this->_lastError = ERROR_TEMP_08;			// FIXME Change to correct error code
+		return false;
+	}
+
+	// Step 2 - Retrieve the Sentence Type
+	auxString[0] = this->_sentenceData[3];
+	auxString[1] = this->_sentenceData[4];
+	auxString[2] = this->_sentenceData[5];
+	auxString[3] = '\0';
+	for (uint8_t i = 0; i < NMEA_PARSER_SENTENCES_LIST_SIZE; i++) {
+		if (strcmp(auxString, nmeaSentencesList[i]) == 0) {	// Match
+			this->_decodedSentenceType = (nmeaSentenceType_e)(i + 1);
+			break;
+		}
+	}
+	if (this->_decodedSentenceType == NMEA_SENTENCE_TYPE_UNKNOWN) {
+		this->_lastError = ERROR_TEMP_09;			// FIXME Change to correct error code
+		return false;
+	}
+
+	// Step 3 - Process each sentence with specific function
+	switch (this->_decodedSentenceType) {
+	case NMEA_SENTENCE_TYPE_AAM: if (!this->_parseSentenceAam()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_ALM: if (!this->_parseSentenceAlm()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_APA: if (!this->_parseSentenceApa()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_APB: if (!this->_parseSentenceApb()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_ASD: if (!this->_parseSentenceAsd()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_BEC: if (!this->_parseSentenceBec()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_BOD: if (!this->_parseSentenceBod()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_BWC: if (!this->_parseSentenceBwc()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_BWR: if (!this->_parseSentenceBwr()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_BWW: if (!this->_parseSentenceBww()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_DBT: if (!this->_parseSentenceDbt()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_DCN: if (!this->_parseSentenceDcn()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_DPT: if (!this->_parseSentenceDpt()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_DTM: if (!this->_parseSentenceDtm()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_FSI: if (!this->_parseSentenceFsi()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_GGA: if (!this->_parseSentenceGga()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_GLC: if (!this->_parseSentenceGlc()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_GLL: if (!this->_parseSentenceGll()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_GRS: if (!this->_parseSentenceGrs()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_GSA: if (!this->_parseSentenceGsa()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_GST: if (!this->_parseSentenceGst()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_GSV: if (!this->_parseSentenceGsv()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_GXA: if (!this->_parseSentenceGxa()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_HDG: if (!this->_parseSentenceHdg()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_HDT: if (!this->_parseSentenceHdt()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_HSC: if (!this->_parseSentenceHsc()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_LCD: if (!this->_parseSentenceLcd()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_MSK: if (!this->_parseSentenceMsk()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_MSS: if (!this->_parseSentenceMss()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_MTA: if (!this->_parseSentenceMta()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_MTW: if (!this->_parseSentenceMtw()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_MWD: if (!this->_parseSentenceMwd()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_MWV: if (!this->_parseSentenceMwv()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_OLN: if (!this->_parseSentenceOln()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_OSD: if (!this->_parseSentenceOsd()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_R00: if (!this->_parseSentenceR00()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_RMA: if (!this->_parseSentenceRma()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_RMB: if (!this->_parseSentenceRmb()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_RMC: if (!this->_parseSentenceRmc()) {
+			return false;
+		}
+		break;
+	case NMEA_SENTENCE_TYPE_ROT: if (!this->_parseSentenceRot()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_RPM: if (!this->_parseSentenceRpm()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_RSA: if (!this->_parseSentenceRsa()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_RSD: if (!this->_parseSentenceRsd()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_RTE: if (!this->_parseSentenceRte()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_SFI: if (!this->_parseSentenceSfi()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_STN: if (!this->_parseSentenceStn()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_TRF: if (!this->_parseSentenceTrf()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_TTM: if (!this->_parseSentenceTtm()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_VBW: if (!this->_parseSentenceVbw()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_VDR: if (!this->_parseSentenceVdr()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_VHW: if (!this->_parseSentenceVhw()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_VLW: if (!this->_parseSentenceVlw()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_VPW: if (!this->_parseSentenceVpw()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_VTG: if (!this->_parseSentenceVtg()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_WCV: if (!this->_parseSentenceWcv()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_WNC: if (!this->_parseSentenceWnc()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_WPL: if (!this->_parseSentenceWpl()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_XDR: if (!this->_parseSentenceXdr()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_XTC: if (!this->_parseSentenceXtc()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_XTE: if (!this->_parseSentenceXte()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_XTR: if (!this->_parseSentenceXtr()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_ZDA: if (!this->_parseSentenceZda()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_ZFO: if (!this->_parseSentenceZfo()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	case NMEA_SENTENCE_TYPE_ZTG: if (!this->_parseSentenceZtg()) {
+			this->_lastError = ERROR_PROTOCOL_GENERIC_ERROR;
+			return false;
+		} break;
+	default:
+		// You shouldn't be here...
+				this->_lastError = ERROR_TEMP_01;						// FIXME Change to correct error code
+				return false;
+		this->_lastError = ERROR_UNKNOWN;
+		return false;
+	}
+
+	// Step 4 - Sinalize to user that new data is available
+	this->_newDataAvailable = true;
+
+	// Step 5 - Call the callback function (if enabled)
+	if (this->_callbackFunctionEnable) {
+		this->_dataReadyCallbackFunction();
+	}
+
+	// Returns successfully
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+bool NmeaParser::startToReceiveData(void)
+{
+	// Check for erros - initialization
+	if (!this->_initialized) {
+		this->_lastError = ERROR_NOT_INITIALIZED;
+		return false;
+	}
+
+	// Forces a new process to begin, flusing old data
+	this->_newDataAvailable = false;
+	this->_readyToProcessData = false;
+	this->_sentenceIndex = 0;
+	this->_sentenceLength = 0;
+	this->_fieldLength = 0;
+	this->_state = NMEA_STATE_GETTING_TALKER;
+	this->_clearToReceiveData = true;
+
+	// Returns successfully
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+// =============================================================================
+// Class private methods
+// =============================================================================
+
+bool NmeaParser::_parseSentenceRmc(void) {
+	// char		auxChar					= 0;
+	// uint8_t		auxUint8				= 0;
+	// uint8_t		fieldLength				= 0;
+	// bool		auxBool;
+	char		auxString[15];
+
+	// Clears last RMC struct data
+	// this->_sentenceRmc.date.day = 0;
+	// this->_sentenceRmc.date.month = 0;
+	// this->_sentenceRmc.date.year = 0;
+	// this->_sentenceRmc.time.hours = 0;
+	// this->_sentenceRmc.time.minutes = 0;
+	// this->_sentenceRmc.time.seconds = 0;
+	// this->_sentenceRmc.course.internalValue = 0;
+	// this->_sentenceRmc.latitude.degrees = 0;
+	// this->_sentenceRmc.latitude.minutesInteger = 0;
+	// this->_sentenceRmc.latitude.minutesDecimal = 0;
+	// this->_sentenceRmc.latitude.eastWest = false;
+	// this->_sentenceRmc.longitude.degreesInteger = 0;
+	// this->_sentenceRmc.longitude.minutesInteger = 0;
+	// this->_sentenceRmc.longitude.minutesDecimal = 0;
+	// this->_sentenceRmc.longitude.northSouth = false;
+	// this->_sentenceRmc.magDeclination.degreesInteger = 0;
+	// this->_sentenceRmc.magDeclination.degreesDecimal = 0;
+	// this->_sentenceRmc.magDeclination.eastWest = false;
+	// this->_sentenceRmc.speed.internalValue = 0;
+	// this->_sentenceRmc.valid = false;
+
+	this->_sentenceRmc.course[0] = '\0';
+	this->_sentenceRmc.date[0] = '\0';
+	this->_sentenceRmc.latitudeValue[0] = '\0';
+	this->_sentenceRmc.latitudeIndicator[0] = '\0';
+	this->_sentenceRmc.longitudeValue[0] = '\0';
+	this->_sentenceRmc.longitudeIndicator[0] = '\0';
+	this->_sentenceRmc.speed[0] = '\0';
+	this->_sentenceRmc.time[0] = '\0';
+	this->_sentenceRmc.valid[0] = '\0';
+	this->_sentenceRmc.mode[0] = '\0';
+
+	// Look for NMEA header terminator delimiter (comma ',')
+	this->_sentenceIndex = 6;
+	if (this->_sentenceData[this->_sentenceIndex++] != ',') {
+		this->_lastError = ERROR_TEMP_10;			// FIXME Change to correct error code
+		showErrorStatus(this->_lastError);
+		return false;
+	}
+
+	// Reading field - UTC Time
+	if (!this->_getField(auxString)) {
+		this->_lastError = ERROR_TEMP_11;			// FIXME Change to correct error code
+		showErrorStatus(this->_lastError);
+		return false;
+	}
+	strcpy(this->_sentenceRmc.time, auxString);
+
+	// Reading field - Validation status
+	if (!this->_getField(auxString)) {
+		this->_lastError = ERROR_TEMP_12;			// FIXME Change to correct error code
+		showErrorStatus(this->_lastError);
+		return false;
+	}
+	strcpy(this->_sentenceRmc.valid, auxString);
+
+	// Reading field - Latitude value
+	if (!this->_getField(auxString)) {
+		this->_lastError = ERROR_TEMP_13;			// FIXME Change to correct error code
+		showErrorStatus(this->_lastError);
+		return false;
+	}
+	strcpy(this->_sentenceRmc.latitudeValue, auxString);
+
+	// Reading field - Latitude indicator
+	if (!this->_getField(auxString)) {
+		this->_lastError = ERROR_TEMP_14;			// FIXME Change to correct error code
+		showErrorStatus(this->_lastError);
+		return false;
+	}
+	strcpy(this->_sentenceRmc.latitudeIndicator, auxString);
+
+	// Reading field - Longitude value
+	if (!this->_getField(auxString)) {
+		this->_lastError = ERROR_TEMP_15;			// FIXME Change to correct error code
+		showErrorStatus(this->_lastError);
+		return false;
+	}
+	strcpy(this->_sentenceRmc.longitudeValue, auxString);
+
+	// Reading field - Longitude indicator
+	if (!this->_getField(auxString)) {
+		this->_lastError = ERROR_TEMP_16;			// FIXME Change to correct error code
+		showErrorStatus(this->_lastError);
+		return false;
+	}
+	strcpy(this->_sentenceRmc.longitudeIndicator, auxString);
+
+	// Reading field - Speed over ground
+	if (!this->_getField(auxString)) {
+		this->_lastError = ERROR_TEMP_17;			// FIXME Change to correct error code
+		showErrorStatus(this->_lastError);
+		return false;
+	}
+	strcpy(this->_sentenceRmc.speed, auxString);
+
+	// Reading field - Course over ground
+	if (!this->_getField(auxString)) {
+		this->_lastError = ERROR_TEMP_18;			// FIXME Change to correct error code
+		showErrorStatus(this->_lastError);
+		return false;
+	}
+	strcpy(this->_sentenceRmc.course, auxString);
+
+	// Reading field - Date
+	if (!this->_getField(auxString)) {
+		this->_lastError = ERROR_TEMP_19;			// FIXME Change to correct error code
+		showErrorStatus(this->_lastError);
+		return false;
+	}
+	strcpy(this->_sentenceRmc.date, auxString);
+
+	// Reading field - Mode
+	if (!this->_getField(auxString)) {
+		this->_lastError = ERROR_TEMP_20;			// FIXME Change to correct error code
+		showErrorStatus(this->_lastError);
+		return false;
+	}
+
+	// Returns successfully
+	this->_lastError = ERROR_NONE;
+	showErrorStatus(this->_lastError);
+	return true;
+}
+
+bool NmeaParser::_getField(char * field)
+{
+	uint8_t index	= 0;
+	uint8_t auxChar	= 0;
+
+	// Read entire field
+	while (1) {
+		auxChar = this->_sentenceData[this->_sentenceIndex++];
+
+		// Delimiter successfully found
+		if (auxChar == ',') {
+			field[index++] = '\0';
+			break;
+		}
+		// Error - Code too long
+		if (index == 20) {
+			this->_lastError = ERROR_TEMP_21;						// FIXME Change to correct error code
+		showErrorStatus(this->_lastError);
+			return false;
+		}
+		// Error - Code too long
+		if (this->_sentenceIndex == this->_sentenceLength)
+		{
+			this->_lastError = ERROR_TEMP_22;						// FIXME Change to correct error code
+		showErrorStatus(this->_lastError);
+			return false;
+		}
+		field[index++] = auxChar;
+	}
+
+	// Returns successfully
+	this->_lastError = ERROR_NONE;
+	showErrorStatus(this->_lastError);
+	return true;
+}
+
+bool NmeaParser::_scanSentence(char *format)
+{
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceAam(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceAlm(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceApa(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceApb(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceAsd(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceBec(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceBod(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceBwc(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceBwr(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceBww(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceDbt(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceDcn(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceDpt(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceDtm(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceFsi(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceGga(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceGlc(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceGll(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceGrs(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceGsa(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceGst(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceGsv(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceGxa(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceHdg(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceHdt(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceHsc(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceLcd(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceMsk(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceMss(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceMta(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceMtw(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceMwd(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceMwv(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceOln(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceOsd(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceR00(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceRma(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceRmb(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceRot(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceRpm(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceRsa(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceRsd(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceRte(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceSfi(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceStn(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceTrf(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceTtm(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceVbw(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceVdr(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceVhw(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceVlw(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceVpw(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceVtg(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceWcv(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceWnc(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceWpl(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceXdr(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceXtc(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceXte(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceXtr(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceZda(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceZfo(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+bool NmeaParser::_parseSentenceZtg(void)
+{
+	// TODO Implement  this function
+	// Returns error - Not implemented yet
+	this->_lastError = ERROR_UNTIL_IN_DEVELOPMENT;
+	return false;
+}
+
+// =============================================================================
+// Class protected methods
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// General public functions definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Public functions definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Interruption handlers
+// =============================================================================
+
+// NONE

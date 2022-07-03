@@ -1,0 +1,93 @@
+\hypertarget{group___h_a_s_h___group6}{}\section{High Level S\+H\+A1 functions}
+\label{group___h_a_s_h___group6}\index{High Level S\+H\+A1 functions@{High Level S\+H\+A1 functions}}
+
+
+High Level S\+H\+A1 Hash and H\+M\+A\+C functions.  
+
+
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+Error\+Status \hyperlink{group___h_a_s_h___group6_ga2728c02c36de6d800e1ede56ea7789cb}{H\+A\+S\+H\+\_\+\+S\+H\+A1} (uint8\+\_\+t $\ast$Input, uint32\+\_\+t Ilen, uint8\+\_\+t Output\mbox{[}20\mbox{]})
+\begin{DoxyCompactList}\small\item\em Compute the H\+A\+S\+H S\+H\+A1 digest. \end{DoxyCompactList}\item 
+Error\+Status \hyperlink{group___h_a_s_h___group6_ga2e38e900ca7838c1cea17cef19953a5e}{H\+M\+A\+C\+\_\+\+S\+H\+A1} (uint8\+\_\+t $\ast$Key, uint32\+\_\+t Keylen, uint8\+\_\+t $\ast$Input, uint32\+\_\+t Ilen, uint8\+\_\+t Output\mbox{[}20\mbox{]})
+\begin{DoxyCompactList}\small\item\em Compute the H\+M\+A\+C S\+H\+A1 digest. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+High Level S\+H\+A1 Hash and H\+M\+A\+C functions. 
+
+\begin{DoxyVerb} ===============================================================================
+                          High Level SHA1 Hash and HMAC functions
+ ===============================================================================\end{DoxyVerb}
+ 
+
+\subsection{Function Documentation}
+\hypertarget{group___h_a_s_h___group6_ga2728c02c36de6d800e1ede56ea7789cb}{}\index{High Level S\+H\+A1 functions@{High Level S\+H\+A1 functions}!H\+A\+S\+H\+\_\+\+S\+H\+A1@{H\+A\+S\+H\+\_\+\+S\+H\+A1}}
+\index{H\+A\+S\+H\+\_\+\+S\+H\+A1@{H\+A\+S\+H\+\_\+\+S\+H\+A1}!High Level S\+H\+A1 functions@{High Level S\+H\+A1 functions}}
+\subsubsection[{H\+A\+S\+H\+\_\+\+S\+H\+A1}]{\setlength{\rightskip}{0pt plus 5cm}Error\+Status H\+A\+S\+H\+\_\+\+S\+H\+A1 (
+\begin{DoxyParamCaption}
+\item[{uint8\+\_\+t $\ast$}]{Input, }
+\item[{uint32\+\_\+t}]{Ilen, }
+\item[{uint8\+\_\+t}]{Output\mbox{[}20\mbox{]}}
+\end{DoxyParamCaption}
+)}\label{group___h_a_s_h___group6_ga2728c02c36de6d800e1ede56ea7789cb}
+
+
+Compute the H\+A\+S\+H S\+H\+A1 digest. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Input} & pointer to the Input buffer to be treated. \\
+\hline
+{\em Ilen} & length of the Input buffer. \\
+\hline
+{\em Output} & the returned digest \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em An} & Error\+Status enumeration value\+:
+\begin{DoxyItemize}
+\item S\+U\+C\+C\+E\+S\+S\+: digest computation done
+\item E\+R\+R\+O\+R\+: digest computation failed 
+\end{DoxyItemize}\\
+\hline
+\end{DoxyRetVals}
+\hypertarget{group___h_a_s_h___group6_ga2e38e900ca7838c1cea17cef19953a5e}{}\index{High Level S\+H\+A1 functions@{High Level S\+H\+A1 functions}!H\+M\+A\+C\+\_\+\+S\+H\+A1@{H\+M\+A\+C\+\_\+\+S\+H\+A1}}
+\index{H\+M\+A\+C\+\_\+\+S\+H\+A1@{H\+M\+A\+C\+\_\+\+S\+H\+A1}!High Level S\+H\+A1 functions@{High Level S\+H\+A1 functions}}
+\subsubsection[{H\+M\+A\+C\+\_\+\+S\+H\+A1}]{\setlength{\rightskip}{0pt plus 5cm}Error\+Status H\+M\+A\+C\+\_\+\+S\+H\+A1 (
+\begin{DoxyParamCaption}
+\item[{uint8\+\_\+t $\ast$}]{Key, }
+\item[{uint32\+\_\+t}]{Keylen, }
+\item[{uint8\+\_\+t $\ast$}]{Input, }
+\item[{uint32\+\_\+t}]{Ilen, }
+\item[{uint8\+\_\+t}]{Output\mbox{[}20\mbox{]}}
+\end{DoxyParamCaption}
+)}\label{group___h_a_s_h___group6_ga2e38e900ca7838c1cea17cef19953a5e}
+
+
+Compute the H\+M\+A\+C S\+H\+A1 digest. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Key} & pointer to the Key used for H\+M\+A\+C. \\
+\hline
+{\em Keylen} & length of the Key used for H\+M\+A\+C. \\
+\hline
+{\em Input} & pointer to the Input buffer to be treated. \\
+\hline
+{\em Ilen} & length of the Input buffer. \\
+\hline
+{\em Output} & the returned digest \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em An} & Error\+Status enumeration value\+:
+\begin{DoxyItemize}
+\item S\+U\+C\+C\+E\+S\+S\+: digest computation done
+\item E\+R\+R\+O\+R\+: digest computation failed 
+\end{DoxyItemize}\\
+\hline
+\end{DoxyRetVals}

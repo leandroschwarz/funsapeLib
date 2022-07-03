@@ -1,0 +1,33 @@
+\hypertarget{group___f_l_a_s_h___option___bytes___read___protection}{}\section{F\+L\+A\+S\+H\+\_\+\+Option\+\_\+\+Bytes\+\_\+\+Read\+\_\+\+Protection}
+\label{group___f_l_a_s_h___option___bytes___read___protection}\index{F\+L\+A\+S\+H\+\_\+\+Option\+\_\+\+Bytes\+\_\+\+Read\+\_\+\+Protection@{F\+L\+A\+S\+H\+\_\+\+Option\+\_\+\+Bytes\+\_\+\+Read\+\_\+\+Protection}}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___f_l_a_s_h___option___bytes___read___protection_gae0417128469ebd025ef619bb9bd28271}{}\#define {\bfseries O\+B\+\_\+\+R\+D\+P\+\_\+\+Level\+\_\+0}~((uint8\+\_\+t)0x\+A\+A)\label{group___f_l_a_s_h___option___bytes___read___protection_gae0417128469ebd025ef619bb9bd28271}
+
+\item 
+\hypertarget{group___f_l_a_s_h___option___bytes___read___protection_gaeee87887410dcc3d47f0e6416f1d49d5}{}\#define {\bfseries O\+B\+\_\+\+R\+D\+P\+\_\+\+Level\+\_\+1}~((uint8\+\_\+t)0x55)\label{group___f_l_a_s_h___option___bytes___read___protection_gaeee87887410dcc3d47f0e6416f1d49d5}
+
+\item 
+\#define \hyperlink{group___f_l_a_s_h___option___bytes___read___protection_ga9f6200da3a5294668e1b24b65f85b34a}{I\+S\+\_\+\+O\+B\+\_\+\+R\+D\+P}(L\+E\+V\+E\+L)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{group___f_l_a_s_h___option___bytes___read___protection_ga9f6200da3a5294668e1b24b65f85b34a}{}\index{F\+L\+A\+S\+H\+\_\+\+Option\+\_\+\+Bytes\+\_\+\+Read\+\_\+\+Protection@{F\+L\+A\+S\+H\+\_\+\+Option\+\_\+\+Bytes\+\_\+\+Read\+\_\+\+Protection}!I\+S\+\_\+\+O\+B\+\_\+\+R\+D\+P@{I\+S\+\_\+\+O\+B\+\_\+\+R\+D\+P}}
+\index{I\+S\+\_\+\+O\+B\+\_\+\+R\+D\+P@{I\+S\+\_\+\+O\+B\+\_\+\+R\+D\+P}!F\+L\+A\+S\+H\+\_\+\+Option\+\_\+\+Bytes\+\_\+\+Read\+\_\+\+Protection@{F\+L\+A\+S\+H\+\_\+\+Option\+\_\+\+Bytes\+\_\+\+Read\+\_\+\+Protection}}
+\subsubsection[{I\+S\+\_\+\+O\+B\+\_\+\+R\+D\+P}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+S\+\_\+\+O\+B\+\_\+\+R\+D\+P(
+\begin{DoxyParamCaption}
+\item[{}]{L\+E\+V\+E\+L}
+\end{DoxyParamCaption}
+)}\label{group___f_l_a_s_h___option___bytes___read___protection_ga9f6200da3a5294668e1b24b65f85b34a}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+(((LEVEL) == OB\_RDP\_Level\_0)||\(\backslash\)
+                          ((LEVEL) == OB\_RDP\_Level\_1))\textcolor{comment}{/*||\(\backslash\)}
+\textcolor{comment}{                          ((LEVEL) == OB\_RDP\_Level\_2))*/}
+\end{DoxyCode}
+$<$ Warning\+: When enabling read protection level 2 it's no more possible to go back to level 1 or 0 

@@ -1,0 +1,76 @@
+\hypertarget{stm32f4xx__rng_8c}{}\section{\+\_\+hide/\+M\+P\+U/\+S\+T\+M32\+F4/stm32f4xx\+\_\+rng.c File Reference}
+\label{stm32f4xx__rng_8c}\index{\+\_\+hide/\+M\+P\+U/\+S\+T\+M32\+F4/stm32f4xx\+\_\+rng.\+c@{\+\_\+hide/\+M\+P\+U/\+S\+T\+M32\+F4/stm32f4xx\+\_\+rng.\+c}}
+
+
+This file provides firmware functions to manage the following functionalities of the Random Number Generator (R\+N\+G) peripheral\+:  
+
+
+{\ttfamily \#include \char`\"{}stm32f4xx\+\_\+rng.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}stm32f4xx\+\_\+rcc.\+h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{group___r_n_g___group1_ga15ff5e649080076eebd51143b9ac4491}{R\+N\+G\+\_\+\+De\+Init} (void)
+\begin{DoxyCompactList}\small\item\em Deinitializes the R\+N\+G peripheral registers to their default reset values. \end{DoxyCompactList}\item 
+void \hyperlink{group___r_n_g___group1_ga6c1a8372da6e8a06819903c63faecd7b}{R\+N\+G\+\_\+\+Cmd} (Functional\+State New\+State)
+\begin{DoxyCompactList}\small\item\em Enables or disables the R\+N\+G peripheral. \end{DoxyCompactList}\item 
+uint32\+\_\+t \hyperlink{group___r_n_g___group2_ga2cead4780224fd74a3fc15543c98ed36}{R\+N\+G\+\_\+\+Get\+Random\+Number} (void)
+\begin{DoxyCompactList}\small\item\em Returns a 32-\/bit random number. \end{DoxyCompactList}\item 
+void \hyperlink{group___r_n_g___group3_ga41d9be4c303ba0875a82c62dc7085f08}{R\+N\+G\+\_\+\+I\+T\+Config} (Functional\+State New\+State)
+\begin{DoxyCompactList}\small\item\em Enables or disables the R\+N\+G interrupt. \end{DoxyCompactList}\item 
+Flag\+Status \hyperlink{group___r_n_g___group3_gab70d6cc7d943dfb8eac15ccecf6cd7b3}{R\+N\+G\+\_\+\+Get\+Flag\+Status} (uint8\+\_\+t R\+N\+G\+\_\+\+F\+L\+A\+G)
+\begin{DoxyCompactList}\small\item\em Checks whether the specified R\+N\+G flag is set or not. \end{DoxyCompactList}\item 
+void \hyperlink{group___r_n_g___group3_gac3c67fe6bacdc4529f1707025224f954}{R\+N\+G\+\_\+\+Clear\+Flag} (uint8\+\_\+t R\+N\+G\+\_\+\+F\+L\+A\+G)
+\begin{DoxyCompactList}\small\item\em Clears the R\+N\+G flags. \end{DoxyCompactList}\item 
+I\+T\+Status \hyperlink{group___r_n_g___group3_gab58eaab67698770d9ea9775fb280271f}{R\+N\+G\+\_\+\+Get\+I\+T\+Status} (uint8\+\_\+t R\+N\+G\+\_\+\+I\+T)
+\begin{DoxyCompactList}\small\item\em Checks whether the specified R\+N\+G interrupt has occurred or not. \end{DoxyCompactList}\item 
+void \hyperlink{group___r_n_g___group3_ga2b1c78c003cd5c886e09fdbc2c89cacb}{R\+N\+G\+\_\+\+Clear\+I\+T\+Pending\+Bit} (uint8\+\_\+t R\+N\+G\+\_\+\+I\+T)
+\begin{DoxyCompactList}\small\item\em Clears the R\+N\+G interrupt pending bit(s). \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This file provides firmware functions to manage the following functionalities of the Random Number Generator (R\+N\+G) peripheral\+: 
+
+\begin{DoxyAuthor}{Author}
+M\+C\+D Application Team 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+V1.\+0.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+30-\/\+September-\/2011
+\begin{DoxyItemize}
+\item Initialization and Configuration
+\item Get 32 bit Random number
+\item Interrupts and flags management
+\end{DoxyItemize}
+\end{DoxyDate}
+\begin{DoxyVerb}*                               
+*          ===================================================================      
+*                                   How to use this driver
+*          ===================================================================          
+*          1. Enable The RNG controller clock using 
+*            RCC_AHB2PeriphClockCmd(RCC_AHB2Periph_RNG, ENABLE) function.
+*              
+*          2. Activate the RNG peripheral using RNG_Cmd() function.
+*          
+*          3. Wait until the 32 bit Random number Generator contains a valid 
+*            random data (using polling/interrupt mode). For more details, 
+*            refer to "Interrupts and flags management functions" module 
+*            description.
+*           
+*          4. Get the 32 bit Random number using RNG_GetRandomNumber() function
+*          
+*          5. To get another 32 bit Random number, go to step 3.       
+*
+*         
+*              
+*  \end{DoxyVerb}
+
+
+\begin{DoxyAttention}{Attention}
+
+\end{DoxyAttention}
+T\+H\+E P\+R\+E\+S\+E\+N\+T F\+I\+R\+M\+W\+A\+R\+E W\+H\+I\+C\+H I\+S F\+O\+R G\+U\+I\+D\+A\+N\+C\+E O\+N\+L\+Y A\+I\+M\+S A\+T P\+R\+O\+V\+I\+D\+I\+N\+G C\+U\+S\+T\+O\+M\+E\+R\+S W\+I\+T\+H C\+O\+D\+I\+N\+G I\+N\+F\+O\+R\+M\+A\+T\+I\+O\+N R\+E\+G\+A\+R\+D\+I\+N\+G T\+H\+E\+I\+R P\+R\+O\+D\+U\+C\+T\+S I\+N O\+R\+D\+E\+R F\+O\+R T\+H\+E\+M T\+O S\+A\+V\+E T\+I\+M\+E. A\+S A R\+E\+S\+U\+L\+T, S\+T\+M\+I\+C\+R\+O\+E\+L\+E\+C\+T\+R\+O\+N\+I\+C\+S S\+H\+A\+L\+L N\+O\+T B\+E H\+E\+L\+D L\+I\+A\+B\+L\+E F\+O\+R A\+N\+Y D\+I\+R\+E\+C\+T, I\+N\+D\+I\+R\+E\+C\+T O\+R C\+O\+N\+S\+E\+Q\+U\+E\+N\+T\+I\+A\+L D\+A\+M\+A\+G\+E\+S W\+I\+T\+H R\+E\+S\+P\+E\+C\+T T\+O A\+N\+Y C\+L\+A\+I\+M\+S A\+R\+I\+S\+I\+N\+G F\+R\+O\+M T\+H\+E C\+O\+N\+T\+E\+N\+T O\+F S\+U\+C\+H F\+I\+R\+M\+W\+A\+R\+E A\+N\+D/\+O\+R T\+H\+E U\+S\+E M\+A\+D\+E B\+Y C\+U\+S\+T\+O\+M\+E\+R\+S O\+F T\+H\+E C\+O\+D\+I\+N\+G I\+N\+F\+O\+R\+M\+A\+T\+I\+O\+N C\+O\+N\+T\+A\+I\+N\+E\+D H\+E\+R\+E\+I\+N I\+N C\+O\+N\+N\+E\+C\+T\+I\+O\+N W\+I\+T\+H T\+H\+E\+I\+R P\+R\+O\+D\+U\+C\+T\+S.
+
+\subsubsection*{\begin{center}\copyright{} C\+O\+P\+Y\+R\+I\+G\+H\+T 2011 S\+T\+Microelectronics\end{center} }

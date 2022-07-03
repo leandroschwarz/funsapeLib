@@ -1,0 +1,12 @@
+nov 29, 2018 12:19:37 PM com.sun.xml.internal.bind.v2.runtime.unmarshaller.SAXConnector endElement
+MAIS DETALHADO: SAXConnector.startElement: :rss:rss
+nov 29, 2018 12:19:37 PM com.sun.xml.internal.bind.v2.runtime.unmarshaller.UnmarshallingContext$State pop
+O MAIS DETALHADO: State.pop
+nov 29, 2018 12:19:37 PM com.sun.xml.internal.bind.v2.runtime.unmarshaller.SAXConnector endPrefixMapping
+MAIS DETALHADO: SAXConnector.endPrefixMapping: content
+nov 29, 2018 12:19:37 PM com.sun.xml.internal.bind.v2.runtime.unmarshaller.SAXConnector endPrefixMapping
+MAIS DETALHADO: SAXConnector.endPrefixMapping: dc
+nov 29, 2018 12:19:37 PM com.sun.xml.internal.bind.v2.runtime.unmarshaller.SAXConnector endDocument
+MAIS DETALHADO: SAXConnector.endDocument
+nov 29, 2018 12:23:02 PM edu.hawaii.ics.csdl.jupiter.util.JupiterLogger debug
+INFORMAÇÕES: the window was closed.

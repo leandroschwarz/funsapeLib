@@ -1,0 +1,20 @@
+{
+	"configurations": [
+		{
+			"name": "STM32",
+			"defines": [
+				"__GNUC__",
+				"STM32F103xB",
+				"USE_HAL_DRIVER"
+			],
+			"cppStandard": "c++14",
+			"cStandard": "c11",
+			"includePath": [
+				"${workspaceFolder}/**"
+			],
+			"compilerPath": "C:/Program Files/toolchains/GNU Tools ARM Embedded/7 2017-q4-major/bin/arm-none-eabi-g++",
+			"intelliSenseMode": "gcc-arm"
+		}
+	],
+	"version": 4
+}

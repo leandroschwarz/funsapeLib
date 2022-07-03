@@ -1,0 +1,1091 @@
+/* =============================================================================
+ * Project:			FunSAPE++ Embedded Library
+ * File name:		max9250.cpp
+ * Module:			MAX9250 module interface for FunSAPE++ Embedded Library
+ * 					project
+ * Authors:			__AUTHORS_TO_REPLACE__
+ * Build:			__BUILD_TO_REPLACE__
+ * Last edition:	__DATE_TO_REPLACE__
+ * ========================================================================== */
+
+// =============================================================================
+// Dependencies
+// =============================================================================
+
+#include "mpu9250.hpp"
+#ifndef __MPU9250_HPP
+#	error	[mpu9250.cpp] Error 1 - Header file (mpu9250.hpp) is missing or corrupted!
+#elif __MPU9250_HPP != __BUILD_TO_REPLACE__
+#	error	[mpu9250.cpp] Error 13 - Build mismatch between source (mpu9250.cpp) and header (mpu9250.hpp) files!
+#endif
+
+// =============================================================================
+// File exclusive - Constants
+// =============================================================================
+
+#define MPU9250_SLAVE_ADDRESS_NORMAL			0x68
+#define MPU9250_SLAVE_ADDRESS_ALTERNATE			0x69
+#define MPU9250_WHO_AM_I						0x71
+#define MPU9250_RESET_DELAY						50
+
+// =============================================================================
+// File exclusive - New data types
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// MPU9250 register bit position
+// -----------------------------------------------------------------------------
+
+typedef enum mpu9250RegisterBit_e {
+
+	MPU9250_BIT_CONFIG_FIFO_MODE				= 6,
+	MPU9250_BIT_CONFIG_EXT_SYNC_SET_0			= 3,
+	MPU9250_BIT_CONFIG_GYRO_DLPF_CFG_0			= 0,
+	MPU9250_BIT_GYRO_CONFIG_Z_ST_EN				= 7,
+	MPU9250_BIT_GYRO_CONFIG_Y_ST_EN				= 6,
+	MPU9250_BIT_GYRO_CONFIG_X_ST_EN				= 5,
+	MPU9250_BIT_GYRO_CONFIG_FS_SEL0				= 2,
+	MPU9250_BIT_GYRO_CONFIG_FCHOICE_B_0			= 0,
+	MPU9250_BIT_ACCEL_CONFIG_Z_ST_EN			= 7,
+	MPU9250_BIT_ACCEL_CONFIG_Y_ST_EN			= 6,
+	MPU9250_BIT_ACCEL_CONFIG_X_ST_EN			= 5,
+	MPU9250_BIT_ACCEL_CONFIG_FS_SEL0			= 3,
+	MPU9250_BIT_ACCEL_CONFIG2_FCHOICE_B_0		= 2,
+	MPU9250_BIT_ACCEL_CONFIG2_DLPF_CFG_0		= 0,
+	MPU9250_BIT_I2C_SLV0_EN						= 7,
+	MPU9250_BIT_I2C_SLV0_BYTE_SW				= 6,
+	MPU9250_BIT_I2C_SLV0_REG_DIS				= 5,
+	MPU9250_BIT_I2C_SLV0_GRP					= 4,
+	MPU9250_BIT_I2C_SLV0_LENG_0					= 0,
+	MPU9250_BIT_I2C_SLV1_EN						= 7,
+	MPU9250_BIT_I2C_SLV1_BYTE_SW				= 6,
+	MPU9250_BIT_I2C_SLV1_REG_DIS				= 5,
+	MPU9250_BIT_I2C_SLV1_GRP					= 4,
+	MPU9250_BIT_I2C_SLV1_LENG_0					= 0,
+	MPU9250_BIT_I2C_SLV2_EN						= 7,
+	MPU9250_BIT_I2C_SLV2_BYTE_SW				= 6,
+	MPU9250_BIT_I2C_SLV2_REG_DIS				= 5,
+	MPU9250_BIT_I2C_SLV2_GRP					= 4,
+	MPU9250_BIT_I2C_SLV2_LENG_0					= 0,
+	MPU9250_BIT_I2C_SLV3_EN						= 7,
+	MPU9250_BIT_I2C_SLV3_BYTE_SW				= 6,
+	MPU9250_BIT_I2C_SLV3_REG_DIS				= 5,
+	MPU9250_BIT_I2C_SLV3_GRP					= 4,
+	MPU9250_BIT_I2C_SLV3_LENG_0					= 0,
+	MPU9250_BIT_I2C_SLV4_EN						= 7,
+	MPU9250_BIT_I2C_SLV4_INT_EN					= 6,
+	MPU9250_BIT_I2C_SLV4_REG_DIS				= 5,
+	MPU9250_BIT_I2C_SLV4_DELAY					= 0,
+	MPU9250_BIT_SIG_PAT_RST_GYRO				= 2,
+	MPU9250_BIT_SIG_PAT_RST_ACCEL				= 1,
+	MPU9250_BIT_SIG_PAT_RST_TEMP				= 0,
+	MPU9250_BIT_USR_CONTROLFIFO_EN				= 6,
+	MPU9250_BIT_USR_CONTROLI2C_MST_EN			= 5,
+	MPU9250_BIT_USR_CONTROLI2C_IF_DIS			= 4,
+	MPU9250_BIT_USR_CONTROLFIFO_RST				= 2,
+	MPU9250_BIT_USR_CONTROLI2C_MST_RST			= 1,
+	MPU9250_BIT_USR_CONTROLSIG_COND_RST			= 0,
+	MPU9250_BIT_PWR_MGMT_1_H_RESET				= 7,
+	MPU9250_BIT_PWR_MGMT_1_SLEEP				= 6,
+	MPU9250_BIT_PWR_MGMT_1_CYCLE				= 5,
+	MPU9250_BIT_PWR_MGMT_1_GYRO_STANDBY			= 4,
+	MPU9250_BIT_PWR_MGMT_1_PD_PTAT				= 3,
+	MPU9250_BIT_PWR_MGMT_1_CLKSEL_0				= 0,
+	MPU9250_BIT_PWR_MGMT_2_DIS_XA				= 5,
+	MPU9250_BIT_PWR_MGMT_2_DIS_YA				= 4,
+	MPU9250_BIT_PWR_MGMT_2_DIS_ZA				= 3,
+	MPU9250_BIT_PWR_MGMT_2_DIS_XG				= 2,
+	MPU9250_BIT_PWR_MGMT_2_DIS_YG				= 1,
+	MPU9250_BIT_PWR_MGMT_2_DIS_ZG				= 0,
+	MPU9250_BIT_INT_PIN_LEVEL					= 7,
+	MPU9250_BIT_INT_PIN_DRIVER					= 6,
+	MPU9250_BIT_INT_PIN_LATCH					= 5,
+	MPU9250_BIT_INT_PIN_AUTO_RESET				= 4,
+	MPU9250_BIT_FSYNC_LEVEL						= 3,
+	MPU9250_BIT_FSYNC_MODE_EN					= 2,
+	MPU9250_BIT_BYPASS_EN						= 1,
+	MPU9250_BIT_WAKE_ON_MOTION_EN				= 6,
+	MPU9250_BIT_FIFO_OVERFLOW_EN				= 4,
+	MPU9250_BIT_FSYNC_INT_EN					= 3,
+	MPU9250_BIT_RAW_DATA_READY_EN				= 0,
+	MPU9250_BIT_INT_STATUS_WOM					= 6,
+	MPU9250_BIT_INT_STATUS_FIFO_OVERFLOW		= 4,
+	MPU9250_BIT_INT_STATUS_FSYNC				= 3,
+	MPU9250_BIT_INT_STATUS_RAW_DATA_RDY			= 0,
+} mpu9250RegisterBit_e;
+
+// -----------------------------------------------------------------------------
+// MPU9250 register addresses
+// -----------------------------------------------------------------------------
+
+typedef enum mpu9250Register_e {
+	// Self test registers
+	MPU9250_REG_ACCEL_SELF_TEST_X				= 0x0D,
+	MPU9250_REG_ACCEL_SELF_TEST_Y				= 0x0E,
+	MPU9250_REG_ACCEL_SELF_TEST_Z				= 0x0F,
+	MPU9250_REG_GYRO_SELF_TEST_X				= 0x00,
+	MPU9250_REG_GYRO_SELF_TEST_Y				= 0x01,
+	MPU9250_REG_GYRO_SELF_TEST_Z				= 0x02,
+
+	// Offset registers
+	MPU9250_REG_ACCEL_OFFSET_XH					= 0x77,
+	MPU9250_REG_ACCEL_OFFSET_XL					= 0x78,
+	MPU9250_REG_ACCEL_OFFSET_YH					= 0x7A,
+	MPU9250_REG_ACCEL_OFFSET_YL					= 0x7B,
+	MPU9250_REG_ACCEL_OFFSET_ZH					= 0x7D,
+	MPU9250_REG_ACCEL_OFFSET_ZL					= 0x7E,
+	MPU9250_REG_GYRO_OFFSET_XH					= 0x13,
+	MPU9250_REG_GYRO_OFFSET_XL					= 0x14,
+	MPU9250_REG_GYRO_OFFSET_YH					= 0x15,
+	MPU9250_REG_GYRO_OFFSET_YL					= 0x16,
+	MPU9250_REG_GYRO_OFFSET_ZH					= 0x17,
+	MPU9250_REG_GYRO_OFFSET_ZL					= 0x18,
+
+	// Configuration registers
+	MPU9250_REG_ACCEL_CONFIG_1					= 0x1C,
+	MPU9250_REG_ACCEL_CONFIG_2					= 0x1D,
+	MPU9250_REG_ACCEL_LOW_POWER_ODR				= 0x1E,
+	MPU9250_REG_CONFIG							= 0x1A,
+	MPU9250_REG_GYRO_CONFIG						= 0x1B,
+	MPU9250_REG_MOT_DETECT_CONTROL				= 0x69,
+	MPU9250_REG_PWR_MGMT_1						= 0x6B,
+	MPU9250_REG_PWR_MGMT_2						= 0x6C,
+	MPU9250_REG_SAMPLE_RATE_DIV					= 0x19,
+	MPU9250_REG_SIGNAL_PATH_RESET				= 0x68,
+	MPU9250_REG_USER_CONTROL					= 0x6A,
+	MPU9250_REG_WOM_THR							= 0x1F,
+
+	// FIFO registers
+	MPU9250_REG_FIFO_COUNT_H					= 0x72,
+	MPU9250_REG_FIFO_COUNT_L					= 0x73,
+	MPU9250_REG_FIFO_EN							= 0x23,
+	MPU9250_REG_FIFO_R_W						= 0x74,
+
+	// I2C master registers
+	MPU9250_REG_I2C_MASTER_CONTROL				= 0x24,
+	MPU9250_REG_I2C_MASTER_DELAY_CONTROL		= 0x67,
+	MPU9250_REG_I2C_MASTER_STATUS				= 0x36,
+	MPU9250_REG_I2C_SLV0_ADDRESS				= 0x25,
+	MPU9250_REG_I2C_SLV0_CONTROL				= 0x27,
+	MPU9250_REG_I2C_SLV0_DO						= 0x63,
+	MPU9250_REG_I2C_SLV0_REG					= 0x26,
+	MPU9250_REG_I2C_SLV1_ADDRESS				= 0x28,
+	MPU9250_REG_I2C_SLV1_CONTROL				= 0x2A,
+	MPU9250_REG_I2C_SLV1_DO						= 0x64,
+	MPU9250_REG_I2C_SLV1_REG					= 0x29,
+	MPU9250_REG_I2C_SLV2_ADDRESS				= 0x2B,
+	MPU9250_REG_I2C_SLV2_CONTROL				= 0x2D,
+	MPU9250_REG_I2C_SLV2_DO						= 0x65,
+	MPU9250_REG_I2C_SLV2_REG					= 0x2C,
+	MPU9250_REG_I2C_SLV3_ADDRESS				= 0x2E,
+	MPU9250_REG_I2C_SLV3_CONTROL				= 0x30,
+	MPU9250_REG_I2C_SLV3_DO						= 0x66,
+	MPU9250_REG_I2C_SLV3_REG					= 0x2F,
+	MPU9250_REG_I2C_SLV4_ADDRESS				= 0x31,
+	MPU9250_REG_I2C_SLV4_CONTROL				= 0x34,
+	MPU9250_REG_I2C_SLV4_DI						= 0x35,
+	MPU9250_REG_I2C_SLV4_DO						= 0x33,
+	MPU9250_REG_I2C_SLV4_REG					= 0x32,
+
+	// Interrupt registers
+	MPU9250_REG_INT_ENABLE						= 0x38,
+	MPU9250_REG_INT_PIN_CONFIG					= 0x37,
+	MPU9250_REG_INT_STATUS						= 0x3A,
+
+	// Data registers
+	MPU9250_REG_ACCEL_DATA_XH					= 0x3B,
+	MPU9250_REG_ACCEL_DATA_XL					= 0x3C,
+	MPU9250_REG_ACCEL_DATA_YH					= 0x3D,
+	MPU9250_REG_ACCEL_DATA_YL					= 0x3E,
+	MPU9250_REG_ACCEL_DATA_ZH					= 0x3F,
+	MPU9250_REG_ACCEL_DATA_ZL					= 0x40,
+	MPU9250_REG_GYRO_DATA_XH					= 0x43,
+	MPU9250_REG_GYRO_DATA_XL					= 0x44,
+	MPU9250_REG_GYRO_DATA_YH					= 0x45,
+	MPU9250_REG_GYRO_DATA_YL					= 0x46,
+	MPU9250_REG_GYRO_DATA_ZH					= 0x47,
+	MPU9250_REG_GYRO_DATA_ZL					= 0x48,
+	MPU9250_REG_TEMP_DATA_H						= 0x41,
+	MPU9250_REG_TEMP_DATA_L						= 0x42,
+
+	// External sensor data registers
+	MPU9250_REG_EXT_SENS_DATA_00				= 0x49,
+	MPU9250_REG_EXT_SENS_DATA_01				= 0x4A,
+	MPU9250_REG_EXT_SENS_DATA_02				= 0x4B,
+	MPU9250_REG_EXT_SENS_DATA_03				= 0x4C,
+	MPU9250_REG_EXT_SENS_DATA_04				= 0x4D,
+	MPU9250_REG_EXT_SENS_DATA_05				= 0x4E,
+	MPU9250_REG_EXT_SENS_DATA_06				= 0x4F,
+	MPU9250_REG_EXT_SENS_DATA_07				= 0x50,
+	MPU9250_REG_EXT_SENS_DATA_08				= 0x51,
+	MPU9250_REG_EXT_SENS_DATA_09				= 0x52,
+	MPU9250_REG_EXT_SENS_DATA_10				= 0x53,
+	MPU9250_REG_EXT_SENS_DATA_11				= 0x54,
+	MPU9250_REG_EXT_SENS_DATA_12				= 0x55,
+	MPU9250_REG_EXT_SENS_DATA_13				= 0x56,
+	MPU9250_REG_EXT_SENS_DATA_14				= 0x57,
+	MPU9250_REG_EXT_SENS_DATA_15				= 0x58,
+	MPU9250_REG_EXT_SENS_DATA_16				= 0x59,
+	MPU9250_REG_EXT_SENS_DATA_17				= 0x5A,
+	MPU9250_REG_EXT_SENS_DATA_18				= 0x5B,
+	MPU9250_REG_EXT_SENS_DATA_19				= 0x5C,
+	MPU9250_REG_EXT_SENS_DATA_20				= 0x5D,
+	MPU9250_REG_EXT_SENS_DATA_21				= 0x5E,
+	MPU9250_REG_EXT_SENS_DATA_22				= 0x5F,
+	MPU9250_REG_EXT_SENS_DATA_23				= 0x60,
+
+	// Who am I register
+	MPU9250_REG_WHO_AM_I						= 0x75,
+} mpu9250Register_e;
+
+// =============================================================================
+// File exclusive - Macro-functions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Global variables
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Static functions declarations
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Class constructors
+// =============================================================================
+
+Mpu9250::Mpu9250(void)
+{
+	// Mark passage for debug
+	debugMark("Mpu9250(void)");
+
+	// Reset data members
+	this->_clearData();
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return;
+}
+
+Mpu9250::~Mpu9250(void)									// TODO: Implement this function
+{
+	// Mark passage for debug
+	debugMark("~Mpu9250(void)")
+
+	// Returns successfully
+	return;
+}
+
+// =============================================================================
+// Inherited methods - Public
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Inherited methods - Protected
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Class own methods - Public
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// INITIALIZATION
+// -----------------------------------------------------------------------------
+
+bool Mpu9250::init(Handler *twiHandler_p, bool useAlternateAddress_p)
+{
+	// Local variables
+	uint8_t auxBuff;
+
+	// Mark passage for debug
+	debugMark("init(Handler *, bool)");
+
+	// Reset data members
+	this->_initialized = false;
+	this->_handler = nullptr;
+	this->_activateDevice = nullptr;
+	this->_deactivateDevice = nullptr;
+	this->_useSpi = false;
+	this->_i2cAddress = 0;
+
+	// Check for errors
+	if(!isPointerValid(twiHandler_p)) {
+		this->_handler = nullptr;
+		this->_lastError = Error::HANDLER_POINTER_NULL;
+		debugMessage(Error::HANDLER_POINTER_NULL);
+		return false;
+	} else {
+		switch(twiHandler_p->getHandlerType()) {
+		case Handler::HandlerType::TWI:
+			break;
+		case Handler::HandlerType::SPI:
+			this->_lastError = Error::UNKNOWN;			// TODO: Create specific error code
+			debugMessage(Error::UNKNOWN);				// TODO: Create specific error code
+			return false;
+		default:
+			this->_lastError = Error::HANDLER_UNSUPPORTED;
+			debugMessage(Error::HANDLER_UNSUPPORTED);
+			return false;
+		}
+	}
+
+	// Update data members
+	this->_handler = twiHandler_p;
+	if(useAlternateAddress_p) {
+		this->_i2cAddress = MPU9250_SLAVE_ADDRESS_ALTERNATE;
+	} else {
+		this->_i2cAddress = MPU9250_SLAVE_ADDRESS_NORMAL;
+	}
+	this->_useSpi = false;
+
+	// Get device ID
+	if(!this->_read(MPU9250_REG_WHO_AM_I, &auxBuff, 1)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+	// Check device ID
+	if(auxBuff != MPU9250_WHO_AM_I) {
+		// Returns error
+		this->_lastError = Error::DEVICE_ID_MATCH_FAILED;
+		debugMessage(Error::DEVICE_ID_MATCH_FAILED);
+		return false;
+	}
+
+	// Restart device
+	if(!this->restart()) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Initialize device
+	if(!this->_initialize()) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+bool Mpu9250::init(Handler *spiHandler_p, void (*actDevFuncCallback_p)(void), void (*deactDevFuncCallback_p)(void))
+{
+	// Local variables
+	uint8_t auxBuff;
+
+	// Mark passage for debug
+	debugMark("init(Handler *, void (*), void (*)");
+
+	// Reset data members
+	this->_initialized = false;
+	this->_handler = nullptr;
+	this->_activateDevice = nullptr;
+	this->_deactivateDevice = nullptr;
+	this->_useSpi = false;
+	this->_i2cAddress = 0;
+
+	// Check for errors
+	if(!isPointerValid(actDevFuncCallback_p) || !isPointerValid(deactDevFuncCallback_p)) {
+		this->_handler = nullptr;
+		this->_lastError = Error::FUNCTION_POINTER_NULL;
+		debugMessage(Error::FUNCTION_POINTER_NULL);
+		return false;
+	}
+	if(!isPointerValid(spiHandler_p)) {
+		this->_handler = nullptr;
+		this->_lastError = Error::HANDLER_POINTER_NULL;
+		debugMessage(Error::HANDLER_POINTER_NULL);
+		return false;
+	} else {
+		switch(spiHandler_p->getHandlerType()) {
+		case Handler::HandlerType::TWI:
+			this->_lastError = Error::UNKNOWN;			// TODO: Create specific error code
+			debugMessage(Error::UNKNOWN);				// TODO: Create specific error code
+			return false;
+		case Handler::HandlerType::SPI:
+			break;
+		default:
+			this->_lastError = Error::HANDLER_UNSUPPORTED;
+			debugMessage(Error::HANDLER_UNSUPPORTED);
+			return false;
+		}
+	}
+
+	// Update data members
+	this->_handler = spiHandler_p;
+	this->_activateDevice = actDevFuncCallback_p;
+	this->_deactivateDevice = deactDevFuncCallback_p;
+	this->_useSpi = true;
+
+	// Get device ID
+	if(!this->_read(MPU9250_REG_WHO_AM_I, &auxBuff, 1)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+	// Check device ID
+	if(auxBuff != MPU9250_WHO_AM_I) {
+		// Returns error
+		this->_lastError = Error::DEVICE_ID_MATCH_FAILED;
+		debugMessage(Error::DEVICE_ID_MATCH_FAILED);
+		return false;
+	}
+
+	// Restart device
+	if(!this->restart()) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Initialize device
+	if(!this->_initialize()) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+bool Mpu9250::restart(void)
+{
+	// Local variables
+	uint8_t auxBuff;
+
+	// Mark passage for debug
+	debugMark();
+
+	// Send reset signal
+	auxBuff = (1 << MPU9250_BIT_PWR_MGMT_1_H_RESET);
+	if(!this->_write(MPU9250_REG_PWR_MGMT_1, &auxBuff, 1)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Wait until reset takes
+	delayMs(MPU9250_RESET_DELAY);
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+// -----------------------------------------------------------------------------
+// CHECK STATUS
+// -----------------------------------------------------------------------------
+
+Error Mpu9250::getLastError(void)
+{
+	// Returns last error
+	return this->_lastError;
+}
+
+// -----------------------------------------------------------------------------
+// DEVICE CONFIGURATION
+// -----------------------------------------------------------------------------
+
+bool Mpu9250::configAccel(AccelConfig config_p, AccelFullScale scale_p, Axis axis_p)
+{
+	// Local variables
+	uint8_t auxBuff[2];
+	uint8_t auxFChoiceB = 0;
+	uint8_t auxDlpfCfg = 0;
+	uint8_t auxFullScale = 0;
+
+	// Mark passage for debug
+	debugMark();
+
+	// Check for errors
+	if(!this->_initialized) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+	if(axis_p == Axis::NONE) {
+		// Returns error
+		this->_lastError = Error::INVALID_AXIS;
+		debugMessage(Error::INVALID_AXIS);
+		return false;
+	}
+
+	// Process arguments
+	auxFullScale = ((uint8_t)scale_p & 0x03) << MPU9250_BIT_ACCEL_CONFIG_FS_SEL0;
+	auxFChoiceB = isBitSet((uint8_t)config_p, 4) << MPU9250_BIT_ACCEL_CONFIG2_FCHOICE_B_0;
+	auxDlpfCfg = ((uint8_t)config_p & 0x07) << MPU9250_BIT_ACCEL_CONFIG2_DLPF_CFG_0;
+	this->_accelDisableX = isBitClr((uint8_t)axis_p, 0);
+	this->_accelDisableY = isBitClr((uint8_t)axis_p, 1);
+	this->_accelDisableZ = isBitClr((uint8_t)axis_p, 2);
+
+	// Manipulate registers ACCEL_CONFIG and ACCEL_CONFIG2
+	if(!this->_read(MPU9250_REG_ACCEL_CONFIG_1, auxBuff, 2)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+	clrMaskOffset(auxBuff[0], 0x03, MPU9250_BIT_ACCEL_CONFIG_FS_SEL0);
+	clrBit(auxBuff[1], MPU9250_BIT_ACCEL_CONFIG2_FCHOICE_B_0);
+	clrMaskOffset(auxBuff[1], 0x07, MPU9250_BIT_ACCEL_CONFIG2_DLPF_CFG_0);
+	auxBuff[0] |= auxFullScale;
+	auxBuff[1] |= auxFChoiceB | auxDlpfCfg;
+	if(!this->_write(MPU9250_REG_ACCEL_CONFIG_1, auxBuff, 2)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Manipulate registers PWR_MGMT_2
+	if(!this->_read(MPU9250_REG_PWR_MGMT_2, auxBuff, 1)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+	clrBit(auxBuff[0], MPU9250_BIT_PWR_MGMT_2_DIS_XA);
+	clrBit(auxBuff[0], MPU9250_BIT_PWR_MGMT_2_DIS_YA);
+	clrBit(auxBuff[0], MPU9250_BIT_PWR_MGMT_2_DIS_ZA);
+	auxBuff[0] |= (
+					(this->_accelDisableX << MPU9250_BIT_PWR_MGMT_2_DIS_XA) |
+					(this->_accelDisableY << MPU9250_BIT_PWR_MGMT_2_DIS_YA) |
+					(this->_accelDisableX << MPU9250_BIT_PWR_MGMT_2_DIS_ZA));
+	if(!this->_write(MPU9250_REG_PWR_MGMT_2, auxBuff, 1)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+bool Mpu9250::configGyro(GyroConfig config_p, GyroFullScale scale_p, Axis axis_p)
+{
+	// Local variables
+	uint8_t auxBuff[2];
+	uint8_t auxFChoiceB = 0;
+	uint8_t auxDlpfCfg = 0;
+	uint8_t auxFullScale = 0;
+
+	// Mark passage for debug
+	debugMark();
+
+	// Check for errors
+	if(!this->_initialized) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+	if(axis_p == Axis::NONE) {
+		// Returns error
+		this->_lastError = Error::INVALID_AXIS;
+		debugMessage(Error::INVALID_AXIS);
+		return false;
+	}
+
+	// Process arguments
+	auxDlpfCfg = ((uint8_t)config_p & 0x07) << MPU9250_BIT_CONFIG_GYRO_DLPF_CFG_0;
+	auxFChoiceB = (((uint8_t)config_p >> 3) & 0x03) << MPU9250_BIT_GYRO_CONFIG_FCHOICE_B_0;
+	auxFullScale = ((uint8_t)scale_p & 0x03) << MPU9250_BIT_GYRO_CONFIG_FS_SEL0;
+	this->_gyroDisableX = isBitClr((uint8_t)axis_p, 0);
+	this->_gyroDisableY = isBitClr((uint8_t)axis_p, 1);
+	this->_gyroDisableZ = isBitClr((uint8_t)axis_p, 2);
+
+	// Manipulate registers CONFIG and CONFIG_GYRO
+	if(!this->_read(MPU9250_REG_CONFIG, auxBuff, 2)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+	clrMaskOffset(auxBuff[0], 0x07, MPU9250_BIT_CONFIG_GYRO_DLPF_CFG_0);
+	clrMaskOffset(auxBuff[1], 0x03, MPU9250_BIT_GYRO_CONFIG_FCHOICE_B_0);
+	clrMaskOffset(auxBuff[1], 0x03, MPU9250_BIT_GYRO_CONFIG_FS_SEL0);
+	auxBuff[0] |= auxDlpfCfg;
+	auxBuff[1] |= auxFChoiceB | auxFullScale;
+	if(!this->_write(MPU9250_REG_CONFIG, auxBuff, 2)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Manipulate registers PWR_MGMT_2
+	if(!this->_read(MPU9250_REG_PWR_MGMT_2, auxBuff, 1)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+	clrBit(auxBuff[0], MPU9250_BIT_PWR_MGMT_2_DIS_XG);
+	clrBit(auxBuff[0], MPU9250_BIT_PWR_MGMT_2_DIS_YG);
+	clrBit(auxBuff[0], MPU9250_BIT_PWR_MGMT_2_DIS_ZG);
+	auxBuff[0] |= (
+					(this->_gyroDisableX << MPU9250_BIT_PWR_MGMT_2_DIS_XG) |
+					(this->_gyroDisableY << MPU9250_BIT_PWR_MGMT_2_DIS_YG) |
+					(this->_gyroDisableX << MPU9250_BIT_PWR_MGMT_2_DIS_ZG));
+	if(!this->_write(MPU9250_REG_PWR_MGMT_2, auxBuff, 1)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+bool Mpu9250::performSelfTest(Axis accelAxis_p, Axis gyroAxis_p)
+{
+	// Mark passage for debug
+	debugMark();
+
+	// Returns error
+	this->_lastError = Error::UNDER_DEVELOPMENT;
+	debugMessage(Error::UNDER_DEVELOPMENT);
+	return false;
+}
+
+// -----------------------------------------------------------------------------
+// RAW DATA MANAGEMENT
+// -----------------------------------------------------------------------------
+
+bool Mpu9250::getAccelData(int16_t *accelBuff_p, Axis axis_p)
+{
+	// Local variables
+	uint8_t auxBuff[6];
+	int16_t auxInt16 = 0;
+	uint8_t index = 0;
+
+	// Mark passage for debug
+	debugMark();
+
+	// Check for errors
+	if(!this->_initialized) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+	if(axis_p == Axis::NONE) {
+		// Returns error
+		this->_lastError = Error::INVALID_AXIS;
+		debugMessage(Error::INVALID_AXIS);
+		return false;
+	}
+	if(!isPointerValid(accelBuff_p)) {
+		this->_lastError = Error::BUFFER_POINTER_NULL;
+		debugMessage(Error::BUFFER_POINTER_NULL);
+		return false;
+	}
+
+	// Read registers
+	if(!this->_read(MPU9250_REG_ACCEL_DATA_XH, auxBuff, 6)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Process data
+	if((axis_p & Axis::X) == Axis::X) {
+		auxInt16 = (int16_t)auxBuff[0];
+		auxInt16 <<= 8;
+		auxInt16 |= (int16_t)auxBuff[1];
+		accelBuff_p[index++] = auxInt16;
+	}
+	if((axis_p & Axis::Y) == Axis::Y) {
+		auxInt16 = (int16_t)auxBuff[2];
+		auxInt16 <<= 8;
+		auxInt16 |= (int16_t)auxBuff[3];
+		accelBuff_p[index++] = auxInt16;
+	}
+	if((axis_p & Axis::Z) == Axis::Z) {
+		auxInt16 = (int16_t)auxBuff[4];
+		auxInt16 <<= 8;
+		auxInt16 |= (int16_t)auxBuff[5];
+		accelBuff_p[index++] = auxInt16;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+bool Mpu9250::getAccelOffset(int16_t *accelBuff_p, Axis axis_p)
+{
+	// Local variables
+	uint8_t auxBuff[6];
+	int16_t auxInt16 = 0;
+	uint8_t index = 0;
+
+	// Mark passage for debug
+	debugMark();
+
+	// Check for errors
+	if(!this->_initialized) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+	if(axis_p == Axis::NONE) {
+		// Returns error
+		this->_lastError = Error::INVALID_AXIS;
+		debugMessage(Error::INVALID_AXIS);
+		return false;
+	}
+	if(!isPointerValid(accelBuff_p)) {
+		this->_lastError = Error::BUFFER_POINTER_NULL;
+		debugMessage(Error::BUFFER_POINTER_NULL);
+		return false;
+	}
+
+	// Read registers
+	if(!this->_read(MPU9250_REG_ACCEL_OFFSET_XH, auxBuff, 6)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Process data
+	if((axis_p & Axis::X) == Axis::X) {
+		auxInt16 = (int16_t)auxBuff[0];
+		auxInt16 <<= 8;
+		auxInt16 |= (int16_t)auxBuff[1];
+		accelBuff_p[index++] = auxInt16;
+	}
+	if((axis_p & Axis::Y) == Axis::Y) {
+		auxInt16 = (int16_t)auxBuff[2];
+		auxInt16 <<= 8;
+		auxInt16 |= (int16_t)auxBuff[3];
+		accelBuff_p[index++] = auxInt16;
+	}
+	if((axis_p & Axis::Z) == Axis::Z) {
+		auxInt16 = (int16_t)auxBuff[4];
+		auxInt16 <<= 8;
+		auxInt16 |= (int16_t)auxBuff[5];
+		accelBuff_p[index++] = auxInt16;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+bool Mpu9250::setAccelOffset(int16_t *accelBuff_p, Axis axis_p)
+{
+	// Mark passage for debug
+	debugMark();
+
+	// Returns error
+	this->_lastError = Error::UNDER_DEVELOPMENT;
+	debugMessage(Error::UNDER_DEVELOPMENT);
+	return false;
+}
+
+bool Mpu9250::getGyroData(int16_t *gyroBuff_p, Axis axis_p)
+{
+	// Local variables
+	uint8_t auxBuff[6];
+	int16_t auxInt16 = 0;
+	uint8_t index = 0;
+
+	// Mark passage for debug
+	debugMark();
+
+	// Check for errors
+	if(!this->_initialized) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+	if(axis_p == Axis::NONE) {
+		// Returns error
+		this->_lastError = Error::INVALID_AXIS;
+		debugMessage(Error::INVALID_AXIS);
+		return false;
+	}
+	if(!isPointerValid(gyroBuff_p)) {
+		this->_lastError = Error::BUFFER_POINTER_NULL;
+		debugMessage(Error::BUFFER_POINTER_NULL);
+		return false;
+	}
+
+	// Read registers
+	if(!this->_read(MPU9250_REG_GYRO_DATA_XH, auxBuff, 6)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Process data
+	if((axis_p & Axis::X) == Axis::X) {
+		auxInt16 = (int16_t)auxBuff[0];
+		auxInt16 <<= 8;
+		auxInt16 |= (int16_t)auxBuff[1];
+		gyroBuff_p[index++] = auxInt16;
+	}
+	if((axis_p & Axis::Y) == Axis::Y) {
+		auxInt16 = (int16_t)auxBuff[2];
+		auxInt16 <<= 8;
+		auxInt16 |= (int16_t)auxBuff[3];
+		gyroBuff_p[index++] = auxInt16;
+	}
+	if((axis_p & Axis::Z) == Axis::Z) {
+		auxInt16 = (int16_t)auxBuff[4];
+		auxInt16 <<= 8;
+		auxInt16 |= (int16_t)auxBuff[5];
+		gyroBuff_p[index++] = auxInt16;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+bool Mpu9250::getGyroOffset(int16_t *gyroBuff_p, Axis axis_p)
+{
+	// Local variables
+	uint8_t auxBuff[6];
+	int16_t auxInt16 = 0;
+	uint8_t index = 0;
+
+	// Mark passage for debug
+	debugMark();
+
+	// Check for errors
+	if(!this->_initialized) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+	if(axis_p == Axis::NONE) {
+		// Returns error
+		this->_lastError = Error::INVALID_AXIS;
+		debugMessage(Error::INVALID_AXIS);
+		return false;
+	}
+	if(!isPointerValid(gyroBuff_p)) {
+		this->_lastError = Error::BUFFER_POINTER_NULL;
+		debugMessage(Error::BUFFER_POINTER_NULL);
+		return false;
+	}
+
+	// Read registers
+	if(!this->_read(MPU9250_REG_GYRO_OFFSET_XH, auxBuff, 6)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Process data
+	if((axis_p & Axis::X) == Axis::X) {
+		auxInt16 = (int16_t)auxBuff[0];
+		auxInt16 <<= 8;
+		auxInt16 |= (int16_t)auxBuff[1];
+		gyroBuff_p[index++] = auxInt16;
+	}
+	if((axis_p & Axis::Y) == Axis::Y) {
+		auxInt16 = (int16_t)auxBuff[2];
+		auxInt16 <<= 8;
+		auxInt16 |= (int16_t)auxBuff[3];
+		gyroBuff_p[index++] = auxInt16;
+	}
+	if((axis_p & Axis::Z) == Axis::Z) {
+		auxInt16 = (int16_t)auxBuff[4];
+		auxInt16 <<= 8;
+		auxInt16 |= (int16_t)auxBuff[5];
+		gyroBuff_p[index++] = auxInt16;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+bool Mpu9250::setGyroOffset(int16_t *gyroBuff_p, Axis axis_p)
+{
+	// Mark passage for debug
+	debugMark();
+
+	// Returns error
+	this->_lastError = Error::UNDER_DEVELOPMENT;
+	debugMessage(Error::UNDER_DEVELOPMENT);
+	return false;
+}
+
+bool Mpu9250::getTempData(int16_t *temp_p)
+{
+	// Mark passage for debug
+	debugMark();
+
+	// Returns error
+	this->_lastError = Error::UNDER_DEVELOPMENT;
+	debugMessage(Error::UNDER_DEVELOPMENT);
+	return false;
+}
+
+// =============================================================================
+// Class own methods - Private
+// =============================================================================
+
+bool Mpu9250::_initialize(void)
+{
+	// Mark passage for debug
+	debugMark();
+
+	// Local variables
+	uint8_t auxBuff = 0;
+
+	// Get device ID
+	if(!this->_read(MPU9250_REG_WHO_AM_I, &auxBuff, 1)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+	// Check device ID
+	if(auxBuff != MPU9250_WHO_AM_I) {
+		// Returns error
+		this->_lastError = Error::DEVICE_ID_MATCH_FAILED;
+		debugMessage(Error::DEVICE_ID_MATCH_FAILED);
+		return false;
+	}
+
+	// Restart device
+	if(!this->restart()) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Update data members
+	this->_initialized = true;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+void Mpu9250::_clearData(void)
+{
+	// Mark passage for debug
+	debugMark();
+
+	//     /////////////////     PERIPHERAL HANDLER     /////////////////     //
+	this->_activateDevice				= nullptr;
+	this->_deactivateDevice				= nullptr;
+	this->_handler						= nullptr;
+	this->_i2cAddress					= 0x00;
+	this->_useSpi						= false;
+
+	//     /////////////////     CONTROL AND STATUS     /////////////////     //
+	this->_initialized					= false;
+	this->_lastError					= Error::NONE;
+
+	//     ////////////////     SENSOR CONFIGURATION     ////////////////     //
+	this->_accelDisableX				= false;
+	this->_accelDisableY				= false;
+	this->_accelDisableZ				= false;
+	// this->_sampleRateDivider			= 0;
+	this->_gyroDisableX					= false;
+	this->_gyroDisableY					= false;
+	this->_gyroDisableZ					= false;
+
+	// Return successfully
+	return;
+}
+
+bool Mpu9250::_read(uint8_t regAddr_p, uint8_t *dataBuffer_p, uint16_t bytesToRead_p)
+{
+	// Mark passage for debug
+	debugMark();
+
+	// Configure communication handler parameters
+	if(this->_useSpi) {
+		if(!this->_handler->setDevice(this->_activateDevice, this->_deactivateDevice)) {
+			// Returns error
+			this->_lastError = this->_handler->getLastError();
+			debugMessage(this->_lastError);
+			return false;
+		}
+	} else {
+		if(!this->_handler->setAddress(this->_i2cAddress, false)) {
+			// Returns error
+			this->_lastError = this->_handler->getLastError();
+			debugMessage(this->_lastError);
+			return false;
+		}
+	}
+
+	// Read data from device
+	if(!this->_handler->readReg(regAddr_p, dataBuffer_p, bytesToRead_p)) {
+		// Returns error
+		this->_lastError = this->_handler->getLastError();
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Return successfully
+	return true;
+}
+
+bool Mpu9250::_write(uint8_t regAddr_p, uint8_t *dataBuffer_p, uint16_t bytesToWrite_p)
+{
+	// Mark passage for debug
+	debugMark();
+
+	// Configure communication handler parameters
+	if(this->_useSpi) {
+		if(!this->_handler->setDevice(this->_activateDevice, this->_deactivateDevice)) {
+			// Returns error
+			this->_lastError = this->_handler->getLastError();
+			debugMessage(this->_lastError);
+			return false;
+		}
+	} else {
+		if(!this->_handler->setAddress(this->_i2cAddress, false)) {
+			// Returns error
+			this->_lastError = this->_handler->getLastError();
+			debugMessage(this->_lastError);
+			return false;
+		}
+	}
+
+	// Read data from device
+	if(!this->_handler->writeReg(regAddr_p, dataBuffer_p, bytesToWrite_p)) {
+		// Returns error
+		this->_lastError = this->_handler->getLastError();
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Return successfully
+	return true;
+}

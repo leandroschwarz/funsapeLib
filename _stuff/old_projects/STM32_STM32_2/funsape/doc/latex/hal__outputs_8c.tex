@@ -1,0 +1,73 @@
+\hypertarget{hal__outputs_8c}{}\section{\+\_\+hide/\+M\+P\+U/core/mllite/hal\+\_\+outputs.c File Reference}
+\label{hal__outputs_8c}\index{\+\_\+hide/\+M\+P\+U/core/mllite/hal\+\_\+outputs.\+c@{\+\_\+hide/\+M\+P\+U/core/mllite/hal\+\_\+outputs.\+c}}
+
+
+H\+A\+L Outputs.  
+
+
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}hal\+\_\+outputs.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}log.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}ml\+\_\+math\+\_\+func.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}mlmath.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}start\+\_\+manager.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}data\+\_\+builder.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}results\+\_\+holder.\+h\char`\"{}}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structhal__output__t}{hal\+\_\+output\+\_\+t}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{hal__outputs_8c_ab9d40e0bd23cf20e7e789eeabee45874}{}\#define {\bfseries A\+C\+C\+E\+L\+\_\+\+C\+O\+N\+V\+E\+R\+S\+I\+O\+N}~0.\+000149637603759766f\label{hal__outputs_8c_ab9d40e0bd23cf20e7e789eeabee45874}
+
+\item 
+\hypertarget{group___h_a_l___outputs_ga8d7f71e6536f480e180b9623a3f15884}{}\#define {\bfseries G\+Y\+R\+O\+\_\+\+C\+O\+N\+V\+E\+R\+S\+I\+O\+N}~2.\+66316109007924e-\/007f\label{group___h_a_l___outputs_ga8d7f71e6536f480e180b9623a3f15884}
+
+\item 
+\hypertarget{hal__outputs_8c_a7556dfecfd72d36943b25a25bd69c702}{}\#define {\bfseries C\+O\+M\+P\+A\+S\+S\+\_\+\+C\+O\+N\+V\+E\+R\+S\+I\+O\+N}~1.\+52587890625e-\/005f\label{hal__outputs_8c_a7556dfecfd72d36943b25a25bd69c702}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{group___h_a_l___outputs_ga7a75607c44fb603b68b9cd01b235b840}{inv\+\_\+get\+\_\+sensor\+\_\+type\+\_\+accelerometer} (float $\ast$values, int8\+\_\+t $\ast$accuracy, inv\+\_\+time\+\_\+t $\ast$timestamp)
+\item 
+int \hyperlink{group___h_a_l___outputs_gabe1647a5ab8b130749b7accc7595edf2}{inv\+\_\+get\+\_\+sensor\+\_\+type\+\_\+linear\+\_\+acceleration} (float $\ast$values, int8\+\_\+t $\ast$accuracy, inv\+\_\+time\+\_\+t $\ast$timestamp)
+\item 
+int \hyperlink{group___h_a_l___outputs_ga3076522eb94bb46eced2880cc03b2ad2}{inv\+\_\+get\+\_\+sensor\+\_\+type\+\_\+gravity} (float $\ast$values, int8\+\_\+t $\ast$accuracy, inv\+\_\+time\+\_\+t $\ast$timestamp)
+\item 
+int \hyperlink{group___h_a_l___outputs_ga527972322b3eabfe7b06fe98334abd93}{inv\+\_\+get\+\_\+sensor\+\_\+type\+\_\+gyroscope} (float $\ast$values, int8\+\_\+t $\ast$accuracy, inv\+\_\+time\+\_\+t $\ast$timestamp)
+\item 
+int \hyperlink{group___h_a_l___outputs_ga98225449edffe2a6e015bce98c311d86}{inv\+\_\+get\+\_\+sensor\+\_\+type\+\_\+gyroscope\+\_\+raw} (float $\ast$values, int8\+\_\+t $\ast$accuracy, inv\+\_\+time\+\_\+t $\ast$timestamp)
+\item 
+int \hyperlink{group___h_a_l___outputs_gabcb224757402c0c07745749e7139060c}{inv\+\_\+get\+\_\+sensor\+\_\+type\+\_\+rotation\+\_\+vector} (float $\ast$values, int8\+\_\+t $\ast$accuracy, inv\+\_\+time\+\_\+t $\ast$timestamp)
+\item 
+int \hyperlink{group___h_a_l___outputs_ga82ccc6c2f0e0a84f8689bb7f296a6fa9}{inv\+\_\+get\+\_\+sensor\+\_\+type\+\_\+magnetic\+\_\+field} (float $\ast$values, int8\+\_\+t $\ast$accuracy, inv\+\_\+time\+\_\+t $\ast$timestamp)
+\item 
+int \hyperlink{group___h_a_l___outputs_ga76bb6253e6f974919426dbda5f7d54e2}{inv\+\_\+get\+\_\+sensor\+\_\+type\+\_\+orientation} (float $\ast$values, int8\+\_\+t $\ast$accuracy, inv\+\_\+time\+\_\+t $\ast$timestamp)
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___h_a_l___outputs_gab973fa71415a6b7ce0277a13ef5c586a}{inv\+\_\+generate\+\_\+hal\+\_\+outputs} (struct \hyperlink{structinv__sensor__cal__t}{inv\+\_\+sensor\+\_\+cal\+\_\+t} $\ast$sensor\+\_\+cal)
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___h_a_l___outputs_ga3fe9875d4c91b869178a4401c5b104ff}{inv\+\_\+stop\+\_\+hal\+\_\+outputs} (void)
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___h_a_l___outputs_ga66478e69243f42a25992e48ed8a6cadc}{inv\+\_\+start\+\_\+hal\+\_\+outputs} (void)
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___h_a_l___outputs_ga7fbd12eb4b9220834e302424e86d82e2}{inv\+\_\+init\+\_\+hal\+\_\+outputs} (void)
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___h_a_l___outputs_ga5248dd2a8b27d377b752b284ddb729d8}{inv\+\_\+enable\+\_\+hal\+\_\+outputs} (void)
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___h_a_l___outputs_gadfb0057acbe28e3cdfaaff073b084410}{inv\+\_\+disable\+\_\+hal\+\_\+outputs} (void)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+float {\bfseries compass\+\_\+low\+\_\+pass\+\_\+filter\+\_\+coeff} \mbox{[}5\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+H\+A\+L Outputs. 
+

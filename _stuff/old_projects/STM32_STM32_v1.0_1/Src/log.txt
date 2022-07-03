@@ -1,0 +1,35 @@
+EVENT									ECG				SD
+START									0				0
+[  OK  ] OK HALF!						12				0
+[  OK  ] OK COMP!						24				0
+[  OK  ] OK HALF!						36				0
+[  OK  ] OK COMP!						48				0
+[  OK  ] OK HALF!						60				0
+[  OK  ] OK COMP!						72				0
+[  OK  ] ECG CIRC => BUFFER!			8				0
+[  OK  ] BUFFER => SD CIRC!				8				128
+[  OK  ] OK HALF!						20				128
+[  OK  ] OK COMP!						32				128
+[  OK  ] OK HALF!						44				128
+[  OK  ] OK COMP!						56				128
+[  OK  ] OK HALF!						68				128
+[  OK  ] ECG CIRC => BUFFER!			4				128
+[  OK  ] BUFFER => SD CIRC!				4				256
+[  OK  ] OK COMP!						16				256
+[  OK  ] OK HALF!						28				256
+[  OK  ] OK COMP!						40				256
+[  OK  ] OK HALF!						52				256
+[  OK  ] OK COMP!						64				256
+[  OK  ] ECG CIRC => BUFFER!			0				256
+[  OK  ] BUFFER => SD CIRC!				0				384
+[  OK  ] OK HALF!						12				384
+[  OK  ] OK COMP!						24				384
+[  OK  ] OK HALF!						36				384
+[  OK  ] OK COMP!						48				384
+[  OK  ] OK HALF!						60				384
+[  OK  ] OK COMP!						72				384
+[  OK  ] ECG CIRC => BUFFER!			8				384
+[  OK  ] BUFFER => SD CIRC!				8				512
+[  OK  ] SD CIRC => BUFFER!				8				0
+[  OK  ] BUFFER => SD!
+[FAILED] erro! Error = 7.				8				0

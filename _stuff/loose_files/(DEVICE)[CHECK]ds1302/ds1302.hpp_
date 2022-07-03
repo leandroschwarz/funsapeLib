@@ -1,0 +1,86 @@
+
+#include <stdint.h>
+
+
+
+class Rtc
+{
+public:
+	enum class Month {
+		UNDEFINED						= 0,
+		JANUARY							= 1,
+		FEBRUARY						= 2,
+		MARCH							= 3,
+		APRIL							= 4,
+		MAY								= 5,
+		JUNE							= 6,
+		JULY							= 7,
+		AUGUST							= 8,
+		SEPTEMBER						= 9,
+		OCTOBER							= 10,
+		NOVEMBER						= 11,
+		DECEMBER						= 12
+	};
+
+	enum class WeekDay {
+		UNDEFINED						= 0,
+		SUNDAY							= 1,
+		MONDAY							= 2,
+		TUESDAY							= 3,
+		WEDNESDAY						= 4,
+		THURSDAY						= 5,
+		FRIDAY							= 6,
+		SATURDAY						= 7
+	};
+
+	enum class TimeMode {
+		MODE_24_HOURS					= 0,
+		MODE_AM							= 1,
+		MODE_PM							= 2,
+	};
+
+public:
+	bool		setTime(
+			uint8_t hours_p,									//
+			uint8_t minutes_p,									//
+			uint8_t seconds_p,									//
+			TimeMode mode_p = TimeMode::MODE_24_HOURS			//
+	);
+	bool		setDate(
+			uint8_t day_p,										//
+			Month month_p,										//
+			uint8_t year_p,										//
+			WeekDay weekDay_p = WeekDay::UNDEFINED				//
+	);
+	uint8_t		getHours(void);
+	uint8_t		getMinutes(void);
+	uint8_t		getSeconds(void);
+	TimeMode	getTimeMode(void);
+	uint8_t		getDay(void);
+	Month		getMonth(void);
+	uint8_t		getYear(void);
+	WeekDay		getWeekDay(void);
+
+private:
+	uint8_t		year					: 7;
+	Month		month					: 4;
+	uint8_t		day						: 5;
+	WeekDay		weekDay					: 3;
+	uint8_t		hours					: 5;
+	uint8_t		minutes					: 6;
+	uint8_t		seconds					: 6;
+};
+
+
+class Ds1302
+{
+
+public:
+	Ds1302(void);
+
+private:
+	bool init(void);
+	bool read
+
+
+};

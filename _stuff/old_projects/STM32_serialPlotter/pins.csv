@@ -1,0 +1,27 @@
+Module	,	Name				,	Alias	,	Number	,	Mode								,	Level	,	Pull-Up/Pull-Down			,	Speed
+DEBUG	,	DEBUG0				,	PD10	,	57		,	Output Open Drain					,	Low		,	No pull-up and no pull-down	,	High
+DEBUG	,	DEBUG1				,	PD11	,	58		,	Output Open Drain					,	Low		,	No pull-up and no pull-down	,	High
+DEBUG	,	DEBUG2				,	PD12	,	59		,	Output Open Drain					,	Low		,	No pull-up and no pull-down	,	High
+DEBUG	,	DEBUG3				,	PD13	,	60		,	Output Open Drain					,	Low		,	No pull-up and no pull-down	,	High
+DEBUG	,	DEBUG4				,	PD14	,	61		,	Output Open Drain					,	Low		,	No pull-up and no pull-down	,	High
+DEBUG	,	DEBUG5				,	PD15	,	62		,	Output Open Drain					,	Low		,	No pull-up and no pull-down	,	High
+DEBUG	,	DEBUG6				,	PC6		,	63		,	Output Open Drain					,	Low		,	No pull-up and no pull-down	,	High
+DEBUG	,	DEBUG7				,	PC7		,	64		,	Output Open Drain					,	Low		,	No pull-up and no pull-down	,	High
+DEBUG	,	NLED				,	PC13	,	7		,	Output Open Drain					,	Low		,	No pull-up and no pull-down	,	High
+I2C1	,	BT_ST				,	PA1		,	24		,	External Interruption (Rising Edge)	,			,	Pull-Up						,	
+I2C1	,	I2C1_SCL			,	PB6		,	92		,	Alternate Function Open Drain		,			,								,	High
+I2C1	,	I2C1_SDA			,	PB7		,	93		,	Alternate Function Open Drain		,			,								,	High
+JTAG	,	SYS_JTDI			,	PA15	,	77		,										,			,								,
+JTAG	,	SYS_JTDO-TRACESWO	,	PB3		,	89		,										,			,								,
+JTAG	,	SYS_JTMS-SWCLK		,	PA14	,	76		,										,			,								,
+JTAG	,	SYS_JTMS-SWDIO		,	PA13	,	72		,										,			,								,
+JTAG	,	SYS_NJTRST			,	PB4		,	90		,										,			,								,
+RCC		,	RCC_MCO				,	PA8		,	67		,	Alternate Function Push Pull		,			,								,	High
+RCC		,	RCC_OSC_IN			,	OSC_IN	,	12		,										,			,								,
+RCC		,	RCC_OSC_OUT			,	OSC_OUT	,	13		,										,			,								,
+RCC		,	RCC_OSC32_IN		,	PC14	,	8		,										,			,								,
+RCC		,	RCC_OSC32_OUT		,	PC15	,	9		,										,			,								,
+USART1	,	USART1_RX			,	PA10	,	69		,	Input								,			,	No pull-up and no pull-down	,	High
+USART1	,	USART1_TX			,	PA9		,	68		,	Alternate Function Push Pull		,			,								,	High
+USART3	,	USART3_RX			,	PD9		,	56		,	Input								,			,	No pull-up and no pull-down	,	High
+USART3	,	USART3_TX			,	PD8		,	55		,	Alternate Function Push Pull		,			,								,	High

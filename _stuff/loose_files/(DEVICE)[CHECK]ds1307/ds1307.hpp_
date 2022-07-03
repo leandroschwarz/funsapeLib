@@ -1,0 +1,258 @@
+/* =============================================================================
+ * Project:			FunSAPE MCU++ Embedded Library
+ * File name:		ds1307.hpp
+ * Module:			DS1307 Real Time Clock interface module for FunSAPE++
+ * 					Embedded Library project
+ * Authors:			__AUTHORS_TO_REPLACE__
+ * Build:			__BUILD_TO_REPLACE__
+ * Last edition:	__DATE_TO_REPLACE__
+ * ========================================================================== */
+
+// =============================================================================
+// Include guard
+// =============================================================================
+
+#ifndef __DS1307_HPP
+#define __DS1307_HPP							__BUILD_TO_REPLACE__
+
+// =============================================================================
+// Dependencies
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Global definitions file -----------------------------------------------------
+
+#include "..\flGlobalDefines.hpp"
+#ifndef __FL_GLOBAL_DEFINES_HPP
+#	error	[ds1307.hpp] Error 10 - Global definitions file (flGlobalDefines.hpp) is missing!
+#elif __FL_GLOBAL_DEFINES_HPP != __BUILD_TO_REPLACE__
+#	error	[ds1307.hpp] Error 11 - Build mismatch between (ds1307.hpp) and global definitions file (flGlobalDefines.hpp)!
+#endif
+
+// -----------------------------------------------------------------------------
+// FunSAPE Library header files ------------------------------------------------
+
+#include "../util/flHandler.hpp"
+#ifndef __FL_HANDLER_HPP
+#	error	[ds1307.hpp] Error 12 - Required module (flHandler.hpp) is missing or corrupted!
+#elif __FL_HANDLER_HPP != __BUILD_TO_REPLACE__
+#	error [ds1307.hpp] Error 103 - Required module (flHandler.hpp) must be build __BUILD_TO_REPLACE__.
+#endif
+// #include "../flSpi.hpp"
+// #ifndef __FL_SPI_HPP
+// #	error	[ds1307.hpp] Error 12 - Required module (flSpi.hpp) is missing or corrupted!
+// #elif __FL_SPI_HPP != __BUILD_TO_REPLACE__
+// #	error [ds1307.hpp] Error 103 - Required module (flSpi.hpp) must be build __BUILD_TO_REPLACE__.
+// #endif
+// #include "util/flDebug.hpp"
+// #ifndef __FL_DEBUG_HPP
+// #	error	[ds1307.hpp] Error 12 - Required module (flDebug.hpp) is missing or corrupted!
+// #elif __FL_DEBUG_HPP != __BUILD_TO_REPLACE__
+// #	error [ds1307.hpp] Error 103 - Required module (flDebug.hpp) must be build __BUILD_TO_REPLACE__.
+// #endif
+
+// =============================================================================
+// Undefining previous definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Constant definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Macro-function definitions
+// *INDENT-OFF*
+// =============================================================================
+
+// NONE
+
+// *INDENT-ON*
+
+// =============================================================================
+// New data types
+// =============================================================================
+
+enum class Month {
+	UNDEFINED							= 0,
+	JANUARY								= 1,
+	FEBRUARY							= 2,
+	MARCH								= 3,
+	APRIL								= 4,
+	MAY									= 5,
+	JUNE								= 6,
+	JULY								= 7,
+	AUGUST								= 8,
+	SEPTEMBER							= 9,
+	OCTOBER								= 10,
+	NOVEMBER							= 11,
+	DECEMBER							= 12
+};
+
+enum class WeekDay {
+	UNDEFINED							= 0,
+	SUNDAY								= 1,
+	MONDAY								= 2,
+	TUESDAY								= 3,
+	WEDNESDAY							= 4,
+	THURSDAY							= 5,
+	FRIDAY								= 6,
+	SATURDAY							= 7
+};
+
+// =============================================================================
+// Ds1307 - Class declaration
+// =============================================================================
+
+class Ds1307
+{
+	// -------------------------------------------------------------------------
+	// New data types ----------------------------------------------------------
+
+public:
+	// NONE
+
+private:
+	// NONE
+
+protected:
+	// NONE
+
+	// -------------------------------------------------------------------------
+	// Operators overloading ---------------------------------------------------
+
+public:
+	// NONE
+
+private:
+	// NONE
+
+protected:
+	// NONE
+
+	// -------------------------------------------------------------------------
+	// Constructors ------------------------------------------------------------
+
+public:
+	Ds1307(void);							// Automatic constructor
+	Ds1307(Handler *hdlr_p);
+// 	~Ds1307(void);						// Automatic destructor
+
+	// -------------------------------------------------------------------------
+	// Methods - Class own methods ---------------------------------------------
+
+public:
+	// bool initializeMaster(     // Initialize peripheral in master mode
+	// 	uint32_t bitRate = TWI0_MIN_BIT_RATE,	// Master SCL frequency
+	// 	uint8_t bufferSize = 20				// Internal buffer size
+	// );
+
+	// Error getLastError(void);			// Returns last error
+
+	// bool sendData(      // Send data to slave device (explicit device register address)
+	// 	uint8_t devAddress,						// Slave device 7-bit address
+	// 	IoOperation readWrite,					// I/O operation mode
+	// 	uint8_t regAddress,						// Device register address
+	// 	uint8_t *msg = NULL,					// Pointer to message (without device register address)
+	// 	uint8_t msgSize = 0						// Message size
+	// );
+
+	// void interruptHandler(void);		// ... TODO (comments)
+
+	// bool setTimeOut(     // ... TODO (comments)
+	// 	uint8_t timeOut							// ... TODO (comments)
+	// );
+
+private:
+	// void _turnOff(      // Reset peripheral
+	// 	bool kill								// Clear data members
+	// );
+	// void _disable(void);				// Disables peripheral
+	// bool _waitWhileIsBusy(void);		// ... TODO (comments)
+	// bool _startTrasmission(void);		// ... TODO (comments)
+	// bool _readFromBuffer(    // ... TODO (comments)
+	// 	uint8_t *msg,							// ... TODO (comments)
+	// 	uint8_t msgSize							// ... TODO (comments)
+	// );
+
+protected:
+	// NONE
+
+	// -------------------------------------------------------------------------
+	// Properties --------------------------------------------------------------
+
+public:
+	// NONE
+
+private:
+	//     /////////////////    PERIPHERAL HANDLER     //////////////////     //
+//		Handler		*_handler;
+
+	//     //////////////    CONFIGURATION AND STATUS     ///////////////     //
+	bool		_initialized			: 1;
+	Error		_lastError;
+	uint8_t		_squareWaveActivation	: 1;
+	uint8_t		_squareWaveOffValue		: 1;
+	uint8_t		_squareWaveFrequency	: 2;
+	bool		_countingHalted			: 1;
+
+	//     ////////////////////    CALENDAR DATA     ////////////////////     //
+	uint8_t		_year					: 7;
+	Month		_month;
+	uint8_t		_monthDay				: 5;
+	WeekDay		_weekDay;
+
+	//     /////////////////////     CLOCK DATA     /////////////////////     //
+	uint8_t		_hours					: 5;
+	bool		_amPm					: 1;
+	uint8_t		_minutes				: 6;
+	uint8_t		_seconds				: 6;
+	bool		_timeFormat				: 1;
+
+protected:
+	// NONE
+
+}; // class Ds1307
+
+// =============================================================================
+// Ds1307 - Class overloading operators
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Global variables
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Externally defined global variables -----------------------------------------
+
+// NONE
+
+// -----------------------------------------------------------------------------
+// Internally defined global variables -----------------------------------------
+
+// NONE
+
+// =============================================================================
+// Ds1307 - Class inline function definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// General public functions declarations
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// General inline functions definitions
+// =============================================================================
+
+// NONE
+
+#endif // __DS1307_HPP

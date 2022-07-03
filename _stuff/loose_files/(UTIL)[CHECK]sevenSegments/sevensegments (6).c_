@@ -1,0 +1,33 @@
+
+#include "sevensegments.h"
+
+uint8 hex2SevenSegments(uint8 hex, bool_t point, displayCommon_t common)
+{
+	uint8 segments;	// abcdefgjP
+
+	switch(hex){
+		case 0x00:	segments = 0b11111100;	break;
+		case 0x01:	segments = 0b01100000;	break;
+		case 0x02:	segments = 0b11011010;	break;
+		case 0x03:	segments = 0b11110010;	break;
+		case 0x04:	segments = 0b01100110;	break;
+		case 0x05:	segments = 0b10110110;	break;
+		case 0x06:	segments = 0b10111110;	break;
+		case 0x07:	segments = 0b11100000;	break;
+		case 0x08:	segments = 0b11111110;	break;
+		case 0x09:	segments = 0b11110110;	break;
+		case 0x0A:	segments = 0b11101110;	break;
+		case 0x0B:	segments = 0b00111110;	break;
+		case 0x0C:	segments = 0b10011100;	break;
+		case 0x0D:	segments = 0b01111010;	break;
+		case 0x0E:	segments = 0b10011110;	break;
+		case 0x0F:	segments = 0b10001110;	break;
+		default:	segments = 0b00000000;	break;
+	}
+	if(point == TRUE)
+		segments |= 1;
+	if(common == COMMON_ANODE)
+		segments = ~segments;
+
+	return segments;
+}

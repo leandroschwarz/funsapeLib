@@ -1,0 +1,2651 @@
+/* =============================================================================
+ * Project:			FunSAPE++ Embedded Library
+ * File name:		max30102.cpp
+ * Module:			MAX30102 module interface for FunSAPE++ Embedded Library
+ * 					project
+ * Authors:			__AUTHORS_TO_REPLACE__
+ * Build:			__BUILD_TO_REPLACE__
+ * Last edition:	__DATE_TO_REPLACE__
+ * ========================================================================== */
+
+// =============================================================================
+// Dependencies
+// =============================================================================
+
+#include "max30102.hpp"
+#ifndef __MAX30102_HPP
+#	error	[max30102.cpp] Error 1 - Header file (max30102.hpp) is missing or corrupted!
+#elif __MAX30102_HPP != __BUILD_TO_REPLACE__
+#	error	[max30102.cpp] Error 13 - Build mismatch between source (max30102.cpp) and header (max30102.hpp) files!
+#endif
+
+// -----------------------------------------------------------------------------
+// Header files - FunSAPE Library header files ---------------------------------
+
+#include "../util/funsapeLibStopwatch.hpp"
+#ifndef __FUNSAPE_LIB_STOPWATCH_HPP
+#	error	[funsapeLibStopwatch.hpp] Error 1 - Header file (funsapeLibStopwatch.hpp) is missing or corrupted!
+#elif __FUNSAPE_LIB_STOPWATCH_HPP != __BUILD_TO_REPLACE__
+#	error	[funsapeLibStopwatch.hpp] Error 2 - Build mismatch between (max30102.hpp) and (funsapeLibStopwatch.hpp) header files!
+#endif
+
+// =============================================================================
+// File exclusive - Constants
+// =============================================================================
+
+#define MAX30102_BYTES_PER_CHANNEL				3
+#define MAX30102_DEVICE_ADDRESS					0x57
+#define MAX30102_FIFO_SIZE_IN_SAMPLES			32
+#define MAX30102_PART_ID						0x15
+#define MAX30102_SERIAL_CLOCK_FREQUENCY_MAX		400'000UL
+#define MAX30102_SERIAL_CLOCK_FREQUENCY_MIN		0UL
+#define MAX30102_TEMPERATURE_CONVERSION_TIMEOUT	10
+
+// =============================================================================
+// File exclusive - New data types
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// MAX30102 register bit position
+// -----------------------------------------------------------------------------
+
+typedef enum max30102Bit_e {
+	// Interrupt
+	MAX30102_BIT_INTERRUPT_FIFO_ALMOST_FULL_FLAG		= 7,	// Interrupt Status 1
+	MAX30102_BIT_INTERRUPT_FIFO_NEW_DATA_READY_FLAG		= 6,
+	MAX30102_BIT_INTERRUPT_AMBIENT_LIGHT_CANC_FLAG		= 5,
+	MAX30102_BIT_INTERRUPT_POWER_READY_FLAG				= 0,
+	MAX30102_BIT_INTERRUPT_DIE_TEMPERATURE_READY_FLAG	= 1,	// Interrupt Status 2
+	MAX30102_BIT_INTERRUPT_FIFO_ALMOST_FULL_ENABLE		= 7,	// Interrupt Enable 1
+	MAX30102_BIT_INTERRUPT_FIFO_NEW_DATA_READY_ENABLE	= 6,
+	MAX30102_BIT_INTERRUPT_AMBIENT_LIGHT_CANC_ENABLE	= 5,
+	MAX30102_BIT_INTERRUPT_DIE_TEMPERATURE_READY_ENABLE	= 1,	// Interrupt Enable 2
+
+	// FIFO
+	MAX30102_BIT_FIFO_WR_PTR							= 0,	// FIFO Write Pointer
+	MAX30102_BIT_FIFO_OVF_COUNTER						= 0,	// FIFO Overflow Counter
+	MAX30102_BIT_FIFO_RD_PTR							= 0,	// FIFO Read Pointer
+	MAX30102_BIT_FIFO_DATA								= 0,	// FIFO Data Register
+
+	// Configuration
+	MAX30102_BIT_CONFIGURATION_SMP_AVE					= 5,	// FIFO Configuration
+	MAX30102_BIT_CONFIGURATION_FIFO_ROLLOVER_EN			= 4,
+	MAX30102_BIT_CONFIGURATION_FIFO_A_FULL				= 0,
+	MAX30102_BIT_CONFIGURATION_SHDN						= 7,	// Mode Configuration
+	MAX30102_BIT_CONFIGURATION_RESET					= 6,
+	MAX30102_BIT_CONFIGURATION_MODE						= 0,
+	MAX30102_BIT_CONFIGURATION_SENSOR_FULL_SCALE		= 5,	// SPO2 Configuration
+	MAX30102_BIT_CONFIGURATION_SENSOR_SAMPLE_RATE		= 2,
+	MAX30102_BIT_CONFIGURATION_SENSOR_RESOLUTION		= 0,
+	MAX30102_BIT_CONFIGURATION_LED1_PA					= 0,	// LED Pulse Amplitude 1
+	MAX30102_BIT_CONFIGURATION_LED2_PA					= 0,	// LED Pulse Amplitude 2
+	MAX30102_BIT_CONFIGURATION_PILOT_PA					= 0,	// Proximity Mode LED Pulse Amplitude
+	MAX30102_BIT_CONFIGURATION_SLOT2					= 4,	// Multi-LED Mode Control Register 1
+	MAX30102_BIT_CONFIGURATION_SLOT1					= 0,
+	MAX30102_BIT_CONFIGURATION_SLOT4					= 4,	// Multi-LED Mode Control Register 2
+	MAX30102_BIT_CONFIGURATION_SLOT3					= 0,
+
+	// Temperature Data
+	MAX30102_BIT_TEMPERATURE_INT						= 0,	// Die Temperature Integer
+	MAX30102_BIT_TEMPERATURE_FRAC						= 0,	// Die Temperature Fraction
+	MAX30102_BIT_TEMPERATURE_EN							= 0,	// Die Temperature Config
+
+	// Proximity Function
+	MAX30102_BIT_PROX_INT_THRESH						= 0,	// Proximity Interrupt Threshold
+} max30102Bit_e;
+
+// -----------------------------------------------------------------------------
+// MAX30102 register addresses
+// -----------------------------------------------------------------------------
+
+typedef enum max30102Register_e {
+	// Status registers
+	MAX30102_REG_INTERRUPT_STATUS_1				= 0x00,
+	MAX30102_REG_INTERRUPT_STATUS_2				= 0x01,
+	MAX30102_REG_INTERRUPT_ENABLE_1				= 0x02,
+	MAX30102_REG_INTERRUPT_ENABLE_2				= 0x03,
+
+	// FIFO registers
+	MAX30102_REG_FIFO_WRITE_POINTER				= 0x04,
+	MAX30102_REG_FIFO_OVERFLOW_COUNTER			= 0x05,
+	MAX30102_REG_FIFO_READ_POINTER				= 0x06,
+	MAX30102_REG_FIFO_DATA						= 0x07,
+
+	// Configuration registers
+	MAX30102_REG_FIFO_CONFIGURATION				= 0x08,
+	MAX30102_REG_MODE_CONFIGURATION				= 0x09,
+	MAX30102_REG_SPO2_CONFIGURATION				= 0x0A,
+	MAX30102_REG_LED1_PULSE_AMPLITUDE			= 0x0C,
+	MAX30102_REG_LED2_PULSE_AMPLITUDE			= 0x0D,
+	MAX30102_REG_LED3_PULSE_AMPLITUDE			= 0x0E,
+	MAX30102_REG_PROXIMITY_LED_AMPLITUDE		= 0x10,
+	MAX30102_REG_MULTI_LED_CONTROL_1			= 0x11,
+	MAX30102_REG_MULTI_LED_CONTROL_2			= 0x12,
+
+	// Die temperature registers
+	MAX30102_REG_DIE_TEMPERATURE_INTEGER		= 0x1F,
+	MAX30102_REG_DIE_TEMPERATURE_FRACTION		= 0x20,
+	MAX30102_REG_DIE_TEMPERATURE_CONFIG			= 0x21,
+
+	// Proximity function registers
+	MAX30102_REG_PROXIMITY_INTERRUPT_THRESHOLD	= 0x30,
+
+	// Part ID registers
+	MAX30102_REG_REVISION_ID					= 0xFE,
+	MAX30102_REG_PART_ID						= 0xFF
+} max30102Register_e;
+
+// =============================================================================
+// File exclusive - Macro-functions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Global variables
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Static functions declarations
+// =============================================================================
+
+static void defaultCallbackFunction(void);
+
+// =============================================================================
+// Class constructors
+// =============================================================================
+
+/**
+ * @brief		Construct a new Max30102::Max30102 object.
+ * @details		Construct a new Max30102 object and reset all class' internal
+ * 				data members to their deafult values.
+ */
+Max30102::Max30102(void)
+{
+	// Mark passage for debugging purpose
+	debugMark("Max30102(void)");
+
+	// Reset data members
+	this->_clearMembers();
+	this->_ambLightCancOverflowInterruptCallback	= defaultCallbackFunction;
+	this->_dieTempReadyInterruptCallback			= defaultCallbackFunction;
+	this->_fifoAlmostFullInterruptCallback			= defaultCallbackFunction;
+	this->_handler									= nullptr;
+	this->_newFifoDataReadyInterruptCallback		= defaultCallbackFunction;
+	this->_partId									= 0;
+	this->_partRevision								= 0;
+	this->_powerReadyInterruptCallback				= defaultCallbackFunction;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return;
+}
+
+// =============================================================================
+// Inherited methods - Public
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Inherited methods - Protected
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Class own methods - Public
+// =============================================================================
+
+//     //////////////////     DEVICE CONFIGURATION     //////////////////     //
+
+/**
+ * @brief		Initializes the device.
+ * @details		Initializes the handler and communicates with the device to
+ * 				check it's part ID.
+ * @param[in]	handler_p	\ref{Twi} class handler associated with the device
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::init(Handler *handler_p)
+{
+	// Local variables
+	uint8_t auxBuff[2];
+
+	// Mark passage for debugging purpose
+	debugMark("init(Handler *)");
+
+	// Reset data members
+	this->_clearMembers();
+	this->_ambLightCancOverflowInterruptCallback	= defaultCallbackFunction;
+	this->_dieTempReadyInterruptCallback			= defaultCallbackFunction;
+	this->_fifoAlmostFullInterruptCallback			= defaultCallbackFunction;
+	this->_handler									= nullptr;
+	this->_newFifoDataReadyInterruptCallback		= defaultCallbackFunction;
+	this->_partId									= 0;
+	this->_partRevision								= 0;
+	this->_powerReadyInterruptCallback				= defaultCallbackFunction;
+
+	// Check function arguments for errors
+	if(!isPointerValid(handler_p)) {
+		// Returns error
+		this->_lastError = Error::HANDLER_POINTER_NULL;
+		debugMessage(Error::HANDLER_POINTER_NULL);
+		return false;
+	} else if(handler_p->getHandlerType() != Handler::HandlerType::TWI) {
+		// Returns error
+		this->_lastError = Error::HANDLER_UNSUPPORTED;
+		debugMessage(Error::HANDLER_UNSUPPORTED);
+		return false;
+	}
+
+	// Update data members
+	this->_handler = handler_p;
+	this->_initialized = true;
+
+	// Retrieve device's part and revision IDs
+	if(!this->_read(MAX30102_REG_REVISION_ID, auxBuff, 2)) {
+		// Returns error
+		this->_initialized = false;
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Check device ID
+	if(auxBuff[1] != MAX30102_PART_ID) {
+		// Returns error
+		this->_initialized = false;
+		this->_lastError = Error::DEVICE_ID_MATCH_FAILED;
+		debugMessage(Error::DEVICE_ID_MATCH_FAILED);
+		return false;
+	}
+
+	// Reset device
+	delayMs(100);
+	if(!this->reset()) {
+		// Returns error
+		this->_initialized = false;
+		debugMessage(this->_lastError);
+		return false;
+	}
+	delayMs(100);
+
+	// Update data members
+	this->_initialized					= true;
+	this->_partId						= auxBuff[1];
+	this->_partRevision					= auxBuff[0];
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Resets the device.
+ * @details		Sends a reset signal to device and clears internal class data members.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::reset(void)
+{
+	// Local variables
+	uint8_t auxBuff;
+
+	// Mark passage for debugging purpose
+	debugMark("reset(void)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Sends reset signal to device
+	auxBuff = (1 << MAX30102_BIT_CONFIGURATION_RESET);
+	if(!this->_write(MAX30102_REG_MODE_CONFIGURATION, &auxBuff, 1)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Clear class internal data members
+	this->_clearMembers();
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Configures the full scale of the SpO2 ADC.
+ * @detais		Configures the full scale of the SpO2 ADC. The SpO2 ADC has
+ * 				programmable full-scale ranges from 2 µA to 16 µA.
+ * @param[in]	sensorFullScale_p		ADC's full scale value.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::setFullScale(FullScale sensorFullScale_p)
+{
+	// Local variables
+	uint8_t auxBuff;
+
+	// Mark passage for debugging purpose
+	debugMark("setFullScale(FullScale)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Configure device
+	auxBuff = ((sensorFullScale_p << MAX30102_BIT_CONFIGURATION_SENSOR_FULL_SCALE) |
+					(this->_sampleRate << MAX30102_BIT_CONFIGURATION_SENSOR_SAMPLE_RATE) |
+					(this->_resolution << MAX30102_BIT_CONFIGURATION_SENSOR_RESOLUTION));
+	if(!this->_write(MAX30102_REG_SPO2_CONFIGURATION, &auxBuff, 1)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Update data members
+	this->_fullScale = sensorFullScale_p;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Configures the device in Heart Rate mode.
+ * @details		Configures the device in Heart Rate mode. In this mode, each
+ * 				sample consist of 3-byte output into the FIFO. By default, only
+ * 				the red LED is used to capture optical data and determine the
+ * 				user’s heart rate and/or photoplethysmogram (PPG). The function
+ * 				also configures the red LED amplitude of the device and turns
+ * 				the infrared LED channel off. The LED current can be programmed
+ * 				from 0 to 50 mA with proper supply voltage.
+ * @note		Actual measured LED's current amplitude for each part can vary widely due to
+ * 				the trimming methodology.
+ * @note		The user can select either the red LED or the infrared LED
+ * 				channel for heart rate measurements. If the infrared channel is
+ * 				desired, the user must turn the red LED OFF, by calling the
+ * 				setRedLedCurrent() with the parameter LedCurrent::LED_OFF, and
+ * 				call the setInfraredLedCurrent() to configure its amplitide.
+ * @attention	Heart Rate mode using the infrared LED was not tested and its
+ * 				not clear if it really works. Further tests must be executed.
+ * @param[in]	redLedCurrent_p		LED's current amplitude value.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::setHeartRateMode(LedCurrent redLedCurrent_p)
+{
+	// Local variables
+	uint8_t auxBuff[2];
+
+	// Mark passage for debugging purpose
+	debugMark("setHeartRateMode(LedCurrent)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Configure device
+	auxBuff[0] = ((this->_shuttedDown << MAX30102_BIT_CONFIGURATION_SHDN) |
+					(ModeControl::HEART_RATE_MODE << MAX30102_BIT_CONFIGURATION_MODE));
+	if(!this->_write(MAX30102_REG_MODE_CONFIGURATION, auxBuff, 1)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+	auxBuff[0] = (redLedCurrent_p << MAX30102_BIT_CONFIGURATION_LED1_PA);
+	auxBuff[1] = (LedCurrent::LED_OFF << MAX30102_BIT_CONFIGURATION_LED2_PA);
+	if(!this->_write(MAX30102_REG_LED1_PULSE_AMPLITUDE, auxBuff, 2)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Update data members
+	this->_activeLedsCounter			= 1;
+	this->_infraredLedCurrent			= LedCurrent::LED_OFF;
+	this->_modeControl					= ModeControl::HEART_RATE_MODE;
+	this->_redLedCurrent				= redLedCurrent_p;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Configures the infrared LED's amplitude.
+ * @details		Configures the infrared LED's amplitude of the device.
+ * 				The LED's current amplitude can be programmed from 0 to 50 mA with proper
+ * 				supply voltage.
+ * @note		Actual measured LED's current amplitude for each part can vary widely due to
+ * 				the trimming methodology.
+ * @param[in]	infraredLedCurrent_p		LED's current amplitude value.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::setInfraredLedCurrent(LedCurrent infraredLedCurrent_p)
+{
+	// Local variables
+	uint8_t auxBuff;
+
+	// Mark passage for debugging purpose
+	debugMark("setInfraredLedCurrent(LedCurrent)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Configure device
+	auxBuff = (infraredLedCurrent_p << MAX30102_BIT_CONFIGURATION_LED2_PA);
+	if(!this->_write(MAX30102_REG_LED2_PULSE_AMPLITUDE, &auxBuff, 1)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Update data members
+	this->_infraredLedCurrent			= infraredLedCurrent_p;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Configures the device in Multi-LED mode.
+ * @details		Configures the device in Multi-LED mode. In this mode, each
+ * 				sample is split into up to four time slots, SLOT1 through
+ * 				SLOT4. It is possible to set which LED is active in each time
+ * 				slot, making for a very flexible configuration.
+ * 				Each slot generates a 3-byte output into the FIFO. One sample
+ * 				comprises all active slots, for example if SLOT1 and SLOT2 are
+ * 				non-zero, then one sample is 2 x 3 = 6 bytes.
+ * 				The slots should be enabled in order (i.e., SLOT1 should not be
+ * 				disabled if SLOT2 is enabled).
+ * @note		The currents of the LEDs remain unchanged. User must call the
+ * 				setRedLedCurrent() and setInfraredLedCurrent() functions in
+ * 				order to proper configure the device.
+ * @param[in]	slot1_p		Determine the active LED in that time slot.
+ * @param[in]	slot2_p		Determine the active LED in that time slot.
+ * @param[in]	slot3_p		Determine the active LED in that time slot.
+ * @param[in]	slot4_p		Determine the active LED in that time slot.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::setMultiLedMode(SlotControl slot1_p, SlotControl slot2_p, SlotControl slot3_p, SlotControl slot4_p)
+{
+	// Local variables
+	uint8_t auxBuff[2];
+
+	// Mark passage for debugging purpose
+	debugMark("setMultiLedMode(SlotControl, SlotControl, SlotControl, SlotControl)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Check function arguments for errors
+	if(slot1_p == SlotControl::SLOT_OFF) {				// Then, slots 2, 3, and 4 MUST be OFF
+		if((slot2_p != SlotControl::SLOT_OFF) || (slot3_p != SlotControl::SLOT_OFF) || (slot4_p != SlotControl::SLOT_OFF)) {
+			// Returns error
+			this->_lastError = Error::ARGUMENTS_MISMATCH;
+			debugMessage(Error::ARGUMENTS_MISMATCH);
+			return false;
+		}
+		this->_activeLedsCounter = 0;
+	} else if(slot2_p == SlotControl::SLOT_OFF) {		// Then, slots 3, and 4 MUST be OFF
+		if((slot3_p != SlotControl::SLOT_OFF) || (slot4_p != SlotControl::SLOT_OFF)) {
+			// Returns error
+			this->_lastError = Error::ARGUMENTS_MISMATCH;
+			debugMessage(Error::ARGUMENTS_MISMATCH);
+			return false;
+		}
+		this->_activeLedsCounter = 1;
+	} else if(slot3_p == SlotControl::SLOT_OFF) {		// Then, slot 4 MUST be OFF
+		if(slot4_p != SlotControl::SLOT_OFF) {
+			// Returns error
+			this->_lastError = Error::ARGUMENTS_MISMATCH;
+			debugMessage(Error::ARGUMENTS_MISMATCH);
+			return false;
+		}
+		this->_activeLedsCounter = 2;
+	} else if(slot4_p == SlotControl::SLOT_OFF) {		// Ok, just set active LEDs to 3
+		this->_activeLedsCounter = 3;
+	} else {											// Ok, just set active LEDs to 4
+		this->_activeLedsCounter = 4;
+	}
+
+	// Configure device
+	auxBuff[0] = ((slot2_p << MAX30102_BIT_CONFIGURATION_SLOT2) |
+					(slot1_p << MAX30102_BIT_CONFIGURATION_SLOT1));
+	auxBuff[1] = ((slot4_p << MAX30102_BIT_CONFIGURATION_SLOT4) |
+					(slot3_p << MAX30102_BIT_CONFIGURATION_SLOT3));
+	if(!this->_write(MAX30102_REG_MULTI_LED_CONTROL_1, auxBuff, 2)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+	auxBuff[0] = ((this->_shuttedDown << MAX30102_BIT_CONFIGURATION_SHDN) |
+					(ModeControl::MULTI_LED_MODE << MAX30102_BIT_CONFIGURATION_MODE));
+	if(!this->_write(MAX30102_REG_MODE_CONFIGURATION, auxBuff, 1)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Update data members
+	this->_modeControl					= ModeControl::MULTI_LED_MODE;
+	this->_multiLedSlot1Control			= slot1_p;
+	this->_multiLedSlot2Control			= slot2_p;
+	this->_multiLedSlot3Control			= slot3_p;
+	this->_multiLedSlot4Control			= slot4_p;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Configures the red LED's amplitude.
+ * @details		Configures the red LED's amplitude of the device. The
+ * 				LED's current amplitude can be programmed from 0 to 50 mA with proper
+ * 				supply voltage.
+ * @note		Actual measured LED's current amplitude for each part can vary widely due to
+ * 				the trimming methodology.
+ * @param[in]	redLedCurrent_p		LED's current amplitude value.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::setRedLedCurrent(LedCurrent redLedCurrent_p)
+{
+	// Local variables
+	uint8_t auxBuff;
+
+	// Mark passage for debugging purpose
+	debugMark("setRedLedCurrent(LedCurrent)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Configure device
+	auxBuff = (redLedCurrent_p << MAX30102_BIT_CONFIGURATION_LED1_PA);
+	if(!this->_write(MAX30102_REG_LED1_PULSE_AMPLITUDE, &auxBuff, 1)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Update data members
+	this->_redLedCurrent				= redLedCurrent_p;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Configures the channel's output resolution.
+ * @details		Configures the channel's output resolution of the ADC sensor.
+ * 				The output resolution of the ADC sensor is directly related to
+ * 				LED pulse width (the IR and Red have the same pulse width), and
+ * 				therefore, indirectly sets the integration time of the ADC in
+ * 				each sample.
+ * @param[in]	resolution_p		SpO2 ADC sensor full scale.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::setResolution(Resolution resolution_p)
+{
+	// Local variables
+	uint8_t auxBuff;
+
+	// Mark passage for debugging purpose
+	debugMark("setResolution(Resolution)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Configure device
+	auxBuff = ((this->_fullScale << MAX30102_BIT_CONFIGURATION_SENSOR_FULL_SCALE) |
+					(this->_sampleRate << MAX30102_BIT_CONFIGURATION_SENSOR_SAMPLE_RATE) |
+					(resolution_p << MAX30102_BIT_CONFIGURATION_SENSOR_RESOLUTION));
+	if(!this->_write(MAX30102_REG_SPO2_CONFIGURATION, &auxBuff, 1)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Update data members
+	this->_resolution					= resolution_p;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Configures the ADC's output sample rate.
+ * @details		Configures the ADC's output sample rate. The ADC output data
+ * 				rate can be programmed from 50 sps to 3200 sps. The maximum
+ * 				sample rate for the ADC depends on the selected pulse width,
+ * 				which in turn, determines the ADC resolution. For instance, if
+ * 				the ADCresolution is set to 15 bits (pulse width = 69 µs), then
+ * 				all sample rates are selectable. However, if the ADC resolution
+ * 				is set to 18 bits (pulse width = 411 µs), then the samples rates
+ * 				are limited in accordance to the selected operation mode.
+ * @note		The actual FIFO ouput rate is a combination of the ADC's output
+ * 				sample rate and the FIFO averaging. (PUT EQUATION HERE!!!)
+ * @attention	If the user selects a sample rate that is too high for the
+ * 				selected resolution, the highest possible sample rate is
+ * 				programmed instead into the register.
+ * @param[in]	resolution_p		SpO2 ADC sensor full scale.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::setSampleRate(SampleRate sampleRate_p)
+{
+	// Local variables
+	uint8_t auxBuff;
+
+	// Mark passage for debugging purpose
+	debugMark("setSampleRate(SampleRate)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Configure device
+	auxBuff = ((this->_fullScale << MAX30102_BIT_CONFIGURATION_SENSOR_FULL_SCALE) |
+					(sampleRate_p << MAX30102_BIT_CONFIGURATION_SENSOR_SAMPLE_RATE) |
+					(this->_resolution << MAX30102_BIT_CONFIGURATION_SENSOR_RESOLUTION));
+	if(!this->_write(MAX30102_REG_SPO2_CONFIGURATION, &auxBuff, 1)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Update data members
+	this->_sampleRate					= sampleRate_p;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Configures the device in SpO2 mode.
+ * @details		Configures the device in SpO2 mode. In this mode, each sample
+ * 				consist of 6-byte (2 x 3 bytes) output into the FIFO. Both red
+ * 				and infrared LEDs are active. In the FIFO, the red channel is
+ * 				stored first, followed by the infrared channel. The function
+ * 				also configures the LEDs' amplitudes of the device. The LED
+ * 				current can be programmed from 0 to 50 mA with proper supply
+ * 				voltage.
+ * @note		Actual measured LED's current amplitude for each part can vary widely due to
+ * 				the trimming methodology.
+ * @note		In SpO2 mode, the user must use the internal temperature sensor
+ * 				information to calibrate the temperature dependence of the SpO2
+ * 				sub-system. The device output data is relatively insensitive to
+ * 				the wavelength of the IR LED, where the Red LED's wavelength is
+ * 				critical to correct interpretation of the data. An SpO2
+ * 				algorithm used with the MAX30102 output signal can compensate
+ * 				for the associated SpO2 error with ambient temperature changes.
+ * @param[in]	redLedCurrent_p			LED's current amplitude value.
+ * @param[in]	infraredLedCurrent_p	LED's current amplitude value.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::setSpo2Mode(LedCurrent redLedCurrent_p, LedCurrent infraredLedCurrent_p)
+{
+	// Local variables
+	uint8_t auxBuff[2];
+
+	// Mark passage for debugging purpose
+	debugMark("setSpo2Mode(LedCurrent, LedCurrent)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Configure device
+	auxBuff[0] = ((this->_shuttedDown << MAX30102_BIT_CONFIGURATION_SHDN) |
+					(ModeControl::SPO2_MODE << MAX30102_BIT_CONFIGURATION_MODE));
+	if(!this->_write(MAX30102_REG_MODE_CONFIGURATION, auxBuff, 1)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+	auxBuff[0] = (redLedCurrent_p << MAX30102_BIT_CONFIGURATION_LED1_PA);
+	auxBuff[1] = (infraredLedCurrent_p << MAX30102_BIT_CONFIGURATION_LED2_PA);
+	if(!this->_write(MAX30102_REG_LED1_PULSE_AMPLITUDE, auxBuff, 2)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Update data members
+	this->_modeControl					= ModeControl::SPO2_MODE;
+	this->_redLedCurrent				= redLedCurrent_p;
+	this->_infraredLedCurrent			= infraredLedCurrent_p;
+	this->_activeLedsCounter			= 2;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Makes the device to enter in power-save mode.
+ * @details		Makes the device to enter in power-save mode. While power-save
+ * 				mode, the LEDs, the ADC sensor, and all interrupts are tuned
+ * 				off, but all device registers retain their values (allowing
+ * 				quick wake-up). Also, write/read operations function as normal.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::shutDown(void)
+{
+	// Local variables
+	uint8_t auxBuff;
+
+	// Mark passage for debugging purpose
+	debugMark("shutDown(void)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Configure device
+	auxBuff = ((1 << MAX30102_BIT_CONFIGURATION_SHDN) |
+					(this->_modeControl << MAX30102_BIT_CONFIGURATION_MODE));
+	if(!this->_write(MAX30102_REG_MODE_CONFIGURATION, &auxBuff, 1)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Update data members
+	this->_shuttedDown				= true;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Wakes up the device when in power-save mode.
+ * @details		Wakes up the device when in power-save mode. Since all device
+ * 				registers retain their values during power-save mode, all
+ * 				previous device configuration are active and the device responds
+ * 				accordingly imediately (quick wake-up).
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::wakeUp(void)
+{
+	// Local variables
+	uint8_t auxBuff;
+
+	// Mark passage for debugging purpose
+	debugMark("wakeUp(void)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Configure device
+	auxBuff = ((0 << MAX30102_BIT_CONFIGURATION_SHDN) |
+					(this->_modeControl << MAX30102_BIT_CONFIGURATION_MODE));
+	if(!this->_write(MAX30102_REG_MODE_CONFIGURATION, &auxBuff, 1)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Update data members
+	this->_shuttedDown				= false;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+//     /////////////////    FIFO CONTROL AND STATUS     /////////////////     //
+
+/**
+ * @brief		Configures the FIFO.
+ * @details		// TODO: Detailed explanation of the FIFO operation
+ * @param[in]	averages_p					number of ADC samples to be averaged
+ * 											to each sample in FIFO.
+ * @param[in]	overflowEnable_p			if true, new samples will replace
+ * 											old ones in FIFO when FIFO is full.
+ * @param[in]	remainingSpaceInterrupt_p	controls the number of samples
+ * 											spaces are remaining in FIFO when
+ * 											a FIFO almost full interruption is
+ * 											generated.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::configFifo(SampleAveraging averages_p, bool overflowEnable_p, uint8_t remainingSpaceInterrupt_p)
+{
+	// Local variables
+	uint8_t auxBuff;
+
+	// Mark passage for debugging purpose
+	debugMark("configFifo(SampleAveraging, bool, uint8_t)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Configure device
+	auxBuff = (averages_p << MAX30102_BIT_CONFIGURATION_SMP_AVE) |
+			(overflowEnable_p << MAX30102_BIT_CONFIGURATION_FIFO_ROLLOVER_EN) |
+			(remainingSpaceInterrupt_p << MAX30102_BIT_CONFIGURATION_FIFO_A_FULL);
+	if(!this->_write(MAX30102_REG_FIFO_CONFIGURATION, &auxBuff, 1)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Update data members
+	this->_fifoAlmostFullValue			= remainingSpaceInterrupt_p;
+	this->_fifoRolloverOnFull			= overflowEnable_p;
+	this->_sampleAveraging				= averages_p;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Flushes data from the FIFO.
+ * @details		// TODO: Detailed explanation of the FIFO operation
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::flushFifo(void)
+{
+	// Local variables
+	uint8_t auxBuff[3];
+
+	// Mark passage for debugging purpose
+	debugMark("flushFifo(void)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Configure device
+	auxBuff[0] = 0;
+	auxBuff[1] = 0;
+	auxBuff[2] = 0;
+	if(!this->_write(MAX30102_REG_FIFO_WRITE_POINTER, auxBuff, 3)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Update data members
+	this->_fifoOverflowCounter			= 0;
+	this->_fifoReadPointer				= 0;
+	this->_fifoWritePointer				= 0;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Gets the occupation of the FIFO.
+ * @details		// TODO: Detailed explanation of the FIFO operation
+ * @param[out]	samplesWaiting_p	number of samples available in the FIFO.
+ * @param[out]	samplesLost_p		number of samples that where lost in the
+ * 									FIFO.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::getFifoOccupation(uint8_t *samplesWaiting_p, uint8_t *samplesLost_p)
+{
+	// Local variables
+	uint8_t samples;
+
+	// Mark passage for debugging purpose
+	debugMark("getFifoOccupation(uint8_t *, uint8_t *)");
+
+	// Check function arguments for errors
+	if(!isPointerValid(samplesWaiting_p)) {
+		// Returns error
+		this->_lastError = Error::ARGUMENT_POINTER_NULL;
+		debugMessage(Error::ARGUMENT_POINTER_NULL);
+		return false;
+	}
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Gets FIFO information
+	if(!this->_getFifoInfo()) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Calculate number of available samples
+	if(this->_fifoWritePointer >= this->_fifoReadPointer) {
+		samples = this->_fifoWritePointer;
+		samples -= this->_fifoReadPointer;
+	} else {
+		samples = MAX30102_FIFO_SIZE_IN_SAMPLES;
+		samples -= this->_fifoReadPointer;
+		samples += this->_fifoWritePointer;
+	}
+	*samplesWaiting_p = samples;
+	if(isPointerValid(samplesLost_p)) {
+		*samplesLost_p = this->_fifoOverflowCounter;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+//     /////////////////////    DATA MANAGEMENT     /////////////////////     //
+
+/**
+ * @brief		Reads FIFO data, converting it to a 2-bytes per channel.
+ * @details		// TODO: Detailed explanation of the FIFO operation
+ * @param[in]	samplesCount_p			number of samples to be read from the
+ * 										FIFO.
+ * @param[out]	redLedBuffer_p			pointer to the buffer that will hold the
+ * 										red LED channel values.
+ * @param[out]	infraredLedBuffer_p		pointer to the buffer that will hold the
+ * 										infrared LED channel values.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::getFifoData(uint8_t samplesCount_p, uint16_t *redLedBuffer_p, uint16_t *infraredLedBuffer_p)
+{
+	// Mark passage for debugging purpose
+	debugMark("getFifoData(uint8_t, uint16_t *, uint16_t *)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Check function arguments for errors
+	if(samplesCount_p == 0) {
+		// Returns error
+		this->_lastError = Error::ARGUMENT_CANNOT_BE_ZERO;
+		debugMessage(Error::ARGUMENT_CANNOT_BE_ZERO);
+		return false;
+	}
+	if(!(isPointerValid(redLedBuffer_p) || isPointerValid(infraredLedBuffer_p))) {
+		// Returns error
+		this->_lastError = Error::ARGUMENT_POINTER_NULL;
+		debugMessage(Error::ARGUMENT_POINTER_NULL);
+		return false;
+	}
+
+	// Reads data from FIFO
+	if(!this->_readFifoData(samplesCount_p, redLedBuffer_p, infraredLedBuffer_p, sizeof(uint16_t))) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Reads FIFO data, converting it to a 4-bytes per channel.
+ * @details		// TODO: Detailed explanation of the FIFO operation
+ * @param[in]	samplesCount_p			number of samples to be read from the
+ * 										FIFO.
+ * @param[out]	redLedBuffer_p			pointer to the buffer that will hold the
+ * 										red LED channel values.
+ * @param[out]	infraredLedBuffer_p		pointer to the buffer that will hold the
+ * 										infrared LED channel values.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::getFifoData(uint8_t samplesCount_p, uint32_t *redLedBuffer_p, uint32_t *infraredLedBuffer_p)
+{
+	// Mark passage for debugging purpose
+	debugMark("getFifoData(uint8_t, uint32_t *, uint32_t *)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Check function arguments for errors
+	if(samplesCount_p == 0) {
+		// Returns error
+		this->_lastError = Error::ARGUMENT_CANNOT_BE_ZERO;
+		debugMessage(Error::ARGUMENT_CANNOT_BE_ZERO);
+		return false;
+	}
+	if(!(isPointerValid(redLedBuffer_p) || isPointerValid(infraredLedBuffer_p))) {
+		// Returns error
+		this->_lastError = Error::ARGUMENT_POINTER_NULL;
+		debugMessage(Error::ARGUMENT_POINTER_NULL);
+		return false;
+	}
+
+	// Reads data from FIFO
+	if(!this->_readFifoData(samplesCount_p, redLedBuffer_p, infraredLedBuffer_p, sizeof(uint32_t))) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Reads FIFO data, getting the newest sample and converting it to a 2-bytes per channel.
+ * @details		// TODO: Detailed explanation of the FIFO operation
+ * @param[out]	redValue_p			pointer to the buffer that will hold the
+ * 									red LED channel values.
+ * @param[out]	infraredValue_p		pointer to the buffer that will hold the
+ * 									infrared LED channel values.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::getFifoNewestSample(uint16_t *redValue_p, uint16_t *infraredValue_p)
+{
+	// Local variables
+	uint8_t auxBuff[6];
+	uint32_t auxInfrared = 0;
+	uint32_t auxRed = 0;
+	uint8_t readPointer = 0;
+	uint8_t resolutionFix = 0;
+	uint8_t writePointer = 0;
+
+	// Mark passage for debugging purpose
+	debugMark("getFifoNewestSample(uint16_t *, uint16_t *)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Check function arguments for errors
+	if(!(isPointerValid(redValue_p) || isPointerValid(infraredValue_p))) {
+		// Returns error
+		this->_lastError = Error::ARGUMENT_POINTER_NULL;
+		debugMessage(Error::ARGUMENT_POINTER_NULL);
+		return false;
+	}
+
+	// Move FIFO pointers to read only the newest sample
+	if(!this->_getFifoWritePointer(&writePointer)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+	readPointer = (writePointer == 0) ? (MAX30102_FIFO_SIZE_IN_SAMPLES - 1) : (writePointer - 1);
+	if(!this->_setFifoReadPointer(readPointer)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Reads a sample from the FIFO
+	if(!this->_read(MAX30102_REG_FIFO_DATA, auxBuff, 6)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Evaluates the number of shifts to fix the value due to resolution
+	switch(this->_resolution) {
+	case Resolution::RESOLUTION_15_BITS:
+		resolutionFix = 3;
+		break;
+	case Resolution::RESOLUTION_16_BITS:
+		resolutionFix = 2;
+		break;
+	case Resolution::RESOLUTION_17_BITS:
+		resolutionFix = 1;
+		break;
+	case Resolution::RESOLUTION_18_BITS:
+		resolutionFix = 0;
+		break;
+	}
+
+	// Calculates the LED channel values
+	if(isPointerValid(redValue_p)) {
+		auxRed = (uint32_t)auxBuff[0];
+		auxRed <<= 8;
+		auxRed |= (uint32_t)auxBuff[1];
+		auxRed <<= 8;
+		auxRed |= (uint32_t)auxBuff[2];
+		auxRed >>= resolutionFix;
+	}
+	if(isPointerValid(infraredValue_p)) {
+		auxInfrared = (uint32_t)auxBuff[3];
+		auxInfrared <<= 8;
+		auxInfrared |= (uint32_t)auxBuff[4];
+		auxInfrared <<= 8;
+		auxInfrared |= (uint32_t)auxBuff[5];
+		auxInfrared >>= resolutionFix;
+	}
+
+	// Truncates the sample size to 16 bits
+	if(resolutionFix < 2) {
+		resolutionFix = 2 - resolutionFix;
+		auxRed >>= resolutionFix;
+		auxInfrared >>= resolutionFix;
+	}
+
+	// Update values of the function arguments
+	if(isPointerValid(redValue_p)) {
+		*redValue_p = (uint16_t)auxRed;
+	}
+	if(isPointerValid(infraredValue_p)) {
+		*infraredValue_p = (uint16_t)auxInfrared;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Reads FIFO data, getting the newest sample and converting it to a 4-bytes per channel.
+ * @details		// TODO: Detailed explanation of the FIFO operation
+ * @param[out]	redValue_p			pointer to the buffer that will hold the
+ * 									red LED channel values.
+ * @param[out]	infraredValue_p		pointer to the buffer that will hold the
+ * 									infrared LED channel values.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::getFifoNewestSample(uint32_t *redValue_p, uint32_t *infraredValue_p)
+{
+	// Local variables
+	uint8_t auxBuff[6];
+	uint32_t auxInfrared = 0;
+	uint32_t auxRed = 0;
+	uint8_t readPointer = 0;
+	uint8_t resolutionFix = 0;
+	uint8_t writePointer = 0;
+
+	// Mark passage for debugging purpose
+	debugMark("getFifoNewestSample(uint32_t *, uint32_t *)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Check function arguments for errors
+	if(!(isPointerValid(redValue_p) || isPointerValid(infraredValue_p))) {
+		// Returns error
+		this->_lastError = Error::ARGUMENT_POINTER_NULL;
+		debugMessage(Error::ARGUMENT_POINTER_NULL);
+		return false;
+	}
+
+// DEBUG: START TEST
+	this->_read(MAX30102_REG_FIFO_WRITE_POINTER, auxBuff, 3);
+	this->_fifoWritePointerOld = auxBuff[0];
+	this->_fifoOverflowCounterOld = auxBuff[1];
+	this->_fifoReadPointerOld = auxBuff[2];
+// DEBUG: END TEST
+
+	// Move FIFO pointers to read only the newest sample
+	if(!this->_getFifoWritePointer(&writePointer)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+	readPointer = (writePointer == 0) ? (MAX30102_FIFO_SIZE_IN_SAMPLES - 1) : (writePointer - 1);
+	if(!this->_setFifoReadPointer(readPointer)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Reads a sample from the FIFO
+	if(!this->_read(MAX30102_REG_FIFO_DATA, auxBuff, 6)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+// DEBUG: START TEST
+	this->_read(MAX30102_REG_FIFO_WRITE_POINTER, auxBuff, 3);
+	this->_fifoWritePointerNew = auxBuff[0];
+	this->_fifoOverflowCounterNew = auxBuff[1];
+	this->_fifoReadPointerNew = auxBuff[2];
+// DEBUG: END TEST
+
+	// Evaluates the number of shifts to fix the value due to resolution
+	switch(this->_resolution) {
+	case Resolution::RESOLUTION_15_BITS:
+		resolutionFix = 3;
+		break;
+	case Resolution::RESOLUTION_16_BITS:
+		resolutionFix = 2;
+		break;
+	case Resolution::RESOLUTION_17_BITS:
+		resolutionFix = 1;
+		break;
+	case Resolution::RESOLUTION_18_BITS:
+		resolutionFix = 0;
+		break;
+	}
+
+	// Calculates the LED channel values
+	if(isPointerValid(redValue_p)) {
+		auxRed = (uint32_t)auxBuff[0];
+		auxRed <<= 8;
+		auxRed |= (uint32_t)auxBuff[1];
+		auxRed <<= 8;
+		auxRed |= (uint32_t)auxBuff[2];
+		auxRed >>= resolutionFix;
+	}
+	if(isPointerValid(infraredValue_p)) {
+		auxInfrared = (uint32_t)auxBuff[3];
+		auxInfrared <<= 8;
+		auxInfrared |= (uint32_t)auxBuff[4];
+		auxInfrared <<= 8;
+		auxInfrared |= (uint32_t)auxBuff[5];
+		auxInfrared >>= resolutionFix;
+	}
+
+	// Update values of the function arguments
+	if(isPointerValid(redValue_p)) {
+		*redValue_p = (uint32_t)auxRed;
+	}
+	if(isPointerValid(infraredValue_p)) {
+		*infraredValue_p = (uint32_t)auxInfrared;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Reads FIFO data, getting the oldest sample and converting it to a 2-bytes per channel.
+ * @details		// TODO: Detailed explanation of the FIFO operation
+ * @param[out]	redValue_p			pointer to the buffer that will hold the
+ * 									red LED channel values.
+ * @param[out]	infraredValue_p		pointer to the buffer that will hold the
+ * 									infrared LED channel values.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::getFifoOldestSample(uint16_t *redValue_p, uint16_t *infraredValue_p)
+{
+	// Local variables
+	uint8_t auxBuff[6];
+	uint32_t auxInfrared = 0;
+	uint32_t auxRed = 0;
+	uint8_t resolutionFix = 0;
+
+	// Mark passage for debugging purpose
+	debugMark("getFifoOldestSample(uint16_t *, uint16_t *)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Check function arguments for errors
+	if(!(isPointerValid(redValue_p) || isPointerValid(infraredValue_p))) {
+		// Returns error
+		this->_lastError = Error::ARGUMENT_POINTER_NULL;
+		debugMessage(Error::ARGUMENT_POINTER_NULL);
+		return false;
+	}
+
+	// Reads a sample from the FIFO
+	if(!this->_read(MAX30102_REG_FIFO_DATA, auxBuff, 6)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Evaluates the number of shifts to fix the value due to resolution
+	switch(this->_resolution) {
+	case Resolution::RESOLUTION_15_BITS:
+		resolutionFix = 3;
+		break;
+	case Resolution::RESOLUTION_16_BITS:
+		resolutionFix = 2;
+		break;
+	case Resolution::RESOLUTION_17_BITS:
+		resolutionFix = 1;
+		break;
+	case Resolution::RESOLUTION_18_BITS:
+		resolutionFix = 0;
+		break;
+	}
+
+	// Calculates the LED channel values
+	if(isPointerValid(redValue_p)) {
+		auxRed = (uint32_t)auxBuff[0];
+		auxRed <<= 8;
+		auxRed |= (uint32_t)auxBuff[1];
+		auxRed <<= 8;
+		auxRed |= (uint32_t)auxBuff[2];
+		auxRed >>= resolutionFix;
+	}
+	if(isPointerValid(infraredValue_p)) {
+		auxInfrared = (uint32_t)auxBuff[3];
+		auxInfrared <<= 8;
+		auxInfrared |= (uint32_t)auxBuff[4];
+		auxInfrared <<= 8;
+		auxInfrared |= (uint32_t)auxBuff[5];
+		auxInfrared >>= resolutionFix;
+	}
+
+	// Update values of the function arguments
+	if(isPointerValid(redValue_p)) {
+		*redValue_p = (uint16_t)auxRed;
+	}
+	if(isPointerValid(infraredValue_p)) {
+		*infraredValue_p = (uint16_t)auxInfrared;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Reads FIFO data, getting the oldest sample and converting it to a 4-bytes per channel.
+ * @details		// TODO: Detailed explanation of the FIFO operation
+ * @param[out]	redValue_p			pointer to the buffer that will hold the
+ * 									red LED channel values.
+ * @param[out]	infraredValue_p		pointer to the buffer that will hold the
+ * 									infrared LED channel values.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::getFifoOldestSample(uint32_t *redValue_p, uint32_t *infraredValue_p)
+{
+	// Local variables
+	uint8_t auxBuff[6];
+	uint32_t auxInfrared = 0;
+	uint32_t auxRed = 0;
+	uint8_t resolutionFix = 0;
+
+	// Mark passage for debugging purpose
+	debugMark("getFifoOldestSample(uint32_t *, uint32_t *)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Check function arguments for errors
+	if(!(isPointerValid(redValue_p) || isPointerValid(infraredValue_p))) {
+		// Returns error
+		this->_lastError = Error::ARGUMENT_POINTER_NULL;
+		debugMessage(Error::ARGUMENT_POINTER_NULL);
+		return false;
+	}
+
+	// Reads a sample from the FIFO
+	if(!this->_read(MAX30102_REG_FIFO_DATA, auxBuff, 6)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Evaluates the number of shifts to fix the value due to resolution
+	switch(this->_resolution) {
+	case Resolution::RESOLUTION_15_BITS:
+		resolutionFix = 3;
+		break;
+	case Resolution::RESOLUTION_16_BITS:
+		resolutionFix = 2;
+		break;
+	case Resolution::RESOLUTION_17_BITS:
+		resolutionFix = 1;
+		break;
+	case Resolution::RESOLUTION_18_BITS:
+		resolutionFix = 0;
+		break;
+	}
+
+	// Calculates the LED channel values
+	if(isPointerValid(redValue_p)) {
+		auxRed = (uint32_t)auxBuff[0];
+		auxRed <<= 8;
+		auxRed |= (uint32_t)auxBuff[1];
+		auxRed <<= 8;
+		auxRed |= (uint32_t)auxBuff[2];
+		auxRed >>= resolutionFix;
+	}
+	if(isPointerValid(infraredValue_p)) {
+		auxInfrared = (uint32_t)auxBuff[3];
+		auxInfrared <<= 8;
+		auxInfrared |= (uint32_t)auxBuff[4];
+		auxInfrared <<= 8;
+		auxInfrared |= (uint32_t)auxBuff[5];
+		auxInfrared >>= resolutionFix;
+	}
+
+	// Update values of the function arguments
+	if(isPointerValid(redValue_p)) {
+		*redValue_p = (uint32_t)auxRed;
+	}
+	if(isPointerValid(infraredValue_p)) {
+		*infraredValue_p = (uint32_t)auxInfrared;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief
+ * // TODO: document this function
+ * @return true
+ * @return false
+ */
+bool Max30102::startTemperatureRead(void)
+{
+	// Local variables
+	uint8_t auxBuff;
+
+	// Mark passage for debugging purpose
+	debugMark("startTemperatureRead()");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Starts a temperature acquisiton
+	auxBuff = (1 << MAX30102_BIT_TEMPERATURE_EN);
+	if(!this->_write(MAX30102_REG_DIE_TEMPERATURE_CONFIG, &auxBuff, 1)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Update class data members
+	this->_dieTempReady					= false;
+	this->_dieTempEnable				= true;
+	this->_dieTempInteger				= 0;
+	this->_dieTempFraction				= 0;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Reads internal sensor internal temperature.
+ * @details		// TODO: Detailed explanation of the sensor internal temperature
+ * @param[out]	tempValue_p		pointer to the temperature value variable.
+ * @param[in]	tempScale_p		to which thermometric scale the value must be
+ * 								converted.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::getTemperature(float *tempValue_p, ThermometricScale tempScale_p)
+{
+	// Local variables
+	uint8_t auxBuff[2];
+	float auxFloat = 0.0;
+
+	// Mark passage for debugging purpose
+	debugMark("getTemperature(float *, ThermometricScale)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Check function arguments for errors
+	if(!isPointerValid(tempValue_p)) {
+		// Returns error
+		this->_lastError = Error::ARGUMENT_POINTER_NULL;
+		debugMessage(Error::ARGUMENT_POINTER_NULL);
+		return false;
+	}
+
+	// Reads die temperature register
+	if(!this->_read(MAX30102_REG_DIE_TEMPERATURE_INTEGER, auxBuff, 2)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Calculates temperature
+	// FIXME: Implement a better algorithm using the fact that (1/16 = 0.0625 = 1 >> 4)
+	auxFloat = (float)auxBuff[0] + ((float)auxBuff[1] / 16);
+
+	switch(tempScale_p) {
+	case ThermometricScale::CELSIUS:
+		*tempValue_p = auxFloat;
+		break;
+	case ThermometricScale::DELISLE:
+	case ThermometricScale::FAHRENHEIT:
+	case ThermometricScale::KELVIN:
+	case ThermometricScale::NEWTON:
+	case ThermometricScale::RANKINE:
+	case ThermometricScale::REAUMUR:
+	case ThermometricScale::ROMER:
+		// TODO: Implement the conversion between thermometric scales
+		// Returns error
+		this->_lastError = Error::UNDER_DEVELOPMENT;
+		debugMessage(Error::UNDER_DEVELOPMENT);
+		return false;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Reads internal sensor internal temperature.
+ * @details		// TODO: Detailed explanation of the sensor internal temperature
+ * @param[out]	tempInteger_p
+ * @param[out]	tempFrac_p
+ * 								converted.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::getTemperature(int8_t *tempInteger_p, uint8_t *tempFrac_p)
+{
+	// Local variables
+	uint8_t auxBuff[2];
+
+	// Mark passage for debugging purpose
+	debugMark("getTemperature(int8_t *, uint8_t *)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Check function arguments for errors
+	if((!isPointerValid(tempInteger_p)) || (!isPointerValid(tempFrac_p))) {
+		// Returns error
+		this->_lastError = Error::ARGUMENT_POINTER_NULL;
+		debugMessage(Error::ARGUMENT_POINTER_NULL);
+		return false;
+	}
+
+	// Reads die temperature register
+	if(!this->_read(MAX30102_REG_DIE_TEMPERATURE_INTEGER, auxBuff, 2)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Returns temperature
+	*tempInteger_p = (int8_t)auxBuff[0];
+	*tempFrac_p = (uint8_t)auxBuff[1];
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+//     //////////////     INTERRUPT CONTROL AND STATUS     //////////////     //
+
+/**
+ * @brief		Disables the interrupt pin to relay an internal interrupt.
+ * @details		Disables the interrupt pin to relay an internal interrupt.
+ * 				// TODO: Explain the operation of the deactivation mask
+ * @note		Since its not possible to turn on or off the power on interrupt,
+ * 				the function just ignores it from the interrupt mask.
+ * @param[in]	deactivationMask_p	interrupts to be disabled.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::disableInterrupts(InterruptFlags deactivationMask_p)
+{
+	// Local variables
+	uint8_t auxBuff[2];
+	bool intAmbient						= false;
+	bool intAlmostFull					= false;
+	bool intTempReady					= false;
+	bool intNewDataReady				= false;
+
+	// Mark passage for debugging purpose
+	debugMark("disableInterrupts(InterruptFlags)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Populate the variables with the class members values
+	intAmbient = this->_ambLightCancOverflowInterruptEnable;
+	intAlmostFull = this->_fifoAlmostFullInterruptEnable;
+	intTempReady = this->_dieTempReadyInterruptEnable;
+	intNewDataReady = this->_newFifoDataReadyInterruptEnable;
+
+	// Process the deactivation mask
+	if(deactivationMask_p & InterruptFlags::FIFO_ALMOST_FULL_FLAG) {
+		intAlmostFull = false;
+	}
+	if(deactivationMask_p & InterruptFlags::NEW_FIFO_DATA_READY_FLAG) {
+		intNewDataReady = false;
+	}
+	if(deactivationMask_p & InterruptFlags::AMBIENT_LIGHT_CANCELLATION_FLAG) {
+		intAmbient = false;
+	}
+	if(deactivationMask_p & InterruptFlags::INTERNAL_TEMPERATURE_READY_FLAG) {
+		intTempReady  = false;
+	}
+
+	// Configure device
+	auxBuff[0] = (intAlmostFull << MAX30102_BIT_INTERRUPT_FIFO_ALMOST_FULL_ENABLE) |
+			(intNewDataReady << MAX30102_BIT_INTERRUPT_FIFO_NEW_DATA_READY_ENABLE) |
+			(intAmbient << MAX30102_BIT_INTERRUPT_AMBIENT_LIGHT_CANC_ENABLE);
+	auxBuff[1] = (intTempReady << MAX30102_BIT_INTERRUPT_DIE_TEMPERATURE_READY_ENABLE);
+	if(!this->_write(MAX30102_REG_INTERRUPT_ENABLE_1, auxBuff, 2)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Update class data members
+	this->_ambLightCancOverflowInterruptEnable = intAmbient;
+	this->_fifoAlmostFullInterruptEnable = intAlmostFull;
+	this->_dieTempReadyInterruptEnable = intTempReady;
+	this->_newFifoDataReadyInterruptEnable = intNewDataReady;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Enables the interrupt pin to relay an internal interrupt.
+ * @details		Enables the interrupt pin to relay an internal interrupt.
+ * 				// TODO: Explain the operation of the activation mask
+ * @note		Since its not possible to turn on or off the power on interrupt,
+ * 				the function just ignores it from the interrupt mask.
+ * @param[in]	activationMask_p	interrupts to be enabled.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::enableInterrupts(InterruptFlags activationMask_p)
+{
+	// Local variables
+	uint8_t auxBuff[2];
+	bool intAmbient						= false;
+	bool intAlmostFull					= false;
+	bool intTempReady					= false;
+	bool intNewDataReady				= false;
+
+	// Mark passage for debugging purpose
+	debugMark("enableInterrupts(InterruptFlags)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Populate the variables with the class members values
+	intAmbient = this->_ambLightCancOverflowInterruptEnable;
+	intAlmostFull = this->_fifoAlmostFullInterruptEnable;
+	intTempReady = this->_dieTempReadyInterruptEnable;
+	intNewDataReady = this->_newFifoDataReadyInterruptEnable;
+
+	// Process the deactivation mask
+	if(activationMask_p & InterruptFlags::FIFO_ALMOST_FULL_FLAG) {
+		intAlmostFull = true;
+	}
+	if(activationMask_p & InterruptFlags::NEW_FIFO_DATA_READY_FLAG) {
+		intNewDataReady = true;
+	}
+	if(activationMask_p & InterruptFlags::AMBIENT_LIGHT_CANCELLATION_FLAG) {
+		intAmbient = true;
+	}
+	if(activationMask_p & InterruptFlags::INTERNAL_TEMPERATURE_READY_FLAG) {
+		intTempReady  = true;
+	}
+
+	// Configure device
+	auxBuff[0] = (intAlmostFull << MAX30102_BIT_INTERRUPT_FIFO_ALMOST_FULL_ENABLE) |
+			(intNewDataReady << MAX30102_BIT_INTERRUPT_FIFO_NEW_DATA_READY_ENABLE) |
+			(intAmbient << MAX30102_BIT_INTERRUPT_AMBIENT_LIGHT_CANC_ENABLE);
+	auxBuff[1] = (intTempReady << MAX30102_BIT_INTERRUPT_DIE_TEMPERATURE_READY_ENABLE);
+	if(!this->_write(MAX30102_REG_INTERRUPT_ENABLE_1, auxBuff, 2)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Update class data members
+	this->_ambLightCancOverflowInterruptEnable = intAmbient;
+	this->_fifoAlmostFullInterruptEnable = intAlmostFull;
+	this->_dieTempReadyInterruptEnable = intTempReady;
+	this->_newFifoDataReadyInterruptEnable = intNewDataReady;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief
+ * // TODO: document this function
+ * @return true
+ * @return false
+ */
+bool Max30102::generalIrqHandler(void)
+{
+	// Local variables
+//	InterruptFlags auxFlags;
+
+	// Note: Since this function is called asynchroneusly, no debug mark passage
+	// was placed for caution. The same happens with the getInterruptStatus()
+	// function that is called inside this function.
+	// debugMark("generalIrqHandler(void)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Read the interrupt status registers
+	if(!this->getInterruptStatus()) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Call callback functions
+	if(this->_ambLightCancOverflowInterruptFlag) {
+		this->_ambLightCancOverflowInterruptCallback();
+	}
+	if(this->_dieTempReadyInterruptFlag) {
+		this->_dieTempReadyInterruptCallback();
+	}
+	if(this->_fifoAlmostFullInterruptFlag) {
+		this->_fifoAlmostFullInterruptCallback();
+	}
+	if(this->_newFifoDataReadyInterruptFlag) {
+		this->_newFifoDataReadyInterruptCallback();
+	}
+	if(this->_powerReadyInterruptFlag) {
+		this->_powerReadyInterruptCallback();
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief		Reads the sensor interrupt status.
+ * @details		Reads the sensor interrupt status.
+ * 				// TODO: Explain the operation of the interrupt
+ * @param[out]	interruptStatus_p	status of sensor interrupts.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::getInterruptStatus(InterruptFlags *interruptStatus_p)
+{
+	// Local variables
+	uint8_t auxBuff[2];
+
+	// Note: This function is also called by the generalIrqHandler() function.
+	// Since the generalIrqHandler() function is called asynchroneusly,
+	// triggered by interrupts, no debug mark passage was placed for caution.
+	// debugMark("getInterruptStatus(InterruptFlags *)");
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Read the interrupt status registers
+	if(!this->_read(MAX30102_REG_INTERRUPT_STATUS_1, auxBuff, 2)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Update class data members
+	this->_fifoAlmostFullInterruptFlag = (bool)(auxBuff[0] & (1 << MAX30102_BIT_INTERRUPT_FIFO_ALMOST_FULL_FLAG));
+	this->_newFifoDataReadyInterruptFlag = (bool)(auxBuff[0] & (1 << MAX30102_BIT_INTERRUPT_FIFO_NEW_DATA_READY_FLAG));
+	this->_ambLightCancOverflowInterruptFlag = (bool)(auxBuff[0] & (1 << MAX30102_BIT_INTERRUPT_AMBIENT_LIGHT_CANC_FLAG));
+	this->_powerReadyInterruptFlag = (bool)(auxBuff[0] & (1 << MAX30102_BIT_INTERRUPT_POWER_READY_FLAG));
+	this->_dieTempReadyInterruptFlag = (bool)(auxBuff[1] & (1 << MAX30102_BIT_INTERRUPT_DIE_TEMPERATURE_READY_FLAG));
+
+	/*
+		// Retrieve interrupt status
+		if(!isPointerValid(interruptStatus_p)) {
+			*interruptStatus_p = static_cast<InterruptFlags>(0);
+			if(this->_fifoAlmostFullInterruptFlag) {
+				*interruptStatus_p |= InterruptFlags::FIFO_ALMOST_FULL_FLAG;
+			}
+			if(this->_newFifoDataReadyInterruptFlag) {
+				*interruptStatus_p |= InterruptFlags::NEW_FIFO_DATA_READY_FLAG;
+			}
+			if(this->_ambLightCancOverflowInterruptFlag) {
+				*interruptStatus_p |= InterruptFlags::AMBIENT_LIGHT_CANCELLATION_FLAG;
+			}
+			if(this->_dieTempReadyInterruptFlag) {
+				*interruptStatus_p |= InterruptFlags::INTERNAL_TEMPERATURE_READY_FLAG;
+			}
+			if(this->_powerReadyInterruptFlag) {
+				*interruptStatus_p |= InterruptFlags::POWER_READY_FLAG;
+			}
+		}
+	*/
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+//     ///////////////////    INTERRUPT CALLBACKS     ///////////////////     //
+
+/**
+ * @brief
+ * // TODO: document this function
+ * @param callbackFunction_p
+ * @return true
+ * @return false
+ */
+bool Max30102::setAmbLightCancOverflowInterruptCallback(void (* callbackFunction_p)(void))
+{
+	// Mark passage for debugging purpose
+	debugMark("setAmbLightCancOverflowInterruptCallback(void (*)(void)");
+
+	// Check function arguments for errors
+	if(!isPointerValid(callbackFunction_p)) {
+		// Returns error
+		this->_lastError = Error::FUNCTION_POINTER_NULL;
+		debugMessage(Error::FUNCTION_POINTER_NULL);
+		return false;
+	}
+
+	// Update data members
+	this->_ambLightCancOverflowInterruptCallback = callbackFunction_p;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief
+ * // TODO: document this function
+ * @param callbackFunction_p
+ * @return true
+ * @return false
+ */
+bool Max30102::setDieTempReadyInterruptCallback(void (* callbackFunction_p)(void))
+{
+	// Mark passage for debugging purpose
+	debugMark("setDieTempReadyInterruptCallback(void (*)(void)");
+
+	// Check function arguments for errors
+	if(!isPointerValid(callbackFunction_p)) {
+		// Returns error
+		this->_lastError = Error::FUNCTION_POINTER_NULL;
+		debugMessage(Error::FUNCTION_POINTER_NULL);
+		return false;
+	}
+
+	// Update data members
+	this->_dieTempReadyInterruptCallback = callbackFunction_p;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief
+ * // TODO: document this function
+ * @param callbackFunction_p
+ * @return true
+ * @return false
+ */
+bool Max30102::setFifoAlmostFullInterruptCallback(void (* callbackFunction_p)(void))
+{
+	// Mark passage for debugging purpose
+	debugMark("setFifoAlmostFullInterruptCallback(void (*)(void)");
+
+	// Check function arguments for errors
+	if(!isPointerValid(callbackFunction_p)) {
+		// Returns error
+		this->_lastError = Error::FUNCTION_POINTER_NULL;
+		debugMessage(Error::FUNCTION_POINTER_NULL);
+		return false;
+	}
+
+	// Update data members
+	this->_fifoAlmostFullInterruptCallback = callbackFunction_p;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief
+ * // TODO: document this function
+ * @param callbackFunction_p
+ * @return true
+ * @return false
+ */
+bool Max30102::setNewFifoDataReadyInterruptCallback(void (* callbackFunction_p)(void))
+{
+	// Mark passage for debugging purpose
+	debugMark("setNewFifoDataReadyInterruptCallback(void (*)(void)");
+
+	// Check function arguments for errors
+	if(!isPointerValid(callbackFunction_p)) {
+		// Returns error
+		this->_lastError = Error::FUNCTION_POINTER_NULL;
+		debugMessage(Error::FUNCTION_POINTER_NULL);
+		return false;
+	}
+
+	// Update data members
+	this->_newFifoDataReadyInterruptCallback = callbackFunction_p;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+/**
+ * @brief
+ * // TODO: document this function
+ * @param callbackFunction_p
+ * @return true
+ * @return false
+ */
+bool Max30102::setPowerReadyInterruptCallback(void (* callbackFunction_p)(void))
+{
+	// Mark passage for debugging purpose
+	debugMark("setPowerReadyInterruptCallback(void (*)(void)");
+
+	// Check function arguments for errors
+	if(!isPointerValid(callbackFunction_p)) {
+		// Returns error
+		this->_lastError = Error::FUNCTION_POINTER_NULL;
+		debugMessage(Error::FUNCTION_POINTER_NULL);
+		return false;
+	}
+
+	// Update data members
+	this->_powerReadyInterruptCallback = callbackFunction_p;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+//     //////////////////////    DEVICE STATUS     //////////////////////     //
+
+/**
+ * @brief		Returns the code of the last error.
+ * @details		Returns the FunSAPE++ Embedded Library error code of the last
+ * 				operation. If the operation was successfull, the return code
+ * 				will be Error::NONE.
+ * @return		Error	Error:: error code.
+ */
+Error Max30102::getLastError(void)
+{
+	// Returns last error
+	return this->_lastError;
+}
+
+void Max30102::readAllRegs(uint8_t *regs_p)
+{
+	uint8_t auxBuff[11];
+
+	debugMark("readAllRegs(uint8_t *)");
+
+	this->_read(MAX30102_REG_INTERRUPT_STATUS_1, auxBuff, 7);
+	regs_p[0]		= auxBuff[0];		// Int status 1
+	regs_p[1]		= auxBuff[1];		// Int status 2
+	regs_p[2]		= auxBuff[2];		// Int enable 1
+	regs_p[3]		= auxBuff[3];		// Int enable 2
+	regs_p[4]		= auxBuff[4];		// Fifo write
+	regs_p[5]		= auxBuff[5];		// Fifo overflow
+	regs_p[6]		= auxBuff[6];		// Fifo read
+
+	this->_read(MAX30102_REG_FIFO_CONFIGURATION, auxBuff, 11);
+	regs_p[7]		= auxBuff[0];		// Fifo configuration
+	regs_p[8]		= auxBuff[1];		// Mode configuration
+	regs_p[9]		= auxBuff[2];		// SpO2 configuration
+	regs_p[10]		= auxBuff[4];		// Pulse amplitude LED 1
+	regs_p[11]		= auxBuff[5];		// Pulse amplitude LED 2
+	regs_p[12]		= auxBuff[9];		// Multi-slot 1
+	regs_p[13]		= auxBuff[10];		// Multi-slot 2
+
+	this->_read(MAX30102_REG_DIE_TEMPERATURE_INTEGER, auxBuff, 3);
+	regs_p[14]		= auxBuff[0];		// Temperature integer
+	regs_p[15]		= auxBuff[1];		// Temperature fraction
+	regs_p[16]		= auxBuff[2];		// Temperature config
+
+	this->_read(MAX30102_REG_REVISION_ID, auxBuff, 2);
+	regs_p[17]		= auxBuff[0];		// Temperature integer
+	regs_p[18]		= auxBuff[1];		// Temperature fraction
+}
+
+// =============================================================================
+// Class own methods - Private
+// =============================================================================
+
+//     ////////////////    DEVICE CONTROL AND STATUS     ////////////////     //
+
+/**
+ * @brief		Reset internal class members.
+ * @details		Reset internal class members related to the device's registers
+ * 				and the internal class members used to control the device. The
+ * 				function is used after a device physical reset, when the
+ * 				internal registers are reset to their default values.
+ */
+void Max30102::_clearMembers(void)
+{
+	// Reset class members
+	this->_activeLedsCounter					= 0;
+	this->_ambLightCancOverflowInterruptEnable	= false;
+	this->_ambLightCancOverflowInterruptFlag	= false;
+	this->_dieTempEnable						= false;
+	this->_dieTempFraction						= 0;
+	this->_dieTempInteger						= 0;
+	this->_dieTempReady							= false;
+	this->_dieTempReadyInterruptEnable			= false;
+	this->_dieTempReadyInterruptFlag			= false;
+	this->_fifoAlmostFullInterruptEnable		= false;
+	this->_fifoAlmostFullInterruptFlag			= false;
+	this->_fifoAlmostFullValue					= 0;
+	this->_fifoData								= 0;
+	this->_fifoOverflowCounter					= 0;
+	this->_fifoReadPointer						= 0;
+	this->_fifoRolloverOnFull					= false;
+	this->_fifoWritePointer						= 0;
+	this->_fullScale							= FullScale::FULL_SCALE_2048_NA;
+	this->_infraredLedCurrent					= LedCurrent::LED_OFF;
+	this->_initialized							= false;
+	this->_lastError							= Error::NONE;
+	this->_modeControl							= ModeControl::NO_MODE_SELECTED;
+	this->_multiLedSlot1Control					= SlotControl::SLOT_OFF;
+	this->_multiLedSlot2Control					= SlotControl::SLOT_OFF;
+	this->_multiLedSlot3Control					= SlotControl::SLOT_OFF;
+	this->_multiLedSlot4Control					= SlotControl::SLOT_OFF;
+	this->_newFifoDataReadyInterruptEnable		= false;
+	this->_newFifoDataReadyInterruptFlag		= false;
+	this->_powerReadyInterruptFlag				= false;
+	this->_redLedCurrent						= LedCurrent::LED_OFF;
+	this->_resolution							= Resolution::RESOLUTION_15_BITS;
+	this->_sampleAveraging						= SampleAveraging::SAMPLE_AVERAGING_OFF;
+	this->_sampleRate							= SampleRate::SAMPLE_RATE_50_HZ;
+	this->_shuttedDown							= false;
+	this->_slotsEnabledCounter					= 0;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	return;
+}
+
+//     //////////////////    REGISTER MANIPULATION     //////////////////     //
+
+/**
+ * @brief		Reads registers from the device.
+ * @details		Reads registers from the device.
+ * @note		This function is private, so before calling it, the
+ * 				programmer must ensure that all parameters are checked.
+ * @param[in]	regAddr_p		device's register addess.
+ * @param[out]	dataBuffer_p	pointer to buffer.
+ * @param[in]	bytesToRead_p	number of bytes to read from the device.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::_read(uint8_t regAddr_p, uint8_t *dataBuffer_p, uint16_t bytesToRead_p)
+{
+	// Selects device
+	if(!this->_handler->setAddress(MAX30102_DEVICE_ADDRESS)) {
+		// Returns error
+		this->_lastError = this->_handler->getLastError();
+		return false;
+	}
+
+	// Read data from device
+	if(!this->_handler->readReg(regAddr_p, dataBuffer_p, bytesToRead_p)) {
+		// Returns error
+		this->_lastError = this->_handler->getLastError();
+		return false;
+	}
+
+	// Returns succesfully
+	this->_lastError = Error::NONE;
+	return true;
+}
+
+/**
+ * @brief		Writes registers at the device.
+ * @details		Writes registers at the device.
+ * @note		This function is private, so before calling it, the
+ * 				programmer must ensure that all parameters are checked.
+ * @param[in]	regAddr_p		device's register addess.
+ * @param[out]	dataBuffer_p	pointer to buffer.
+ * @param[in]	bytesToWrite_p	number of bytes to write at the device.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::_write(uint8_t regAddr_p, uint8_t *dataBuffer_p, uint16_t bytesToWrite_p)
+{
+	// Selects device
+	if(!this->_handler->setAddress(MAX30102_DEVICE_ADDRESS)) {
+		// Returns error
+		this->_lastError = this->_handler->getLastError();
+		return false;
+	}
+
+	// Read data from device
+	if(!this->_handler->writeReg(regAddr_p, dataBuffer_p, bytesToWrite_p)) {
+		// Returns error
+		this->_lastError = this->_handler->getLastError();
+		return false;
+	}
+
+	// Returns succesfully
+	this->_lastError = Error::NONE;
+	return true;
+}
+
+//     ////////////////    DEVICE CONTROL AND STATUS     ////////////////     //
+
+/**
+ * @brief		Checks if the device was initialized.
+ * @details		Checks if the device was initialized.
+ * @note		This function is private, so before calling it, the
+ * 				programmer must ensure that all parameters are checked.
+ * @attention	This function only verifies the device initialization, it does
+ * 				not verifies if the device is configured properly.
+ * @return		true		Device is initialized.
+ * @return		false		Device is not initialized.
+ */
+bool Max30102::_isInitialized(void)
+{
+	// Checks if device is initialized
+	if(!this->_initialized) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		debugMessage(Error::NOT_INITIALIZED);
+	}
+
+	// Returns successfully
+	return true;
+}
+
+//     /////////////////    FIFO CONTROL AND STATUS     /////////////////     //
+
+/**
+ * @brief		Gets FIFO status registers from the device.
+ * @details		Gets FIFO status registers from the device.
+ * @note		This function is private, so before calling it, the
+ * 				programmer must ensure that all parameters are checked.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::_getFifoInfo(void)
+{
+	// Local variables
+	uint8_t auxBuff[3];
+
+	// Reads from device
+	if(!this->_read(MAX30102_REG_FIFO_WRITE_POINTER, auxBuff, 3)) {
+		// Returns error
+		return false;
+	}
+
+	// Update data members
+	this->_fifoWritePointer = auxBuff[0];
+	this->_fifoOverflowCounter = auxBuff[1];
+	this->_fifoReadPointer = auxBuff[2];
+
+	// Returns successfully
+	return true;
+}
+
+/**
+ * @brief		Gets the FIFO's read pointer from the device.
+ * @details		Gets the FIFO's read pointer from the device.
+ * @note		This function is private, so before calling it, the
+ * 				programmer must ensure that all parameters are checked.
+ * @param[out]	pointer_p		pointer to variable to store the value.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::_getFifoReadPointer(uint8_t *pointer_p)
+{
+	// Local variables
+	uint8_t auxBuff;
+
+	// Reads from device
+	if(!this->_read(MAX30102_REG_FIFO_READ_POINTER, &auxBuff, 1)) {
+		// Returns error
+		return false;
+	}
+
+	// Update data members
+	this->_fifoReadPointer = auxBuff;
+
+	// Returns successfully
+	return true;
+}
+
+/**
+ * @brief		Gets the FIFO's write pointer from the device.
+ * @details		Gets the FIFO's write pointer from the device.
+ * @note		This function is private, so before calling it, the
+ * 				programmer must ensure that all parameters are checked.
+ * @param[out]	pointer_p		pointer to variable to store the value.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::_getFifoWritePointer(uint8_t *pointer_p)
+{
+	// Local variables
+	uint8_t auxBuff;
+
+	// Reads from device
+	if(!this->_read(MAX30102_REG_FIFO_WRITE_POINTER, &auxBuff, 1)) {
+		// Returns error
+		return false;
+	}
+
+	// Update data members
+	this->_fifoWritePointer = auxBuff;
+
+	// Returns successfully
+	return true;
+}
+
+/**
+ * @brief		Sets the FIFO's read pointer at the device.
+ * @details		Sets the FIFO's read pointer at the device.
+ * @note		This function is private, so before calling it, the
+ * 				programmer must ensure that all parameters are checked.
+ * @param[in]	pointer_p		value to be stored into the register.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::_setFifoReadPointer(uint8_t pointer_p)
+{
+	// Local variables
+	uint8_t auxBuff;
+
+	// Writes at device
+	auxBuff = (pointer_p << MAX30102_BIT_FIFO_RD_PTR);
+	if(!this->_write(MAX30102_REG_FIFO_READ_POINTER, &auxBuff, 1)) {
+		// Returns error
+		return false;
+	}
+
+	// Update data members
+	this->_fifoReadPointer = auxBuff;
+
+	// Returns successfully
+	return true;
+}
+
+/**
+ * @brief		Sets the FIFO's write pointer at the device.
+ * @details		Sets the FIFO's write pointer at the device.
+ * @note		This function is private, so before calling it, the
+ * 				programmer must ensure that all parameters are checked.
+ * @param[in]	pointer_p		value to be stored into the register.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::_setFifoWritePointer(uint8_t pointer_p)
+{
+	// Local variables
+	uint8_t auxBuff;
+
+	// Writes at device
+	auxBuff = (pointer_p << MAX30102_BIT_FIFO_WR_PTR);
+	if(!this->_write(MAX30102_REG_FIFO_WRITE_POINTER, &auxBuff, 1)) {
+		// Returns error
+		return false;
+	}
+
+	// Update data members
+	this->_fifoWritePointer = auxBuff;
+
+	// Returns successfully
+	return true;
+}
+
+/**
+ * @brief		Reads data from device's FIFO.
+ * @details		Reads data from device's FIFO.
+ * @note		This function is private, so before calling it, the
+ * 				programmer must ensure that all parameters are checked.
+ * @param[in]	samples_p	number of samples to be read from FIFO.
+ * @param[out]	buff1		buffer to red LED values.
+ * @param[out]	buff2		buffer to infrared LED values.
+ * @param[in]	varSize		size of the variable to be stored.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+bool Max30102::_readFifoData(uint8_t samples_p, void *redLedBuffer_p, void *infraredLedBuffer_p, uint8_t varSize_p)
+{
+	// Local variables
+	uint8_t *auxBuff = nullptr;
+	uint8_t resolutionFix = 0;
+	uint16_t aux16 = 0;
+	int32_t aux32 = 0;
+	uint16_t *buff16ptr1 = (uint16_t *)redLedBuffer_p;
+	uint16_t *buff16ptr2 = (uint16_t *)infraredLedBuffer_p;
+	uint32_t *buff32ptr1 = (uint32_t *)redLedBuffer_p;
+	uint32_t *buff32ptr2 = (uint32_t *)infraredLedBuffer_p;
+
+	// Evaluate buffer size
+	switch(this->_modeControl) {
+	case ModeControl::HEART_RATE_MODE:
+		aux16 = MAX30102_BYTES_PER_CHANNEL * samples_p * 1;
+		break;
+	case ModeControl::SPO2_MODE:
+		aux16 = MAX30102_BYTES_PER_CHANNEL * samples_p * 2;
+		break;
+	case ModeControl::MULTI_LED_MODE:
+		aux16 = MAX30102_BYTES_PER_CHANNEL * samples_p * this->_activeLedsCounter;
+		break;
+	default:
+		break;
+	}
+
+	// Memory allocation
+	auxBuff = (uint8_t *)calloc(aux16, sizeof(uint8_t));
+	if(!isPointerValid(auxBuff)) {
+		// Returns error
+		this->_lastError = Error::MEMORY_ALLOCATION;
+		return false;
+	}
+
+	// Reads from device
+	if(!this->_read(MAX30102_REG_FIFO_DATA, auxBuff, aux16)) {
+		// Returns error
+		return false;
+	}
+
+	// Evaluates the number of shifts to fix the value due to resolution
+	switch(this->_resolution) {
+	case Resolution::RESOLUTION_15_BITS:
+		resolutionFix = 3;
+		break;
+	case Resolution::RESOLUTION_16_BITS:
+		resolutionFix = 2;
+		break;
+	case Resolution::RESOLUTION_17_BITS:
+		resolutionFix = 1;
+		break;
+	case Resolution::RESOLUTION_18_BITS:
+		resolutionFix = 0;
+		break;
+	}
+
+	// Decode data
+	aux16 = 0;
+	for(uint8_t i = 0; i < samples_p; i++) {
+		switch(this->_modeControl) {
+		case ModeControl::HEART_RATE_MODE:
+			// Process red LED value
+			aux32 = (uint32_t)(auxBuff[aux16++]);
+			aux32 <<= 8;
+			aux32 |= (uint32_t)(auxBuff[aux16++]);
+			aux32 <<= 8;
+			aux32 |= (uint32_t)(auxBuff[aux16++]);
+			aux32 >>= resolutionFix;
+			// Truncates the sample size to 16 bits
+			if((resolutionFix < 2) && (varSize_p == 2)) {
+				aux32 >>= (2 - resolutionFix);
+			}
+			// Update function arguments
+			if(isPointerValid(redLedBuffer_p)) {
+				if(varSize_p == 2) {
+					*buff16ptr1++ = (uint16_t)(aux32);
+				} else {
+					*buff32ptr1++ = (uint32_t)(aux32);
+				}
+			}
+			break;
+
+		case ModeControl::SPO2_MODE:
+			// Process red LED value
+			aux32 = (uint32_t)(auxBuff[aux16++]);
+			aux32 <<= 8;
+			aux32 |= (uint32_t)(auxBuff[aux16++]);
+			aux32 <<= 8;
+			aux32 |= (uint32_t)(auxBuff[aux16++]);
+			aux32 >>= resolutionFix;
+			// Truncates the sample size to 16 bits
+			if((resolutionFix < 2) && (varSize_p == 2)) {
+				aux32 >>= (2 - resolutionFix);
+			}
+			// Update function arguments
+			if(isPointerValid(redLedBuffer_p)) {
+				if(varSize_p == 2) {
+					*buff16ptr1++ = (uint16_t)(aux32);
+				} else {
+					*buff32ptr1++ = (uint32_t)(aux32);
+				}
+			}
+			// Process infrared LED value
+			aux32 = (uint32_t)(auxBuff[aux16++]);
+			aux32 <<= 8;
+			aux32 |= (uint32_t)(auxBuff[aux16++]);
+			aux32 <<= 8;
+			aux32 |= (uint32_t)(auxBuff[aux16++]);
+			aux32 >>= resolutionFix;
+			// Truncates the sample size to 16 bits
+			if((resolutionFix < 2) && (varSize_p == 2)) {
+				aux32 >>= (2 - resolutionFix);
+			}
+			// Update function arguments
+			if(isPointerValid(infraredLedBuffer_p)) {
+				if(varSize_p == 2) {
+					*buff16ptr2++ = (uint16_t)(aux32);
+				} else {
+					*buff32ptr2++ = (uint32_t)(aux32);
+				}
+			}
+			break;
+
+		case ModeControl::MULTI_LED_MODE:
+			// TODO: Implement this mode
+			// Returns error
+			this->_lastError = Error::UNDER_DEVELOPMENT;
+			return false;
+		}
+	}
+	free(auxBuff);
+
+	// Update data members
+	if(!this->_getFifoInfo()) {
+		// Returns error
+		return false;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	return true;
+}
+
+// =============================================================================
+// Class own methods - Protected
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Static functions definitions
+// =============================================================================
+
+/**
+ * @brief
+ * // TODO: document this function
+ */
+static void defaultCallbackFunction(void)
+{
+	return;
+}

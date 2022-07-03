@@ -1,0 +1,14 @@
+{
+	"files.exclude": {
+		"*.pdsprj": true,
+		"*.code-workspace": true,
+		"*.pdsprj*workspace": true,
+		".vscode/": true,
+		"_hide/": true
+	},
+	"C_Cpp.intelliSenseEngineFallback": "Disabled",
+	"C_Cpp.default.cppStandard": "c++11",
+	"C_Cpp.default.cStandard": "c11",
+	"C_Cpp.default.intelliSenseMode": "gcc-x64",
+	"C_Cpp.dimInactiveRegions": false,
+}

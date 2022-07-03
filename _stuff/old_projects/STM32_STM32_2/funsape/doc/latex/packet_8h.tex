@@ -1,0 +1,38 @@
+\hypertarget{packet_8h}{}\section{\+\_\+hide/\+M\+P\+U/core/driver/stm32\+L/packet.h File Reference}
+\label{packet_8h}\index{\+\_\+hide/\+M\+P\+U/core/driver/stm32\+L/packet.\+h@{\+\_\+hide/\+M\+P\+U/core/driver/stm32\+L/packet.\+h}}
+
+
+Defines needed for sending data/debug packets via U\+S\+B.  
+
+
+{\ttfamily \#include \char`\"{}mltypes.\+h\char`\"{}}\\*
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___s_t_m32_l_gad0b5944db008f1821019adc6e0807e15}{}enum {\bfseries e\+M\+P\+L\+\_\+packet\+\_\+e} \{ \\*
+{\bfseries P\+A\+C\+K\+E\+T\+\_\+\+D\+A\+T\+A\+\_\+\+A\+C\+C\+E\+L} = 0, 
+{\bfseries P\+A\+C\+K\+E\+T\+\_\+\+D\+A\+T\+A\+\_\+\+G\+Y\+R\+O}, 
+{\bfseries P\+A\+C\+K\+E\+T\+\_\+\+D\+A\+T\+A\+\_\+\+C\+O\+M\+P\+A\+S\+S}, 
+{\bfseries P\+A\+C\+K\+E\+T\+\_\+\+D\+A\+T\+A\+\_\+\+Q\+U\+A\+T}, 
+\\*
+{\bfseries P\+A\+C\+K\+E\+T\+\_\+\+D\+A\+T\+A\+\_\+\+E\+U\+L\+E\+R}, 
+{\bfseries P\+A\+C\+K\+E\+T\+\_\+\+D\+A\+T\+A\+\_\+\+R\+O\+T}, 
+{\bfseries P\+A\+C\+K\+E\+T\+\_\+\+D\+A\+T\+A\+\_\+\+H\+E\+A\+D\+I\+N\+G}, 
+{\bfseries P\+A\+C\+K\+E\+T\+\_\+\+D\+A\+T\+A\+\_\+\+L\+I\+N\+E\+A\+R\+\_\+\+A\+C\+C\+E\+L}, 
+\\*
+{\bfseries N\+U\+M\+\_\+\+D\+A\+T\+A\+\_\+\+P\+A\+C\+K\+E\+T\+S}
+ \}\label{group___s_t_m32_l_gad0b5944db008f1821019adc6e0807e15}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{group___s_t_m32_l_gac781b96a931ab4eb1ad191ce53e4f0d1}{e\+M\+P\+L\+\_\+send\+\_\+quat} (long $\ast$quat)
+\begin{DoxyCompactList}\small\item\em Send a quaternion packet via U\+A\+R\+T. The host is expected to use the data in this packet to graphically represent the device orientation. To send quaternion in the same manner as any other data packet, use e\+M\+P\+L\+\_\+send\+\_\+data. \end{DoxyCompactList}\item 
+void \hyperlink{group___s_t_m32_l_ga6eb41d95d28b12994f2722bda7fab49d}{e\+M\+P\+L\+\_\+send\+\_\+data} (unsigned char type, long $\ast$data)
+\begin{DoxyCompactList}\small\item\em Send a data packet via U\+A\+R\+T. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Defines needed for sending data/debug packets via U\+S\+B. 
+

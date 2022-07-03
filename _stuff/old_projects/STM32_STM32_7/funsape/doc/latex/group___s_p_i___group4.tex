@@ -1,0 +1,52 @@
+\hypertarget{group___s_p_i___group4}{}\section{D\+M\+A transfers management functions}
+\label{group___s_p_i___group4}\index{D\+M\+A transfers management functions@{D\+M\+A transfers management functions}}
+
+
+D\+M\+A transfers management functions.  
+
+
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{group___s_p_i___group4_gabed5b91a8576e6d578f364cc0e807e4a}{S\+P\+I\+\_\+\+I2\+S\+\_\+\+D\+M\+A\+Cmd} (\hyperlink{struct_s_p_i___type_def}{S\+P\+I\+\_\+\+Type\+Def} $\ast$S\+P\+Ix, uint16\+\_\+t S\+P\+I\+\_\+\+I2\+S\+\_\+\+D\+M\+A\+Req, Functional\+State New\+State)
+\begin{DoxyCompactList}\small\item\em Enables or disables the S\+P\+Ix/\+I2\+Sx D\+M\+A interface. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+D\+M\+A transfers management functions. 
+
+\begin{DoxyVerb} ===============================================================================
+                         DMA transfers management functions
+ ===============================================================================  \end{DoxyVerb}
+ 
+
+\subsection{Function Documentation}
+\hypertarget{group___s_p_i___group4_gabed5b91a8576e6d578f364cc0e807e4a}{}\index{D\+M\+A transfers management functions@{D\+M\+A transfers management functions}!S\+P\+I\+\_\+\+I2\+S\+\_\+\+D\+M\+A\+Cmd@{S\+P\+I\+\_\+\+I2\+S\+\_\+\+D\+M\+A\+Cmd}}
+\index{S\+P\+I\+\_\+\+I2\+S\+\_\+\+D\+M\+A\+Cmd@{S\+P\+I\+\_\+\+I2\+S\+\_\+\+D\+M\+A\+Cmd}!D\+M\+A transfers management functions@{D\+M\+A transfers management functions}}
+\subsubsection[{S\+P\+I\+\_\+\+I2\+S\+\_\+\+D\+M\+A\+Cmd}]{\setlength{\rightskip}{0pt plus 5cm}void S\+P\+I\+\_\+\+I2\+S\+\_\+\+D\+M\+A\+Cmd (
+\begin{DoxyParamCaption}
+\item[{{\bf S\+P\+I\+\_\+\+Type\+Def} $\ast$}]{S\+P\+Ix, }
+\item[{uint16\+\_\+t}]{S\+P\+I\+\_\+\+I2\+S\+\_\+\+D\+M\+A\+Req, }
+\item[{Functional\+State}]{New\+State}
+\end{DoxyParamCaption}
+)}\label{group___s_p_i___group4_gabed5b91a8576e6d578f364cc0e807e4a}
+
+
+Enables or disables the S\+P\+Ix/\+I2\+Sx D\+M\+A interface. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em S\+P\+Ix} & To select the S\+P\+Ix/\+I2\+Sx peripheral, where x can be\+: 1, 2 or 3 in S\+P\+I mode or 2 or 3 in I2\+S mode or I2\+Sxext for I2\+S full duplex mode. \\
+\hline
+{\em S\+P\+I\+\_\+\+I2\+S\+\_\+\+D\+M\+A\+Req} & specifies the S\+P\+I D\+M\+A transfer request to be enabled or disabled. This parameter can be any combination of the following values\+: \begin{DoxyItemize}
+\item S\+P\+I\+\_\+\+I2\+S\+\_\+\+D\+M\+A\+Req\+\_\+\+Tx\+: Tx buffer D\+M\+A transfer request \item S\+P\+I\+\_\+\+I2\+S\+\_\+\+D\+M\+A\+Req\+\_\+\+Rx\+: Rx buffer D\+M\+A transfer request \end{DoxyItemize}
+\\
+\hline
+{\em New\+State} & new state of the selected S\+P\+I D\+M\+A transfer request. This parameter can be\+: E\+N\+A\+B\+L\+E or D\+I\+S\+A\+B\+L\+E. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}

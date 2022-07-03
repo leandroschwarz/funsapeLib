@@ -1,0 +1,23 @@
+{
+	"configurations": [
+		{
+			"name": "Win32",
+			"includePath": [
+				"${workspaceFolder}/**",
+				"${workspaceFolder}/Inc/",
+				"${workspaceFolder}/Drivers/CMSIS/Device/ST/STM32F1xx/Include/",
+				"${workspaceFolder}/Drivers/CMSIS/Include/",
+				"${workspaceFolder}/Drivers/STM32F1xx_HAL_Driver/Inc/",
+				"${workspaceFolder}/FatFs/",
+				"${workspaceFolder}/funsape/",
+				"${workspaceFolder}/funsape/parts/",
+				"${workspaceFolder}/funsape/util/",
+				"C:/Portable/Embedded Toolchain/GNU Tools ARM Embedded/7 2017-q4-major/arm-none-eabi/include",
+				"C:/Portable/Embedded Toolchain/GNU Tools ARM Embedded/7 2017-q4-major/lib/gcc/arm-none-eabi/7.2.1/include"
+			],
+			"defines": ["STM32F103xE", "USE_HAL_DRIVER"],
+			"cppStandard": "c++11"
+		}
+	],
+	"version": 4
+}

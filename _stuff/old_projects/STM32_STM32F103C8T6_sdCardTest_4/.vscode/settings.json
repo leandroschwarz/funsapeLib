@@ -1,0 +1,9 @@
+{
+	"files.exclude": {
+		"*.pdsprj": true,
+		"*.code-workspace": true,
+		"*.pdsprj*workspace": true,
+		".vscode/": false,
+		"_hide/": false
+	}
+}

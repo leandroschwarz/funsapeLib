@@ -1,0 +1,50 @@
+\hypertarget{group___r_t_c___interrupts___definitions}{}\section{R\+T\+C\+\_\+\+Interrupts\+\_\+\+Definitions}
+\label{group___r_t_c___interrupts___definitions}\index{R\+T\+C\+\_\+\+Interrupts\+\_\+\+Definitions@{R\+T\+C\+\_\+\+Interrupts\+\_\+\+Definitions}}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___r_t_c___interrupts___definitions_ga2c4632667c515e366a79df6341d5f3d1}{}\#define {\bfseries R\+T\+C\+\_\+\+I\+T\+\_\+\+T\+S}~((uint32\+\_\+t)0x00008000)\label{group___r_t_c___interrupts___definitions_ga2c4632667c515e366a79df6341d5f3d1}
+
+\item 
+\hypertarget{group___r_t_c___interrupts___definitions_gadc90686ace99992f4775c0198a1c6591}{}\#define {\bfseries R\+T\+C\+\_\+\+I\+T\+\_\+\+W\+U\+T}~((uint32\+\_\+t)0x00004000)\label{group___r_t_c___interrupts___definitions_gadc90686ace99992f4775c0198a1c6591}
+
+\item 
+\hypertarget{group___r_t_c___interrupts___definitions_gaeb47520af65e995ddad232f3a846aba8}{}\#define {\bfseries R\+T\+C\+\_\+\+I\+T\+\_\+\+A\+L\+R\+B}~((uint32\+\_\+t)0x00002000)\label{group___r_t_c___interrupts___definitions_gaeb47520af65e995ddad232f3a846aba8}
+
+\item 
+\hypertarget{group___r_t_c___interrupts___definitions_ga0ba352559e4eb6a5430e1254851a0dfb}{}\#define {\bfseries R\+T\+C\+\_\+\+I\+T\+\_\+\+A\+L\+R\+A}~((uint32\+\_\+t)0x00001000)\label{group___r_t_c___interrupts___definitions_ga0ba352559e4eb6a5430e1254851a0dfb}
+
+\item 
+\hypertarget{group___r_t_c___interrupts___definitions_gada511402e0227932824cdc95711ebd55}{}\#define {\bfseries R\+T\+C\+\_\+\+I\+T\+\_\+\+T\+A\+M\+P}~((uint32\+\_\+t)0x00000004) /$\ast$ Used only to Enable the Tamper Interrupt $\ast$/\label{group___r_t_c___interrupts___definitions_gada511402e0227932824cdc95711ebd55}
+
+\item 
+\hypertarget{group___r_t_c___interrupts___definitions_gaae1bc95e46b6951e45c4d857a6701a8a}{}\#define {\bfseries R\+T\+C\+\_\+\+I\+T\+\_\+\+T\+A\+M\+P1}~((uint32\+\_\+t)0x00020000)\label{group___r_t_c___interrupts___definitions_gaae1bc95e46b6951e45c4d857a6701a8a}
+
+\item 
+\hypertarget{group___r_t_c___interrupts___definitions_ga9dacc14e5cef6806a69a6edd094bc151}{}\#define {\bfseries I\+S\+\_\+\+R\+T\+C\+\_\+\+C\+O\+N\+F\+I\+G\+\_\+\+I\+T}(I\+T)~(((I\+T) != (uint32\+\_\+t)R\+E\+S\+E\+T) \&\& (((I\+T) \& 0x\+F\+F\+F\+F0\+F\+F\+B) == (uint32\+\_\+t)\+R\+E\+S\+E\+T))\label{group___r_t_c___interrupts___definitions_ga9dacc14e5cef6806a69a6edd094bc151}
+
+\item 
+\#define {\bfseries I\+S\+\_\+\+R\+T\+C\+\_\+\+G\+E\+T\+\_\+\+I\+T}(I\+T)
+\item 
+\hypertarget{group___r_t_c___interrupts___definitions_ga1289cb21107c648b293aee4a4f8cba70}{}\#define {\bfseries I\+S\+\_\+\+R\+T\+C\+\_\+\+C\+L\+E\+A\+R\+\_\+\+I\+T}(I\+T)~(((I\+T) != (uint32\+\_\+t)R\+E\+S\+E\+T) \&\& (((I\+T) \& 0x\+F\+F\+F\+D0\+F\+F\+F) == (uint32\+\_\+t)\+R\+E\+S\+E\+T))\label{group___r_t_c___interrupts___definitions_ga1289cb21107c648b293aee4a4f8cba70}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{group___r_t_c___interrupts___definitions_ga2e10d8ccb2aa398ac14bde526f98dbc9}{}\index{R\+T\+C\+\_\+\+Interrupts\+\_\+\+Definitions@{R\+T\+C\+\_\+\+Interrupts\+\_\+\+Definitions}!I\+S\+\_\+\+R\+T\+C\+\_\+\+G\+E\+T\+\_\+\+I\+T@{I\+S\+\_\+\+R\+T\+C\+\_\+\+G\+E\+T\+\_\+\+I\+T}}
+\index{I\+S\+\_\+\+R\+T\+C\+\_\+\+G\+E\+T\+\_\+\+I\+T@{I\+S\+\_\+\+R\+T\+C\+\_\+\+G\+E\+T\+\_\+\+I\+T}!R\+T\+C\+\_\+\+Interrupts\+\_\+\+Definitions@{R\+T\+C\+\_\+\+Interrupts\+\_\+\+Definitions}}
+\subsubsection[{I\+S\+\_\+\+R\+T\+C\+\_\+\+G\+E\+T\+\_\+\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+S\+\_\+\+R\+T\+C\+\_\+\+G\+E\+T\+\_\+\+I\+T(
+\begin{DoxyParamCaption}
+\item[{}]{I\+T}
+\end{DoxyParamCaption}
+)}\label{group___r_t_c___interrupts___definitions_ga2e10d8ccb2aa398ac14bde526f98dbc9}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+(((IT) == RTC\_IT\_TS) || ((IT) == RTC\_IT\_WUT) || \(\backslash\)
+                           ((IT) == RTC\_IT\_ALRB) || ((IT) == RTC\_IT\_ALRA) || \(\backslash\)
+                           ((IT) == RTC\_IT\_TAMP1))
+\end{DoxyCode}

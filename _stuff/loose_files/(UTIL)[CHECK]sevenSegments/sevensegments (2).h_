@@ -1,0 +1,35 @@
+/* -----------------------------------------------------------------------------
+ * File:			sevensegments.h
+ * Module:			Seven Segments Display Functions
+ * Author:			Leandro Schwarz
+ * Version:			1.0
+ * Last edition:	12/06/2015
+ * -------------------------------------------------------------------------- */
+
+#ifndef __SEVENSEGMENTS_H
+#define __SEVENSEGMENTS_H 10
+
+#include "LS_defines.h"
+#if __LS_DEFINES_H < 110
+	#error Error 100 - The defintion file is outdated (LS_defines must be version 11.0 or greater).
+#endif
+
+// -----------------------------------------------------------------------------
+// New data types --------------------------------------------------------------
+
+typedef enum displayCommon_t{
+	COMMON_CATHODE	= 0,
+	COMMON_ANODE
+} displayCommon_t;
+
+typedef enum bool_t{
+	TRUE = 1,
+	FALSE = 0
+} bool_t;
+
+// -----------------------------------------------------------------------------
+// Function declaration --------------------------------------------------------
+
+uint8 hex2SevenSegments(uint8 hex, bool_t point, displayCommon_t common);
+
+#endif

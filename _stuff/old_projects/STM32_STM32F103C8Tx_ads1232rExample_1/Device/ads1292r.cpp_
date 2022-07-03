@@ -1,0 +1,337 @@
+
+#include "ads1292r.hpp"
+
+#define ADS1292_REG_ID			0x00
+#define ADS1292_REG_CONFIG1		0x01
+#define ADS1292_REG_CONFIG2		0x02
+#define ADS1292_REG_LOFF		0x03
+#define ADS1292_REG_CH1SET		0x04
+#define ADS1292_REG_CH2SET		0x05
+#define ADS1292_REG_RLDSENS		0x06
+#define ADS1292_REG_LOFFSENS	0x07
+#define ADS1292_REG_LOFFSTAT	0x08
+#define ADS1292_REG_RESP1		0x09
+#define ADS1292_REG_RESP2		0x0A
+#define ADS1292_REG_GPIO		0x0B
+
+#define ADS_READ_REG			0x20
+#define ADS_WRITE_REG			0x40
+
+Ads1292r::Ads1292r(void (* actFunc_p)(void), void (* deactFunc_p)(void))
+{
+	this->_activateDevice = actFunc_p;
+	this->_deactivateDevice = deactFunc_p;
+
+	this->_calibrationOffsetEnabled = false;
+	this->_channelOversamplingRatio = DataRatio::RATIO_125_SPS;
+	this->_chopFrenquency = ChopFrenquency::FMOD_16;
+	this->_clockDivision = ClockDivision::FCLK_4;
+	this->_continuousConversionDisabled = false;
+	this->_flip1Enabled = false;
+	this->_flip2Enabled = false;
+	this->_gpio1Control = GpioControl::INPUT;
+	this->_gpio1Value = false;
+	this->_gpio2Control = GpioControl::INPUT;
+	this->_gpio2Value = false;
+	this->_in1NLeadOffDetected = false;
+	this->_in1PLeadOffDetected = false;
+	this->_in2NLeadOffDetected = false;
+	this->_in2PLeadOffDetected = false;
+	this->_inputSelectionChannel_1 = InputSelectionCh1::NORMAL_ELECTRODE;
+	this->_inputSelectionChannel_2 = InputSelectionCh2::NORMAL_ELECTRODE;
+	this->_leadOffCh1NegativeDetectionEnabled = false;
+	this->_leadOffCh1PositiveDetectionEnabled = false;
+	this->_leadOffCh2NegativeDetectionEnabled = false;
+	this->_leadOffCh2PositiveDetectionEnabled = false;
+	this->_leadOffComparatorEnabled = false;
+	this->_leadOffComparatorThreshold = LeadOffComparatorThreshold::AT_95_0_PERCENT;
+	this->_leadOffCurrentMagnitude = LeadOffCurrentMagnitude::CURRENT_6_NA;
+	this->_leadOffFrequency = LeadOffFrequency::LEAD_OFF_DC;
+	this->_outputClockOscillatorPinEnabled = false;
+	this->_pgaGainChannel_1 = PgaGain::GAIN_4;
+	this->_pgaGainChannel_2 = PgaGain::GAIN_12;
+	this->_powerDownChannel_1 = false;
+	this->_powerDownChannel_2 = false;
+	this->_referenceBufferEnabled = true;
+	this->_referenceSelection = ReferenceSelection::REFERENCE_2420_MV;
+	this->_repirationExternalClockEnabled = false;
+	this->_repirationPhase = RespirationPhase::PHASE_135_00;
+	this->_respirationControlFrequency = RespirationFrequency::FREQ_32_KHZ;
+	this->_respirationDemodulationCircuitEnabled = true;
+	this->_respirationModulationCircuitEnabled = true;
+	this->_rldBufferEnabled = true;
+	this->_rldConnectedToIn1N = false;
+	this->_rldConnectedToIn1P = false;
+	this->_rldConnectedToIn2N = true;
+	this->_rldConnectedToIn2P = true;
+	this->_rldLeadOffDetected = false;
+	this->_rldLeadOffSenseEnabled = false;
+	this->_rldReferenceSource = RldReferenceSource::INTERNAL;
+	this->_testSignalEnabled = false;
+	this->_testSignalFrequency = TestSignalFrequency::TEST_SIGNAL_DC;
+
+	return;
+}
+
+bool Ads1292r::init()
+{
+	// Send RESET
+	this->_sendCommand((uint8_t)(Command::Reset));
+
+	// Send Configuration Commands in Sucession
+	this->_sendCommand((uint8_t)(Command::StopConversion));
+	this->_sendCommand((uint8_t)(Command::ContinuousModeDisabled));
+
+	// Configuration Register 1
+	this->_txBuffer[0] = 0x00 |
+			((uint8_t)(this->_continuousConversionDisabled) << CONFIG1_REG_SINGLE_SHOT_BIT) |
+			((uint8_t)(this->_channelOversamplingRatio) << CONFIG1_REG_DR_BIT);
+	this->_writeReg(ADS1292_REG_CONFIG1, this->_txBuffer, 1);
+
+	// Configuration Register 2
+	this->_txBuffer[0] = (1 << 7) |
+			((uint8_t)(this->_leadOffComparatorEnabled) << CONFIG2_REG_PDB_LOFF_COMP_BIT) |
+			((uint8_t)(this->_referenceBufferEnabled) << CONFIG2_REG_PDB_REFBUF_BIT) |
+			((uint8_t)(this->_referenceSelection) << CONFIG2_REG_VREF_4V_BIT) |
+			((uint8_t)(this->_outputClockOscillatorPinEnabled) << CONFIG2_REG_CLK_EN_BIT) |
+			((uint8_t)(this->_testSignalEnabled) << CONFIG2_REG_INT_TEST_BIT) |
+			((uint8_t)(this->_testSignalFrequency) << CONFIG2_REG_TEST_FREQ_BIT);
+	this->_writeReg(ADS1292_REG_CONFIG2, this->_txBuffer, 1);
+
+	// Lead-Off Control Register
+	this->_txBuffer[0] = (1 << 4) |
+			((uint8_t)(_leadOffComparatorThreshold) << LOFF_REG_COMP_TH_BIT) |
+			((uint8_t)(_leadOffCurrentMagnitude) << LOFF_REG_ILEAD_OFF_BIT) |
+			((uint8_t)(_leadOffFrequency) << LOFF_REG_FLEAD_OFF_BIT);
+	this->_writeReg(ADS1292_REG_LOFF, this->_txBuffer, 1);
+
+	// Channel 1 Settings Register
+	this->_txBuffer[0] = 0x00 |
+			((uint8_t)(_powerDownChannel_1) << CH1SET_REG_PD_BIT) |
+			((uint8_t)(_pgaGainChannel_1) << CH1SET_REG_GAIN_BIT) |
+			((uint8_t)(_inputSelectionChannel_1) << CH1SET_REG_MUX_BIT);
+	this->_writeReg(ADS1292_REG_CH1SET, this->_txBuffer, 1);
+
+	// Channel 2 Settings Register
+	this->_txBuffer[0] = 0x00 |
+			((uint8_t)(_powerDownChannel_2) << CH2SET_REG_PD_BIT) |
+			((uint8_t)(_pgaGainChannel_2) << CH2SET_REG_GAIN_BIT) |
+			((uint8_t)(_inputSelectionChannel_2) << CH2SET_REG_MUX_BIT);
+	this->_writeReg(ADS1292_REG_CH2SET, this->_txBuffer, 1);
+
+	// Right Leg Drive Sense Selection Register
+	this->_txBuffer[0] = 0x00 |
+			((uint8_t)(_chopFrenquency) << RLD_SENS_REG_CHOP_BIT) |
+			((uint8_t)(_rldBufferEnabled) << RLD_SENS_REG_PDB_RLD_BIT) |
+			((uint8_t)(_rldLeadOffSenseEnabled) << RLD_SENS_REG_RLD_LOFF_SENSE_BIT) |
+			((uint8_t)(_rldConnectedToIn2N) << RLD_SENS_REG_RLD2N_BIT) |
+			((uint8_t)(_rldConnectedToIn2P) << RLD_SENS_REG_RLD2P_BIT) |
+			((uint8_t)(_rldConnectedToIn1N) << RLD_SENS_REG_RLD1N_BIT) |
+			((uint8_t)(_rldConnectedToIn1P) << RLD_SENS_REG_RLD1P_BIT);
+	this->_writeReg(ADS1292_REG_RLDSENS, this->_txBuffer, 1);
+
+	// Lead-Off Sense Selection Register
+	this->_txBuffer[0] = 0x00 |
+			((uint8_t)(_flip2Enabled) << LOFF_SENS_REG_FLIP2_BIT) |
+			((uint8_t)(_flip1Enabled) << LOFF_SENS_REG_FLIP1_BIT) |
+			((uint8_t)(_leadOffCh2NegativeDetectionEnabled) << LOFF_SENS_REG_LOFF2N_BIT) |
+			((uint8_t)(_leadOffCh2PositiveDetectionEnabled) << LOFF_SENS_REG_LOFF2P_BIT) |
+			((uint8_t)(_leadOffCh1NegativeDetectionEnabled) << LOFF_SENS_REG_LOFF1N_BIT) |
+			((uint8_t)(_leadOffCh1PositiveDetectionEnabled) << LOFF_SENS_REG_LOFF1P_BIT);
+	this->_writeReg(ADS1292_REG_LOFFSENS, this->_txBuffer, 1);
+
+	// Lead-Off Status Register
+	this->_txBuffer[0] = 0x00 |
+			((uint8_t)(_clockDivision) << LOFF_STAT_REG_CLK_DIV_BIT) |
+			((uint8_t)(_rldLeadOffDetected) << LOFF_STAT_REG_RLD_STAT_BIT) |
+			((uint8_t)(_in2NLeadOffDetected) << LOFF_STAT_REG_IN2N_OFF_BIT) |
+			((uint8_t)(_in2PLeadOffDetected) << LOFF_STAT_REG_IN2P_OFF_BIT) |
+			((uint8_t)(_in1NLeadOffDetected) << LOFF_STAT_REG_IN1N_OFF_BIT) |
+			((uint8_t)(_in1PLeadOffDetected) << LOFF_STAT_REG_IN1P_OFF_BIT);
+	this->_writeReg(ADS1292_REG_LOFFSTAT, this->_txBuffer, 1);
+
+	// Respiration Control Register 1
+	this->_txBuffer[0] = 0x02 |
+			((uint8_t)(_respirationDemodulationCircuitEnabled) << RESP1_REG_RESP_DEMOD_EN1_BIT) |
+			((uint8_t)(_respirationModulationCircuitEnabled) << RESP1_REG_RESP_MOD_EN_BIT) |
+			((uint8_t)(_repirationPhase) << RESP1_REG_RESP_PH_BIT) |
+			((uint8_t)(_repirationExternalClockEnabled) << RESP1_REG_RESP_CTRL_BIT);
+	this->_writeReg(ADS1292_REG_RESP1, this->_txBuffer, 1);
+
+	// Respiration Control Register 2
+	this->_txBuffer[0] = 0x01 |
+			((uint8_t)(_calibrationOffsetEnabled) << RESP2_REG_CALIB_ON_BIT) |
+			((uint8_t)(_respirationControlFrequency) << RESP2_REG_RESP_FREQ_BIT) |
+			((uint8_t)(_rldReferenceSource) << RESP2_REG_RLDREF_INT_BIT);
+	this->_writeReg(ADS1292_REG_RESP2, this->_txBuffer, 1);
+
+	// General-Purpose I/O Register
+	this->_txBuffer[0] = 0x00 |
+			((uint8_t)(_gpio2Control) << GPIO_REG_GPIOC2_BIT) |
+			((uint8_t)(_gpio1Control) << GPIO_REG_GPIOC1_BIT) |
+			((uint8_t)(_gpio2Value) << GPIO_REG_GPIOD2_BIT) |
+			((uint8_t)(_gpio1Value) << GPIO_REG_GPIOD1_BIT);
+	this->_writeReg(ADS1292_REG_GPIO, this->_txBuffer, 1);
+
+	this->_sendCommand((uint8_t)(Command::ContinuousModeEnabled));
+	this->_sendCommand((uint8_t)(Command::StartConversion));
+	this->_sendCommand((uint8_t)(Command::ContinuousModeDisabled));
+
+	return true;
+}
+
+bool Ads1292r::getId()
+{
+	this->_txBuffer[0] = ADS_READ_REG | ADS1292_REG_ID;
+	this->_txBuffer[1] = 0x00;
+	this->_txBuffer[2] = 0xFF;
+
+	this->_activateDevice();
+	HAL_SPI_TransmitReceive(&hspi1, this->_txBuffer, this->_rxBuffer, 3, 10);
+	customDelay();
+	this->_deactivateDevice();
+
+	if(this->_rxBuffer[2] != 0x73) {
+		return false;
+	}
+
+	return true;
+}
+
+bool Ads1292r::checkConfiguration(void)
+{
+	uint8_t i = 0;
+
+	this->_txBuffer[i++] = ADS_READ_REG | ADS1292_REG_ID;
+	this->_txBuffer[i++] = 0x00 | 10;
+	while(i < 14) {
+		this->_txBuffer[i++] = 0xFF;
+	}
+
+	this->_activateDevice();
+	HAL_SPI_TransmitReceive(&hspi1, this->_txBuffer, this->_rxBuffer, 14, 10);
+	customDelay();
+	this->_deactivateDevice();
+
+	return true;
+}
+
+bool Ads1292r::readDataMode(bool enabled_p)
+{
+	if(enabled_p) {
+		this->_sendCommand((uint8_t)Command::ContinuousModeEnabled);
+	} else {
+		this->_sendCommand((uint8_t)Command::ContinuousModeEnabled);
+	}
+
+	return true;
+}
+
+bool Ads1292r::_sendCommand(uint8_t command_p)
+{
+	this->_activateDevice();
+	HAL_SPI_Transmit(&hspi1, (uint8_t *)(&command_p), 1, 10);
+	customDelay();
+	this->_deactivateDevice();
+
+	return true;
+}
+
+bool Ads1292r::_readReg(uint8_t address_p, uint8_t *dataBuffer_p, uint8_t dataSize_p)
+{
+	uint8_t i = 0;
+
+	this->_txBuffer[i++] = ADS_READ_REG | address_p;
+	this->_txBuffer[i++] = 0x00 + (dataSize_p - 1);
+	for(uint8_t j = 0; j < dataSize_p; j++) {
+		this->_txBuffer[i++] = 0xFF;
+	}
+
+	this->_activateDevice();
+	HAL_SPI_TransmitReceive(&hspi1, this->_txBuffer, this->_rxBuffer, i, 10);
+	customDelay();
+	this->_deactivateDevice();
+
+	for(uint8_t j = 0; j < dataSize_p; j++) {
+		dataBuffer_p[j] = this->_rxBuffer[j + 2];
+	}
+
+	return true;
+}
+
+bool Ads1292r::_writeReg(uint8_t address_p, uint8_t *dataBuffer_p, uint8_t dataSize_p)
+{
+	uint8_t i = 0;
+
+	this->_txBuffer[i++] = ADS_WRITE_REG | address_p;
+	this->_txBuffer[i++] = 0x00 + (dataSize_p - 1);
+	for(uint8_t j = 0; j < dataSize_p; j++) {
+		this->_txBuffer[i++] = dataBuffer_p[j];
+	}
+
+	this->_activateDevice();
+	HAL_SPI_Transmit(&hspi1, this->_txBuffer, i, 10);
+	customDelay();
+	this->_deactivateDevice();
+
+	return true;
+}
+
+bool Ads1292r::_readData(void)
+{
+	for(uint8_t  i = 0; i < 9; i++) {
+		this->_txBuffer[i] = 0xFF;
+	}
+
+	this->_activateDevice();
+	HAL_SPI_TransmitReceive(&hspi1, this->_txBuffer, this->_rxBuffer, 9, 10);
+	customDelay();
+	this->_deactivateDevice();
+
+	return true;
+}
+
+bool Ads1292r::getData(ads1292OutputValues_t *ecgRespirationValues)
+{
+	uint32_t ecgData = 0;
+	int32_t ecgDataSign = 0;
+	uint32_t respData = 0;
+	int32_t respDataSign = 0;
+	uint32_t statusData = 0;
+	uint32_t statusByte = 0;
+	uint8_t LeadStatus = 0;
+	uint32_t resultTemp = 0;
+
+	this->_readData();		// Read the data,point the data to a pointer
+
+	statusData = ((uint32_t)(this->_rxBuffer[0]) << 16) | ((uint32_t)(this->_rxBuffer[1]) << 8) | (uint32_t)(this->_rxBuffer[2]);
+	respData = ((uint32_t)(this->_rxBuffer[3]) << 16) | ((uint32_t)(this->_rxBuffer[4]) << 8) | (uint32_t)(this->_rxBuffer[5]);
+	respData <<= 8;
+	respDataSign = (int32_t)(respData);
+	respDataSign >>= 8;
+	ecgData = ((uint32_t)(this->_rxBuffer[6]) << 16) | ((uint32_t)(this->_rxBuffer[7]) << 8) | (uint32_t)(this->_rxBuffer[8]);
+	ecgData <<= 8;
+	ecgDataSign = (int32_t)(ecgData);
+	ecgDataSign >>= 8;
+
+	(ecgRespirationValues->sDaqVals)[0] = respDataSign;
+	(ecgRespirationValues->sDaqVals)[1] = ecgDataSign;
+
+	statusByte = (statusByte & 0x0f8000) >> 15;  // bit15 gives the lead status
+	LeadStatus = (uint8_t)statusByte;
+	resultTemp =	((uint32_t)(0 << 24)) |
+			((uint32_t)(this->_rxBuffer[3]) << 16) |
+			((uint32_t)(this->_rxBuffer[4]) << 8) |
+			((uint32_t)(this->_rxBuffer[5]));
+	resultTemp <<= 8;
+	ecgRespirationValues->sresultTempResp = (int32_t)(resultTemp);
+
+	if(!((LeadStatus & 0x1f) == 0)) {
+		ecgRespirationValues->leadoffDetected  = true;
+	} else {
+		ecgRespirationValues->leadoffDetected  = false;
+	}
+
+	return true;
+}
+

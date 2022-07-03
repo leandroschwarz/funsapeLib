@@ -1,0 +1,65 @@
+\hypertarget{group___message___layer}{}\section{message\+\_\+layer}
+\label{group___message___layer}\index{message\+\_\+layer@{message\+\_\+layer}}
+
+
+Motion Library -\/ Message Layer Holds Low Occurance messages.  
+
+
+\subsection*{Files}
+\begin{DoxyCompactItemize}
+\item 
+file \hyperlink{message__layer_8c}{message\+\_\+layer.\+c}
+\begin{DoxyCompactList}\small\item\em Holds Low Occurance Messages. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structmessage__holder__t}{message\+\_\+holder\+\_\+t}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{group___message___layer_gaf61231cf7b03c6b7b67b6d3c4330cef9}{inv\+\_\+set\+\_\+message} (long set, long clear, int level)
+\item 
+long \hyperlink{group___message___layer_ga3064fea9d7ab633e85dd76987daa1314}{inv\+\_\+get\+\_\+message\+\_\+level\+\_\+0} (int clear)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Motion Library -\/ Message Layer Holds Low Occurance messages. 
+
+
+
+\subsection{Function Documentation}
+\hypertarget{group___message___layer_ga3064fea9d7ab633e85dd76987daa1314}{}\index{message\+\_\+layer@{message\+\_\+layer}!inv\+\_\+get\+\_\+message\+\_\+level\+\_\+0@{inv\+\_\+get\+\_\+message\+\_\+level\+\_\+0}}
+\index{inv\+\_\+get\+\_\+message\+\_\+level\+\_\+0@{inv\+\_\+get\+\_\+message\+\_\+level\+\_\+0}!message\+\_\+layer@{message\+\_\+layer}}
+\subsubsection[{inv\+\_\+get\+\_\+message\+\_\+level\+\_\+0}]{\setlength{\rightskip}{0pt plus 5cm}long inv\+\_\+get\+\_\+message\+\_\+level\+\_\+0 (
+\begin{DoxyParamCaption}
+\item[{int}]{clear}
+\end{DoxyParamCaption}
+)}\label{group___message___layer_ga3064fea9d7ab633e85dd76987daa1314}
+Returns Message Flags for Level 0 Messages. Levels are to allow expansion of more messages in the future. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em clear} & If set, will clear the message. Typically this will be set for one reader, so that you don't get the same message over and over. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+bit field to corresponding message. 
+\end{DoxyReturn}
+\hypertarget{group___message___layer_gaf61231cf7b03c6b7b67b6d3c4330cef9}{}\index{message\+\_\+layer@{message\+\_\+layer}!inv\+\_\+set\+\_\+message@{inv\+\_\+set\+\_\+message}}
+\index{inv\+\_\+set\+\_\+message@{inv\+\_\+set\+\_\+message}!message\+\_\+layer@{message\+\_\+layer}}
+\subsubsection[{inv\+\_\+set\+\_\+message}]{\setlength{\rightskip}{0pt plus 5cm}void inv\+\_\+set\+\_\+message (
+\begin{DoxyParamCaption}
+\item[{long}]{set, }
+\item[{long}]{clear, }
+\item[{int}]{level}
+\end{DoxyParamCaption}
+)}\label{group___message___layer_gaf61231cf7b03c6b7b67b6d3c4330cef9}
+Sets a message. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em set} & The flags to set. \\
+\hline
+\mbox{\tt in}  & {\em clear} & Before setting anything this will clear these messages, which is useful for mutually exclusive messages such a motion or no motion message. \\
+\hline
+\mbox{\tt in}  & {\em level} & Level of the messages. It starts at 0, and may increase in the future to allow more messages if the bit storage runs out. \\
+\hline
+\end{DoxyParams}

@@ -1,0 +1,898 @@
+// *INDENT-OFF*
+
+/* =============================================================================
+ * Project:
+ * File name:		packageApi.cpp
+ * Module:			API Package Frame decoder module
+ * Authors:			__AUTHORS_TO_REPLACE__
+ * Build:			__BUILD_TO_REPLACE__
+ * Last edition:	__DATE_TO_REPLACE__
+ * ========================================================================== */
+
+// =============================================================================
+// Dependencies
+// =============================================================================
+
+#include "packageApi.h"
+#ifndef __PACKAGE_API_H
+#	error	[packageApi.cpp] Error 16 - Header file (packageApi.h) is missing or corrupted!
+#elif __PACKAGE_API_H != __BUILD_TO_REPLACE__
+#	error	[packageApi.cpp] Error 17 - Build mismatch between source (packageApi.cpp) and header (packageApi.h) files!
+#endif
+
+// =============================================================================
+// File exclusive - Constants
+// =============================================================================
+
+cuint16_t minFrameSize = 10;
+cuint16_t maxFrameSize = 150;
+cuint16_t minBufferSize = 200;
+cuint16_t maxBufferSize = 2000;
+cuint8_t constFrameCharMask = 0xAA;
+cuint8_t constFrameCharEscape = 0x0D;
+cuint8_t constFrameCharStart                = 0x7E;
+
+// =============================================================================
+// File exclusive - New data types
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// File exclusive - Macro-functions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Global variables
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Static functions declarations
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Class constructors
+// =============================================================================
+
+/**
+ * @brief Construct a new PackageApi::PackageApi object
+ *
+ * Detailed description of this element.
+ *
+ */
+PackageApi::PackageApi(void)
+{
+	// Resets data members
+	this->_frameDataBuffer      = nullptr;
+	this->_frameDataMaxSize     = 0;
+	this->_frameDataSize        = 0;
+	this->_frameId              = 0;
+	this->_frameState           = FrameState::GET_START;
+	this->_frameType            = 0;
+	this->_frameValidity        = false;
+	this->_initialized          = false;
+	this->_newFrameReady        = false;
+
+	// Checks circular buffer creation status
+	this->_lastError = this->_circularBuffer.getLastError();
+	if(this->_lastError != Error::NONE) {
+		// Returns error
+		return;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	return;
+}
+
+/**
+ * @brief Construct a new PackageApi::PackageApi object
+ *
+ * Detailed description of this element.
+ *
+ * @param[in] bufferSize_p description of this parameter
+ * @param[in] overwrite_p description of this parameter
+ */
+PackageApi::PackageApi(cuint16_t circularBufferSize_p, cuint16_t frameBufferSize_p, cbool_t overwrite_p)
+{
+	// Resets data members
+	this->_frameDataBuffer      = nullptr;
+	this->_frameDataMaxSize     = 0;
+	this->_frameDataSize        = 0;
+	this->_frameId              = 0;
+	this->_frameState           = FrameState::GET_START;
+	this->_frameType            = 0;
+	this->_frameValidity        = false;
+	this->_initialized          = false;
+	this->_newFrameReady        = false;
+
+	// Checks circular buffer creation status
+	this->_lastError = this->_circularBuffer.getLastError();
+	if(this->_lastError != Error::NONE) {
+		// Returns error
+		return;
+	}
+
+	// Initialize module
+	if(!this->_initialize(circularBufferSize_p, frameBufferSize_p, overwrite_p)) {
+		// Returns error
+		return;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	return;
+}
+
+/**
+ * @brief Destroy the PackageApi:: PackageApi object
+ *
+ * Detailed description of this element.
+ *
+ */
+PackageApi::~PackageApi(void)
+{
+	// Resets data members
+	this->_initialized                  = false;
+	this->_newFrameReady                = false;
+	this->_frameValidity                = false;
+	this->_frameDataMaxSize             = 0;
+	this->_frameDataSize                = 0;
+	this->_frameType                    = 0;
+	this->_frameId                      = 0;
+
+	// Deletes circular buffer
+	if(this->_circularBuffer.isInitialized()) {
+		this->_circularBuffer.~CircularBuffer<uint8_t>();
+	}
+
+	// Deallocate memory
+	if(isPointerValid(this->_frameDataBuffer)) {
+		free(this->_frameDataBuffer);
+		this->_frameDataBuffer = nullptr;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	return;
+}
+
+// =============================================================================
+// Class own methods - Public
+// =============================================================================
+
+//     ///////////////////     CONTROL AND STATUS     ///////////////////     //
+
+/**
+ * @brief
+ *
+ * Detailed description of this element.
+ *
+ * @return Error
+ */
+Error PackageApi::getLastError(void)
+{
+	// Returns last error
+	return this->_lastError;
+}
+
+/**
+ * @brief
+ *
+ * Detailed description of this element.
+ *
+ * @param[in] bufferSize_p description of this parameter
+ * @param[in] overwrite_p description of this parameter
+ * @return true
+ * @return false
+ */
+bool PackageApi::init(cuint16_t circularBufferSize_p, cuint16_t frameBufferSize_p, cbool_t overwrite_p)
+{
+	// Initialize module
+	if(!this->_initialize(circularBufferSize_p, frameBufferSize_p, overwrite_p)) {
+		// Returns error
+		return false;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	return true;
+}
+
+/**
+ * @brief
+ *
+ * Detailed description of this element.
+ *
+ * @return true
+ * @return false
+ */
+bool PackageApi::isFrameValid(void)
+{
+	// Returns result
+	return this->_frameValidity;
+}
+
+/**
+ * @brief
+ *
+ * Detailed description of this element.
+ *
+ * @return true
+ * @return false
+ */
+bool PackageApi::isInitialized(void)
+{
+	// Checks initialization
+	if(!this->_initialized) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		return false;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	return true;
+}
+
+/**
+ * @brief
+ *
+ * Detailed description of this element.
+ *
+ * @return true
+ * @return false
+ */
+bool PackageApi::isNewFrameAvailable(void)
+{
+	// Process buffer if last frame was not available
+	if(this->_frameState != FrameState::READY) {
+		// Try to process internal buffer
+		this->_processInternalBuffer();
+	} else {
+		this->_newFrameReady = true;
+	}
+
+	// Returns result
+	this->_lastError = Error::NONE;
+	return this->_newFrameReady;
+}
+
+//     ////////////////    FRAME BUFFER MANIPULATION     ////////////////     //
+
+/**
+ * @brief
+ *
+ * Detailed description of this element.
+ *
+ * @param[in] data_p description of this parameter
+ * @return true
+ * @return false
+ */
+bool PackageApi::feedBuffer(uint8_t data_p)
+{
+	// Testing for errors - not initialized
+	if(!this->_initialized) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		return false;
+	}
+	// Testing for errors - BUFFER NOT INITIALIZED
+	if(!this->_circularBuffer.isInitialized()) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		return false;
+	}
+
+	// Feed buffer
+	if(!this->_circularBuffer.push(data_p)) {
+		// Returns error
+		this->_lastError = this->_circularBuffer.getLastError();
+		return false;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	return true;
+}
+
+/**
+ * @brief
+ *
+ * Detailed description of this element.
+ *
+ * @param[in] data_p description of this parameter
+ * @param[in] size_p description of this parameter
+ * @return true
+ * @return false
+ */
+bool PackageApi::feedBuffer(uint8_t *data_p, cuint16_t size_p)
+{
+	// Testing for errors - not initialized
+	if(!this->_initialized) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		return false;
+	}
+	// Testing for errors - BUFFER NOT INITIALIZED
+	if(!this->_circularBuffer.isInitialized()) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		return false;
+	}
+
+	// Feed buffer
+	if(!this->_circularBuffer.push(data_p, size_p)) {
+		// Returns error
+		this->_lastError = this->_circularBuffer.getLastError();
+		return false;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	return true;
+}
+
+/**
+ * @brief
+ *
+ * Detailed description of this element.
+ *
+ * @return true
+ * @return false
+ */
+bool PackageApi::flushBuffer(void)
+{
+	// Testing for errors - not initialized
+	if(!this->_initialized) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		return false;
+	}
+	// Testing for errors - BUFFER NOT INITIALIZED
+	if(!this->_circularBuffer.isInitialized()) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		return false;
+	}
+	// Flush buffer
+	if(!this->_circularBuffer.flush()) {
+		// Returns error
+		this->_lastError = this->_circularBuffer.getLastError();
+		return false;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	return true;
+}
+
+/**
+ * @brief
+ *
+ * Detailed description of this element.
+ *
+ * @return true
+ * @return false
+ */
+uint16_t PackageApi::getBufferFreeSpace(void)
+{
+	// Testing for errors - not initialized
+	if(!this->_initialized) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		return 0;
+	}
+	// Testing for errors - BUFFER NOT INITIALIZED
+	if(!this->_circularBuffer.isInitialized()) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		return 0;
+	}
+
+	// Returns value
+	this->_lastError = Error::NONE;
+	return this->_circularBuffer.getFreeSpace();
+}
+
+/**
+ * @brief
+ *
+ * Detailed description of this element.
+ *
+ * @return true
+ * @return false
+ */
+uint16_t PackageApi::getBufferOccupation(void)
+{
+	// Testing for errors - not initialized
+	if(!this->_initialized) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		return 0;
+	}
+	// Testing for errors - BUFFER NOT INITIALIZED
+	if(!this->_circularBuffer.isInitialized()) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		return 0;
+	}
+
+	// Returns value
+	this->_lastError = Error::NONE;
+	return this->_circularBuffer.getOccupation();
+}
+
+/**
+ * @brief
+ *
+ * Detailed description of this element.
+ *
+ * @return true
+ * @return false
+ */
+bool PackageApi::isBufferEmpty(void)
+{
+	// Testing for errors - not initialized
+	if(!this->_initialized) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		return false;
+	}
+	// Testing for errors - BUFFER NOT INITIALIZED
+	if(!this->_circularBuffer.isInitialized()) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		return false;
+	}
+
+	// Returns value
+	this->_lastError = Error::NONE;
+	return this->_circularBuffer.isEmpty();
+}
+
+/**
+ * @brief
+ *
+ * Detailed description of this element.
+ *
+ * @return true
+ * @return false
+ */
+bool PackageApi::isBufferFull(void)
+{
+	// Testing for errors - not initialized
+	if(!this->_initialized) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		return false;
+	}
+	// Testing for errors - BUFFER NOT INITIALIZED
+	if(!this->_circularBuffer.isInitialized()) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		return false;
+	}
+
+	// Returns value
+	this->_lastError = Error::NONE;
+	return this->_circularBuffer.isFull();
+}
+
+//     /////////////////    FRAME DATA MANIPULATION     /////////////////     //
+
+/**
+ * @brief
+ *
+ * Detailed description of this element.
+ *
+ * @param[out] frameId_p description of this parameter
+ * @param[out] frameType_p description of this parameter
+ * @param[out] frameData_p description of this parameter
+ * @param[out] frameDataSize_p description of this parameter
+ * @param[in] maxDataSize_p description of this parameter
+ * @param[out] isFrameValid_p description of this parameter
+ * @return true
+ * @return false
+ */
+bool PackageApi::getFrameData(uint8_t *frameId_p, uint8_t *frameType_p, uint8_t *frameData_p, uint16_t *frameDataSize_p, cuint16_t maxDataSize_p, bool_t *isFrameValid_p)
+{
+	// Testing for errors - not initialized
+	if(!this->_initialized) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+		return false;
+	}
+	// Testing for errors - argument pointer null
+	if((!isPointerValid(frameId_p)) || (!isPointerValid(frameType_p)) || (!isPointerValid(frameData_p)) || (!isPointerValid(frameDataSize_p)) || (!isPointerValid(isFrameValid_p))) {
+		// Returns error
+		this->_lastError = Error::ARGUMENT_POINTER_NULL;
+		return false;
+	}
+	// Testing for errors - buffer size zero
+	if(maxDataSize_p == 0) {
+		// Returns error
+		this->_lastError = Error::BUFFER_SIZE_ZERO;
+		return false;
+	}
+	// Testing for errors - buffer size too small
+	if(maxDataSize_p < this->_frameDataSize) {
+		// Returns error
+		this->_lastError = Error::BUFFER_SIZE_TOO_SMALL;
+		return false;
+	}
+	// Testing for errors - frame is not ready
+	if(!this->_newFrameReady) {
+		// Returns error
+		this->_lastError = Error::NOT_READY;
+		return false;
+	}
+
+	// Retrieve data
+	memcpy(frameData_p, this->_frameDataBuffer, this->_frameDataSize);
+	*frameDataSize_p = this->_frameDataSize;
+	*frameId_p = this->_frameId;
+	*frameType_p = this->_frameType;
+	*isFrameValid_p = this->_frameValidity;
+
+	// Restart states machine
+	this->_newFrameReady = false;
+	this->_frameState = FrameState::GET_START;
+	this->_frameId = 0;
+	this->_frameType = 0;
+	this->_frameValidity = false;
+	this->_frameDataSize = 0;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	return true;
+}
+
+// =============================================================================
+// Class own methods - Private
+// =============================================================================
+
+//     ///////////////////     CONTROL AND STATUS     ///////////////////     //
+
+/**
+ * @brief
+ *
+ * Detailed description of this element.
+ *
+ */
+bool PackageApi::_deinitialize(void)
+{
+	// Deallocate memory
+	if(isPointerValid(this->_frameDataBuffer)) {
+		free(this->_frameDataBuffer);
+		this->_frameDataBuffer = nullptr;
+	}
+
+	// Deinitialize circular buffer
+	// TODO create function to deinitialize the circular buffer
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	return true;
+}
+
+/**
+ * @brief
+ *
+ * Detailed description of this element.
+ *
+ * @param[in] bufferSize_p description of this parameter
+ * @param[in] overwrite_p description of this parameter
+ * @return true
+ * @return false
+ */
+bool PackageApi::_initialize(cuint16_t circularBufferSize_p, cuint16_t frameBufferSize_p, cbool_t overwrite_p)
+{
+	// Deinitialize if necessary
+	if(this->_initialized) {
+		this->_deinitialize();
+	}
+	// Testing for error - Frame Buffer Size too small
+	if(frameBufferSize_p < minFrameSize) {
+		// Returns error
+		this->_lastError = Error::BUFFER_SIZE_TOO_SMALL;
+		return false;
+	}
+	// Testing for error - Frame Buffer Size too large
+	if(frameBufferSize_p > maxFrameSize) {
+		// Returns error
+		this->_lastError = Error::BUFFER_SIZE_TOO_LARGE;
+		return false;
+	}
+	// Testing for error - Circular Buffer Size too small
+	if(circularBufferSize_p < minBufferSize) {
+		// Returns error
+		this->_lastError = Error::BUFFER_SIZE_TOO_SMALL;
+		return false;
+	}
+	// Testing for error - Circular Buffer Size too large
+	if(circularBufferSize_p > maxBufferSize) {
+		// Returns error
+		this->_lastError = Error::BUFFER_SIZE_TOO_LARGE;
+		return false;
+	}
+
+	// Allocate memory
+	this->_frameDataBuffer = (uint8_t *)calloc(frameBufferSize_p, sizeof(uint8_t));
+	if(!isPointerValid(this->_frameDataBuffer)) {
+		// Returns error
+		this->_lastError = Error::MEMORY_ALLOCATION;
+		return false;
+	}
+
+	// Initialize circular buffer
+	if(!(this->_circularBuffer.init(circularBufferSize_p))) {
+		// Deallocate memory
+		free(this->_frameDataBuffer);
+		this->_frameDataBuffer = nullptr;
+		// Returns error
+		this->_lastError = Error::UNKNOWN;
+		return false;
+	}
+
+	// Update class members
+	this->_frameDataMaxSize     = frameBufferSize_p;
+	this->_frameDataSize        = 0;
+	this->_frameId              = 0;
+	this->_frameType            = 0;
+	this->_frameValidity        = false;
+	this->_initialized          = true;
+	this->_newFrameReady        = false;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	return true;
+}
+
+bool PackageApi::_processInternalBuffer(void)
+{
+	// Local variables
+	uint8_t auxData = 0;
+	uint8_t auxChecksum = 0;
+
+//// DEBUG START
+//do {
+//	char auxString[50];
+//	sprintf(auxString, "_processInternalBuffer");
+//	myErrorHandler(auxString);
+//} while(0);
+//// DEBUG END
+
+	// Testing for errors - not initialized
+	if(!this->_initialized) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+//// DEBUG START
+//do {
+//	char auxString[50];
+//	sprintf(auxString, "Error::NOT_INITIALIZED");
+//	myErrorHandler(auxString);
+//} while(0);
+//// DEBUG END
+		return false;
+	}
+
+	// Gets data from buffer
+	while(this->_frameState != FrameState::READY) {
+			this->_newFrameReady = false;
+
+		// Returns if internal buffer is empty
+		if(this->_circularBuffer.isEmpty()) {
+			// Operation was successfull, but must return
+			//     false because package is not ready yet
+			this->_lastError = Error::NONE;
+//// DEBUG START
+//do {
+//	char auxString[50];
+//	sprintf(auxString, "Circular Buffer is Empty");
+//	myErrorHandler(auxString);
+//} while(0);
+//// DEBUG END
+			return false;
+		}
+
+		// Gets data from buffer
+		if(!this->_circularBuffer.pop(&auxData)) {
+			// Returns error
+			this->_lastError = this->_circularBuffer.getLastError();
+//// DEBUG START
+//do {
+//	char auxString[50];
+//	sprintf(auxString, "Error on pop data");
+//	myErrorHandler(auxString);
+//} while(0);
+////DEBUG END
+			return false;
+		}
+
+//// DEBUG START
+//do {
+//	char auxString[50];
+//	sprintf(auxString, "Byte read = 0x%02X", auxData);
+//	myErrorHandler(auxString);
+//} while(0);
+//// DEBUG END
+
+		// Process escape char
+		if(this->_escapeNextChar) {                   // Last char was a escape
+			this->_escapeNextChar = false;            // - reset escape flag
+			auxData ^= constFrameCharMask;              // - masks data char
+		} else {
+			if(auxData == constFrameCharEscape) {       // Next char must be escaped
+				this->_escapeNextChar = true;         // - set escape flag
+				continue;                               // - process next loop
+			}
+		}
+
+		// Mount frame
+		switch(this->_frameState) {
+
+		//     /////////////////    START DELIMITER     /////////////////     //
+		case FrameState::GET_START:
+			// Clears all frame data
+			this->_frameDataIndex = 0;
+			this->_frameDataSize = 0;
+			this->_frameId = 0;
+			this->_frameType = 0;
+			this->_frameValidity = false;
+			if(auxData != constFrameCharStart) {        // Discards until START CHAR
+//// DEBUG START
+//do {
+//	char auxString[50];
+//	sprintf(auxString, "Byte discarded");
+//	myErrorHandler(auxString);
+//} while(0);
+//// DEBUG END
+				break;
+			}
+			// Process data
+			this->_frameState = FrameState::GET_ID;                  // Updates states machine
+//// DEBUG START
+//do {
+//	char auxString[50];
+//	sprintf(auxString, "GET START SUCCESS");
+//	myErrorHandler(auxString);
+//} while(0);
+//// DEBUG END
+			break;
+
+		//     ////////////////////     FRAME ID     ////////////////////     //
+		case FrameState::GET_ID:
+			this->_frameId = auxData;					
+			this->_frameState = FrameState::GET_SIZE;                // Updates states machine
+//// DEBUG START
+//do {
+//	char auxString[50];
+//	sprintf(auxString, "GET ID SUCCESS");
+//	myErrorHandler(auxString);
+//} while(0);
+//// DEBUG END
+			break;
+
+		//     ///////////////////     FRAME SIZE     ///////////////////     //
+		case FrameState::GET_SIZE:
+			this->_frameDataSize = (auxData - 1);
+			this->_frameDataIndex = 0;
+			this->_frameState = FrameState::GET_TYPE;                // Updates states machine
+//// DEBUG START
+//do {
+//	char auxString[50];
+//	sprintf(auxString, "GET SIZE SUCCESS");
+//	myErrorHandler(auxString);
+//} while(0);
+//// DEBUG END
+			break;
+
+		//     ///////////////////     FRAME TYPE     ///////////////////     //
+		case FrameState::GET_TYPE:
+			this->_frameType = auxData;
+			this->_frameDataIndex = 0;
+			this->_frameState = FrameState::GET_DATA;                // Updates states machine
+//// DEBUG START
+//do {
+//	char auxString[50];
+//	sprintf(auxString, "GET TYPE SUCCESS");
+//	myErrorHandler(auxString);
+//} while(0);
+//// DEBUG END
+			break;
+
+		//     ///////////////////     FRAME DATA     ///////////////////     //
+		case FrameState::GET_DATA:
+//// DEBUG START
+//do {
+//	char auxString[50];
+//	sprintf(auxString, "Getting data %d", this->_frameDataIndex);
+//	myErrorHandler(auxString);
+//} while(0);
+//// DEBUG END
+			this->_frameDataBuffer[this->_frameDataIndex++] = auxData;
+			if(this->_frameDataIndex == this->_frameDataSize) { // Last data byte reached
+				this->_frameDataIndex = 0;
+				this->_frameState = FrameState::GET_CHECKSUM;
+//// DEBUG START
+//do {
+//	char auxString[50];
+//	sprintf(auxString, "GET DATA SUCCESS");
+//	myErrorHandler(auxString);
+//} while(0);
+//// DEBUG END
+			}
+			break;
+
+		//     /////////////////     FRAME CHECKSUM     /////////////////     //
+		case FrameState::GET_CHECKSUM:
+			// Evaluates checksum
+			auxChecksum = auxData + this->_frameType;
+//// DEBUG START
+//do {
+//	char auxString[50];
+//	sprintf(auxString, "    CHECKSUM VALUE = 0x%02X", auxData);
+//	myErrorHandler(auxString);
+//} while(0);
+//// DEBUG END
+			for(uint16_t i = 0;i < this->_frameDataSize;i++) {
+				uint8_t oldChecksum = auxChecksum;
+				auxChecksum += this->_frameDataBuffer[i];
+//// DEBUG START
+//do {
+//	char auxString[50];
+//	sprintf(auxString, "    CHECKSUM => 0x%02X + 0x%02X = 0x%02X", oldChecksum, this->_frameDataBuffer[i], auxChecksum);
+//	myErrorHandler(auxString);
+//} while(0);
+//// DEBUG END
+			}
+			// Update class members
+			if(auxChecksum == 0xFF) {
+//// DEBUG START
+//do {
+//	char auxString[50];
+//	sprintf(auxString, "CHECKSUM SUCCESS");
+//	myErrorHandler(auxString);
+//} while(0);
+//// DEBUG END
+				this->_frameValidity = true;
+			} else {
+//// DEBUG START
+//do {
+//	char auxString[50];
+//	sprintf(auxString, "CHECKSUM FALSE");
+//	myErrorHandler(auxString);
+//} while(0);
+//// DEBUG END
+				this->_frameValidity = false;
+			}
+			this->_newFrameReady = true;
+			this->_frameState = FrameState::READY;                // Updates states machine
+			return true;
+
+		default:
+			break;
+		} // switch(frameState)
+	}
+
+	return true;
+}
+
+// =============================================================================
+// Class own methods - Protected
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// END OF FILE
+// =============================================================================
+
+// *INDENT-ON*

@@ -1,0 +1,42 @@
+\hypertarget{group___f_s_m_c___flags}{}\section{F\+S\+M\+C\+\_\+\+Flags}
+\label{group___f_s_m_c___flags}\index{F\+S\+M\+C\+\_\+\+Flags@{F\+S\+M\+C\+\_\+\+Flags}}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___f_s_m_c___flags_ga5aadbd5d9f1b6a25bcc1fc6f3bf4c9cc}{}\#define {\bfseries F\+S\+M\+C\+\_\+\+F\+L\+A\+G\+\_\+\+Rising\+Edge}~((uint32\+\_\+t)0x00000001)\label{group___f_s_m_c___flags_ga5aadbd5d9f1b6a25bcc1fc6f3bf4c9cc}
+
+\item 
+\hypertarget{group___f_s_m_c___flags_ga25868d35780998a52190c424ebb3823f}{}\#define {\bfseries F\+S\+M\+C\+\_\+\+F\+L\+A\+G\+\_\+\+Level}~((uint32\+\_\+t)0x00000002)\label{group___f_s_m_c___flags_ga25868d35780998a52190c424ebb3823f}
+
+\item 
+\hypertarget{group___f_s_m_c___flags_gaaaa85bce06ed962874686ad7af0f0cb7}{}\#define {\bfseries F\+S\+M\+C\+\_\+\+F\+L\+A\+G\+\_\+\+Falling\+Edge}~((uint32\+\_\+t)0x00000004)\label{group___f_s_m_c___flags_gaaaa85bce06ed962874686ad7af0f0cb7}
+
+\item 
+\hypertarget{group___f_s_m_c___flags_ga8da2bd0b9d11877aaebaba0c77e8b0cc}{}\#define {\bfseries F\+S\+M\+C\+\_\+\+F\+L\+A\+G\+\_\+\+F\+E\+M\+P\+T}~((uint32\+\_\+t)0x00000040)\label{group___f_s_m_c___flags_ga8da2bd0b9d11877aaebaba0c77e8b0cc}
+
+\item 
+\#define {\bfseries I\+S\+\_\+\+F\+S\+M\+C\+\_\+\+G\+E\+T\+\_\+\+F\+L\+A\+G}(F\+L\+A\+G)
+\item 
+\hypertarget{group___f_s_m_c___flags_ga1114bf56b54e726831b38fc8c5daa14e}{}\#define {\bfseries I\+S\+\_\+\+F\+S\+M\+C\+\_\+\+C\+L\+E\+A\+R\+\_\+\+F\+L\+A\+G}(F\+L\+A\+G)~((((F\+L\+A\+G) \& (uint32\+\_\+t)0x\+F\+F\+F\+F\+F\+F\+F8) == 0x00000000) \&\& ((\+F\+L\+A\+G) != 0x00000000))\label{group___f_s_m_c___flags_ga1114bf56b54e726831b38fc8c5daa14e}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{group___f_s_m_c___flags_gab8674160ef7884f939e07041bbf5b18b}{}\index{F\+S\+M\+C\+\_\+\+Flags@{F\+S\+M\+C\+\_\+\+Flags}!I\+S\+\_\+\+F\+S\+M\+C\+\_\+\+G\+E\+T\+\_\+\+F\+L\+A\+G@{I\+S\+\_\+\+F\+S\+M\+C\+\_\+\+G\+E\+T\+\_\+\+F\+L\+A\+G}}
+\index{I\+S\+\_\+\+F\+S\+M\+C\+\_\+\+G\+E\+T\+\_\+\+F\+L\+A\+G@{I\+S\+\_\+\+F\+S\+M\+C\+\_\+\+G\+E\+T\+\_\+\+F\+L\+A\+G}!F\+S\+M\+C\+\_\+\+Flags@{F\+S\+M\+C\+\_\+\+Flags}}
+\subsubsection[{I\+S\+\_\+\+F\+S\+M\+C\+\_\+\+G\+E\+T\+\_\+\+F\+L\+A\+G}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+S\+\_\+\+F\+S\+M\+C\+\_\+\+G\+E\+T\+\_\+\+F\+L\+A\+G(
+\begin{DoxyParamCaption}
+\item[{}]{F\+L\+A\+G}
+\end{DoxyParamCaption}
+)}\label{group___f_s_m_c___flags_gab8674160ef7884f939e07041bbf5b18b}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+(((FLAG) == FSMC\_FLAG\_RisingEdge) || \(\backslash\)
+                                ((FLAG) == FSMC\_FLAG\_Level) || \(\backslash\)
+                                ((FLAG) == FSMC\_FLAG\_FallingEdge) || \(\backslash\)
+                                ((FLAG) == FSMC\_FLAG\_FEMPT))
+\end{DoxyCode}

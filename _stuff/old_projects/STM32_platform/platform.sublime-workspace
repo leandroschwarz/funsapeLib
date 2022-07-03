@@ -1,0 +1,875 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"get",
+				"getWeekDay\tbool getWeekDay(weekDay_t *weekDay)"
+			],
+			[
+				"aux",
+				"aux8_1\tuint8_t aux8_1"
+			],
+			[
+				"date",
+				"dateTime.hpp"
+			],
+			[
+				"em",
+				"empty_\tbool empty_"
+			],
+			[
+				"emp",
+				"isEmpty\tbool isEmpty()"
+			],
+			[
+				"Inde",
+				"wrIndex_\tuint16_t wrIndex_"
+			],
+			[
+				"isFu",
+				"isFull\tbool isFull()"
+			],
+			[
+				"write",
+				"blockWrite\tvoid blockWrite(bool block)"
+			],
+			[
+				"isLock",
+				"isLocked\tbool isLocked()"
+			],
+			[
+				"lock",
+				"locked_\tbool locked_"
+			],
+			[
+				"HAL_UART_Transmit",
+				"HAL_UART_Transmit_IT\tHAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)"
+			],
+			[
+				"HAL_GPIO",
+				"HAL_GPIO_TogglePin\tvoid HAL_GPIO_TogglePin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)"
+			],
+			[
+				"HAL_UART_Tan",
+				"HAL_UART_Transmit_DMA\tHAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)"
+			],
+			[
+				"syste",
+				"systemFlags\tvolatile systemFlags_f systemFlags"
+			],
+			[
+				"HAL_GP",
+				"HAL_GPIO_WritePin\tvoid HAL_GPIO_WritePin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState)"
+			],
+			[
+				"tx",
+				"txPackage\tPackageApi txPackage"
+			],
+			[
+				"escap",
+				"escapeXorValue_\tuint8_t escapeXorValue_"
+			],
+			[
+				"esca",
+				"escapeCharacter_\tuint8_t escapeCharacter_"
+			],
+			[
+				"escape",
+				"escapeCharData_\tuint8_t * escapeCharData_"
+			],
+			[
+				"char",
+				"escapeCharSize_\tuint8_t escapeCharSize_"
+			],
+			[
+				"siz",
+				"listSize\tuint8_t listSize"
+			],
+			[
+				"list",
+				"__va_list\t__va_list"
+			],
+			[
+				"size",
+				"sizeof\tsize_t sizeof(expression-or-type)"
+			],
+			[
+				"callo",
+				"calloc\tvoid * calloc(size_t nitems, size_t size)"
+			],
+			[
+				"ret",
+				"return\treturn expression"
+			],
+			[
+				"e",
+				"escapeCharacters_\tuint8_t * escapeCharacters_"
+			],
+			[
+				"ADDRES",
+				"ADDRESS_BASE\tADDRESS_BASE"
+			],
+			[
+				"chec",
+				"checkInitilized\tbool_t checkInitilized()"
+			],
+			[
+				"read",
+				"ready_\tbool_t ready_"
+			],
+			[
+				"pack",
+				"packageSize\tuint16_t packageSize"
+			],
+			[
+				"pa",
+				"payload\tuint8_t * payload"
+			],
+			[
+				"payload",
+				"payloadSize\tuint8_t payloadSize"
+			],
+			[
+				"s",
+				"sourceAddress_\tuint8_t sourceAddress_"
+			],
+			[
+				"dest",
+				"destAddr\tuint8_t destAddr"
+			],
+			[
+				"uint",
+				"uint8_t\tuint8_t"
+			],
+			[
+				"packa",
+				"packageApi.hpp"
+			],
+			[
+				"Pac",
+				"packageApi.hpp"
+			],
+			[
+				"mont",
+				"month\tmonth_t * month"
+			],
+			[
+				"strle",
+				"strlen\tsize_t strlen()"
+			],
+			[
+				"HAL_GIO",
+				"HAL_GPIO_LockPin\tHAL_StatusTypeDef HAL_GPIO_LockPin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)"
+			],
+			[
+				"timeZ",
+				"timeZone\tutcTimeZone_e timeZone"
+			],
+			[
+				"mil",
+				"millisecond\tuint16_t millisecond"
+			],
+			[
+				"sec",
+				"second\tuint8_t second"
+			],
+			[
+				"minu",
+				"minute\tuint8_t minute"
+			],
+			[
+				"boo",
+				"auxBool\tbool_t auxBool"
+			],
+			[
+				"day",
+				"day\tuint8_t day"
+			],
+			[
+				"yer",
+				"year\tuint16_t year"
+			],
+			[
+				"bool",
+				"bool_t\tbool_t"
+			],
+			[
+				"HAL_UART_Re",
+				"HAL_UART_Receive_IT\tHAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)"
+			],
+			[
+				"HAL_UART_Rece",
+				"HAL_UART_AbortReceive_IT\tHAL_StatusTypeDef HAL_UART_AbortReceive_IT(UART_HandleTypeDef *huart)"
+			],
+			[
+				"RTC_ALARMSUBSECONDMASK_",
+				"RTC_ALARMSUBSECONDMASK_SS14\tRTC_ALARMSUBSECONDMASK_SS14"
+			],
+			[
+				"GPIO",
+				"GPIOA\tGPIOA"
+			],
+			[
+				"HAL_GPIO_",
+				"HAL_GPIO_TogglePin\tvoid HAL_GPIO_TogglePin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)"
+			],
+			[
+				"GPIO_PIN",
+				"GPIO_PIN_5\tGPIO_PIN_5"
+			],
+			[
+				"HAL_UART_TRA",
+				"HAL_UART_Transmit_IT\tHAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)"
+			],
+			[
+				"HAL_GPIO_LOCK",
+				"HAL_GPIO_LockPin\tHAL_StatusTypeDef HAL_GPIO_LockPin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)"
+			],
+			[
+				"I",
+				"Inc"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "ARM build",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"ARM build",
+					""
+				],
+				[
+					"ARM program",
+					""
+				],
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					""
+				],
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					"Run"
+				],
+				[
+					"Packages/Makefile/Make.sublime-build",
+					""
+				],
+				[
+					"Packages/Makefile/Make.sublime-build",
+					"Clean"
+				]
+			],
+			[
+				"ARM build",
+				""
+			]
+		],
+		[
+			[
+				[
+					"ARM build",
+					""
+				],
+				[
+					"ARM program",
+					""
+				],
+				[
+					"Packages/Makefile/Make.sublime-build",
+					""
+				],
+				[
+					"Packages/Makefile/Make.sublime-build",
+					"Clean"
+				]
+			],
+			[
+				"ARM build",
+				""
+			]
+		],
+		[
+			[
+				[
+					"ARM build",
+					""
+				],
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					""
+				],
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					"Run"
+				],
+				[
+					"Packages/Makefile/Make.sublime-build",
+					""
+				],
+				[
+					"Packages/Makefile/Make.sublime-build",
+					"Clean"
+				]
+			],
+			[
+				"ARM build",
+				""
+			]
+		],
+		[
+			[
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					""
+				],
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					"Run"
+				],
+				[
+					"Packages/Makefile/Make.sublime-build",
+					""
+				],
+				[
+					"Packages/Makefile/Make.sublime-build",
+					"Clean"
+				]
+			],
+			[
+				"Packages/Makefile/Make.sublime-build",
+				""
+			]
+		],
+		[
+			[
+				[
+					"Packages/Makefile/Make.sublime-build",
+					""
+				],
+				[
+					"Packages/Makefile/Make.sublime-build",
+					"Clean"
+				]
+			],
+			[
+				"Packages/Makefile/Make.sublime-build",
+				""
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"remo",
+				"Package Control: Remove Package"
+			],
+			[
+				"ena",
+				"Package Control: Enable Package"
+			],
+			[
+				"dis",
+				"Package Control: Disable Package"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"resou",
+				"PackageResourceViewer: Open Resource"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"resource",
+				"PackageResourceViewer: Extract Package"
+			],
+			[
+				"ea",
+				"EasyClangComplete: Clean current CMake cache"
+			],
+			[
+				"res",
+				"PackageResourceViewer: Open Resource"
+			],
+			[
+				"nsta",
+				"Package Control: Install Package"
+			],
+			[
+				"rem",
+				"Package Control: Remove Package"
+			],
+			[
+				"ins",
+				"Package Control: Install Package"
+			],
+			[
+				"pa",
+				"Package Control: Disable Package"
+			],
+			[
+				"color",
+				"Colorsublime: Install Theme"
+			],
+			[
+				"colors",
+				"Colorsublime: Browse Themes Online"
+			],
+			[
+				"disa",
+				"Package Control: Disable Package"
+			],
+			[
+				"packagere",
+				"PackageResourceViewer: Extract Package"
+			],
+			[
+				"packa",
+				"Package Control: Discover Packages"
+			],
+			[
+				"enable",
+				"Package Control: Enable Package"
+			],
+			[
+				"disab",
+				"Package Control: Disable Package"
+			],
+			[
+				"package",
+				"Package Control: Enable Package"
+			]
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 218.0,
+		"history":
+		[
+			" sadsada",
+			"dfdsds",
+			"s",
+			"sublime.log_input(False)",
+			"sublime.log_input(True)",
+			"sublime.log_inputs(True)",
+			"sublime.log_commands(False)",
+			"+",
+			"sublime.log_commands(True)",
+			"sdfsdsd",
+			"xxxxxxxxxxxxx",
+			"xxxxxxxxxxxx",
+			"ZZZZZZZZZZZZZZZZZZZ",
+			"ZZZZZZZZZZZZZZZ",
+			"YYYYYYYYYYYYYY",
+			"XXXXXXXXXX",
+			"XXXXXXXXXXXXXXXX",
+			"XXXXXXXXXX",
+			"xxxxxxxxxxxxx",
+			"xxxxxxxxxxxx",
+			"AAAAAAAAAAAA",
+			"KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
+			"xxxxxxxxxxxxxxxxxx",
+			"print ${project_folder}",
+			"echo ${project_folder}",
+			" ${project_folder}"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/C/WORKSPACE/platform",
+		"/C/WORKSPACE/platform/Inc",
+		"/C/WORKSPACE/platform/Src"
+	],
+	"file_history":
+	[
+		"/C/WORKSPACE/platform/Makefile",
+		"/C/WORKSPACE/platform/Src/functions.cpp",
+		"/C/WORKSPACE/platform/Inc/functions.hpp",
+		"/C/WORKSPACE/platform/Inc/mainDefs.h",
+		"/C/WORKSPACE/platform/Src/main.cpp",
+		"/C/WORKSPACE/platform/In file included from Src/main.cpp",
+		"/C/WORKSPACE/platform/gpdse/devices/mpu9250.cpp",
+		"/C/WORKSPACE/platform/gpdse/util/packageApi.hpp",
+		"/C/WORKSPACE/platform/gpdse/template.cpp",
+		"/C/WORKSPACE/platform/gpdse/devices/mpu9250.hpp",
+		"/C/WORKSPACE/platform/gpdse/stubs/stubs.h",
+		"/C/WORKSPACE/platform/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rtc.h",
+		"/C/WORKSPACE/platform/gpdse/util/dateTime.hpp",
+		"/C/WORKSPACE/platform/gpdse/util/dateTime.cpp",
+		"/C/WORKSPACE/platform/gpdse/globalDefines.hpp",
+		"/C/WORKSPACE/platform/gpdse/devices/mpu.txt",
+		"/C/WORKSPACE/platform/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_wwdg.h",
+		"/C/WORKSPACE/platform/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_usart.h",
+		"/C/WORKSPACE/platform/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart.h",
+		"/C/WORKSPACE/platform/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_spi.h",
+		"/C/WORKSPACE/platform/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_smbus.h",
+		"/C/WORKSPACE/platform/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_smartcard.h",
+		"/C/WORKSPACE/platform/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rcc_ex.h",
+		"/C/WORKSPACE/platform/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rcc.h",
+		"/C/WORKSPACE/platform/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_pwr.h",
+		"/C/WORKSPACE/platform/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_pcd.h",
+		"/C/WORKSPACE/platform/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_lcd.h",
+		"/C/WORKSPACE/platform/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_irda.h",
+		"/C/WORKSPACE/platform/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_i2s.h",
+		"/C/WORKSPACE/platform/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_firewall.h",
+		"/C/WORKSPACE/platform/gpdse/system.hpp",
+		"/C/WORKSPACE/platform/gpdse/template.hpp",
+		"/C/WORKSPACE/platform/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_cryp.h",
+		"/C/WORKSPACE/platform/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_adc.h",
+		"/C/WORKSPACE/platform/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal.h",
+		"/C/WORKSPACE/platform/Middlewares/Third_Party/FatFs/src/option/syscall.c",
+		"/C/WORKSPACE/platform/gpdse/util/circularBuffer8.hpp",
+		"/C/WORKSPACE/platform/gpdse/system.cpp",
+		"/C/WORKSPACE/platform/In file included from gpdse/devices/mpu9250.cpp",
+		"/C/WORKSPACE/platform/gpdse/projectConfig.hpp",
+		"/C/WORKSPACE/platform/.clang_complete",
+		"/C/WORKSPACE/platform/gpdse1001/globalDefines.hpp",
+		"/C/WORKSPACE/platform/gpdse1001/util/circularBuffer8.cpp",
+		"/C/WORKSPACE/platform/gpdse1001/util/circularBuffer8.hpp",
+		"/C/WORKSPACE/platform/gpdse1001/util/packageApi.cpp",
+		"/C/Users/Schwarz/AppData/Roaming/Sublime Text 3/Packages/User/ColorHighlighter.sublime-settings",
+		"/C/Users/Schwarz/AppData/Roaming/Sublime Text 3/Packages/User/SublimeAStyleFormatter.sublime-settings",
+		"/C/Users/Schwarz/AppData/Roaming/Sublime Text 3/Packages/User/AdvancedNewFile.sublime-settings",
+		"/C/Users/Schwarz/AppData/Roaming/Sublime Text 3/Packages/User/Side Bar.sublime-settings",
+		"/C/Users/Schwarz/AppData/Roaming/Sublime Text 3/Packages/User/sidebar..no-sublime-package",
+		"/C/Users/Schwarz/AppData/Roaming/Sublime Text 3/Packages/User/Colorsublime.sublime-settings",
+		"/C/Users/Schwarz/AppData/Roaming/Sublime Text 3/Packages/Color Highlighter/ColorHighlighter.sublime-settings",
+		"/C/x/color Highlighter..no-sublime-package",
+		"/C/Users/Schwarz/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/C/x/advancednewfile..no-sublime-package",
+		"/C/x/settings..no-sublime-package",
+		"/C/WORKSPACE/platform/gpdse1001/util/packageApi.hpp",
+		"/C/WORKSPACE/platform/In file included from gpdse1001/util/circularBuffer8.cpp",
+		"/C/Program Files (x86)/GNU Tools ARM Embedded/7 2017-q4-major/arm-none-eabi/include/stdio.h",
+		"/C/Program Files (x86)/GNU Tools ARM Embedded/7 2017-q4-major/arm-none-eabi/include/c++/7.2.1/cstdint",
+		"/C/WORKSPACE/platform/gpdse1001/stubs/stubs.h",
+		"/C/WORKSPACE/platform/gpdse1001/globalConfigs.hpp",
+		"/C/WORKSPACE/platform/platform.sublime-project",
+		"/E/packageApi.cpp",
+		"/E/globalDefines.cpp",
+		"/E/main.cpp",
+		"/F/Projetos/AVR/projects_avr/packageGenerator/package.c",
+		"/F/Projetos/AVR/projects_avr/packageGenerator/package.h",
+		"/C/WORKSPACE/platform/gpdse1001/stubs/_stubs.h",
+		"/C/Program Files (x86)/GNU Tools ARM Embedded/7 2017-q4-major/arm-none-eabi/include/stdlib.h",
+		"/C/Users/Schwarz/AppData/Roaming/Sublime Text 3/Packages/SublimeAStyleFormatter/SublimeAStyleFormatter.sublime-settings",
+		"/C/WORKSPACE/platform/stubs/stdio.h",
+		"/C/Program Files (x86)/GNU Tools ARM Embedded/7 2017-q4-major/arm-none-eabi/include/sys/stdio.h",
+		"/C/Program Files (x86)/GNU Tools ARM Embedded/7 2017-q4-major/arm-none-eabi/include/string.h",
+		"/C/WORKSPACE/platform/gpdse1001/devices/mpu9250.hpp",
+		"/C/WORKSPACE/platform/gpdse1001/devices/mpu9250.cpp",
+		"/C/WORKSPACE/platform/gpdse1001/globalDefines.cpp",
+		"/C/Users/Schwarz/AppData/Roaming/Sublime Text 3/Packages/Colorsublime - Themes/Schwarz.tmTheme",
+		"/C/WORKSPACE/platform/Drivers/STM32L0xx_HAL_Driver/Src/stm32l0xx_hal.c",
+		"/C/WORKSPACE/platform/Src/rtc.c",
+		"/C/Users/Schwarz/AppData/Roaming/Sublime Text 3/Packages/AutoFileName/autofilename.sublime-settings",
+		"/C/Users/Schwarz/AppData/Roaming/Sublime Text 3/Packages/Package Control/Package Control.sublime-settings",
+		"/C/WORKSPACE/platform/Drivers/CMSIS/Device/ST/STM32L0xx/Include/stm32l053xx.h",
+		"/F/Projetos/ARM/Outros.txt",
+		"/C/platform/Src/spi.c",
+		"/F/Projetos/ARM/Plugins para Desenvolvimento ARM.txt",
+		"/C/platform/Src/main.c",
+		"/C/platform/platform.sublime-project",
+		"/C/platform/.clang_complete",
+		"/C/Users/Schwarz/AppData/Roaming/Sublime Text 3/Packages/User/Default (Windows).sublime-keymap",
+		"/C/Users/Schwarz/AppData/Roaming/Sublime Text 3/Packages/SideBarEnhancements/Default (Windows).sublime-keymap",
+		"/C/Users/Schwarz/AppData/Roaming/Sublime Text 3/Packages/AdvancedNewFile/AdvancedNewFile.sublime-settings",
+		"/C/Users/Schwarz/AppData/Roaming/Sublime Text 3/Packages/User/Portuguese (Brazilian).aff",
+		"/C/platform/startup_stm32l053xx.s",
+		"/C/ledBlink/Makefile",
+		"/C/platform/Makefile",
+		"/C/ledBlink/ledBlink.sublime-project",
+		"/F/Projetos/ARM/projects_arm3/ledBlinkTimer_X/MDK-ARM/ledBlinkTimer/ledBlinkTimer_ledBlinkTimer.dep",
+		"/F/Projetos/ARM/projects_arm3/ledBlinkTimer_X/MDK-ARM/ledBlinkTimer/ledBlinkTimer.lnp",
+		"/F/Projetos/ARM/projects_arm3/ledBlinkTimer_X/MDK-ARM/ledBlinkTimer/ledBlinkTimer.sct",
+		"/F/Projetos/ARM/projects_arm3/ledBlinkTimer_X/MDK-ARM/ledBlinkTimer.uvguix.Schwarz",
+		"/F/Projetos/ARM/projects_arm3/ledBlinkTimer_X/MDK-ARM/ledBlinkTimer.uvoptx",
+		"/F/Projetos/ARM/projects_arm3/adcDmaTimer/MDK-ARM/adcDmaTimer/stm32l0xx_hal_adc.crf",
+		"/F/Projetos/ARM/projects_arm3/adcDmaTimer/MDK-ARM/adcDmaTimer/adcDmaTimer_adcDmaTimer.dep",
+		"/F/Projetos/ARM/projects_arm3/adcDmaTimer/MDK-ARM/adcDmaTimer/adcDmaTimer.lnp",
+		"/C/platform/Drivers/CMSIS/Device/ST/STM32L0xx/Source/Templates/iar/linker/stm32l011xx_flash.icf",
+		"/C/platform/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_gpio.h",
+		"/C/platform/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_adc_ex.h",
+		"/C/platform/STM32L053R8Tx_FLASH.ld",
+		"/C/ledBlink/build/ledBlink.map",
+		"/C/platform/mx.scratch",
+		"/C/platform/.mxproject",
+		"/C/ledBlink/build/stm32l0xx_hal.d",
+		"/C/ledBlink/build/stm32l0xx_hal_i2c.lst",
+		"/C/ledBlink/build/stm32l0xx_hal.o",
+		"/C/ledBlink/build/startup_stm32l053xx.d",
+		"/C/ledBlink/Src/main.c",
+		"/C/ledBlink/x.txt",
+		"/C/ledBlink/oldmake",
+		"/C/Users/Schwarz/AppData/Roaming/Sublime Text 3/Packages/User/make_program.py",
+		"/C/ledBlink/ok/x/STM32L053R8Tx_FLASH.ld",
+		"/C/ledBlink/.clang_complete",
+		"/C/ledBlink/stub/stdio.h",
+		"/C/ledBlink/Inc/gpio.h",
+		"/C/Program Files/LLVM/include/libcxx/stdio.h",
+		"/C/Program Files (x86)/GNU Tools ARM Embedded/7 2017-q4-major/arm-none-eabi/include/c++/7.2.1/tr1/cstdint",
+		"/C/Program Files (x86)/GNU Tools ARM Embedded/7 2017-q4-major/arm-none-eabi/include/c++/7.2.1/tr1/stdio.h",
+		"/C/Program Files (x86)/GNU Tools ARM Embedded/7 2017-q4-major/arm-none-eabi/include/c++/7.2.1/tr1/cstdio"
+	],
+	"find":
+	{
+		"height": 46.0
+	},
+	"find_in_files":
+	{
+		"height": 120.0,
+		"where_history":
+		[
+			"<project>",
+			"",
+			"C:\\ledBlink",
+			"<project>",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"sTime.",
+			"sTime",
+			"TRUE",
+			"FALSE",
+			"bool_t",
+			"defintions",
+			"bool_t",
+			"#ifdef _PLATFORM_AVR_",
+			"ERROR_PACKAGE_API_PACKAGE_DATA_FULL",
+			"ERROR_PACKAGE_API_PACKAGE_NOT_READY",
+			"ERROR_LOCKED",
+			"ERROR_ARGUMENT_MISMATCH",
+			"ERROR_PACKAGE_API_ARGUMENT_MISMATCH",
+			"ERROR_PACKAGE_API_INVALID_SOURCE_ADDRESS",
+			"ERROR_PACKAGE_API_NULL_PAYLOAD_DATA",
+			"ERROR_PACKAGE_API_PACKAGE_SIZE_TOO_SMALL",
+			"ERROR_PACKAGE_API_NULL_PACKAGE_SIZE",
+			"uint16_t ",
+			"PackageApi",
+			"PACKAGE_API_ERROR_NONE",
+			"packageApiError_e",
+			"ERROR_PACKAGE_API_NONE",
+			"ERROR_",
+			"Error_",
+			"ERROR_",
+			"endif",
+			"packageApiError_e",
+			"circularBuffer8_s * buffer, ",
+			"circularBuffer16",
+			"circularBuffer16_s",
+			"circularBuffer16",
+			"usart2SafeSend",
+			"usart2DmaSend",
+			"escape",
+			"escapeCharacters_",
+			"sprintf",
+			"sprintf(",
+			"sprintf",
+			"uint32_t\t\t",
+			"    ",
+			"obj",
+			"_READ_WRITE_RETURN_TYPE",
+			"fprintf",
+			"$(BINPATH)",
+			"$(PREFIX)",
+			"stm32l053r8",
+			"stm32L053R8",
+			"USART",
+			"usart",
+			",",
+			"[",
+			"{",
+			"{\"",
+			"{"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"true",
+			"false",
+			"bool",
+			"definitions",
+			"#if defined(_PLATFORM_AVR_)",
+			"ERROR_ARGUMENT_MISMATCH",
+			"ERROR_BUFFER_SIZE_TOO_SMALL",
+			"ERROR_SIZE_CANNOT_BE_ZERO",
+			"this->",
+			"ERROR_NONE",
+			"uart2SafeSend",
+			"usart2SafeSend",
+			"escapeCharData_",
+			"this->",
+			"\t",
+			"",
+			"arm-none-eabi-",
+			",\n\t",
+			"[\n\t",
+			"{\n\t"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 33.0
+	},
+	"input":
+	{
+		"height": 46.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.SublimeLinter":
+	{
+		"height": 139.0
+	},
+	"output.SublimeLinter Messages":
+	{
+		"height": 261.0
+	},
+	"output.astyle_error_message":
+	{
+		"height": 139.0
+	},
+	"output.exec":
+	{
+		"height": 318.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.mdpopups":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "platform.sublime-project",
+	"replace":
+	{
+		"height": 83.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"Drivers\\CMSIS\\Device\\ST\\STM32L0xx\\Source\\Templates\\iar\\linker\\stm32l011xx_flash.icf"
+			],
+			[
+				"stdio.h",
+				"Drivers\\STM32L0xx_HAL_Driver\\Inc\\stm32l0xx_hal_gpio.h"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"C:\\WORKSPACE\\packageGenerator\\packageGenerator.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 224.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

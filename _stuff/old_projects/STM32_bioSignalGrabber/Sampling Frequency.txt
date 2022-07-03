@@ -1,0 +1,6 @@
+
+Peripheral	Channels			Size		Sample Size		Freq		Total Size
+ADC			3xECG	2xBEL		2 Bytes		10 Bytes		200			2000
+I2C			1xPPG				4 Bytes		4 Bytes			200			800
+SPI			12xACC				2 Bytes		24 Bytes		50			1200
+

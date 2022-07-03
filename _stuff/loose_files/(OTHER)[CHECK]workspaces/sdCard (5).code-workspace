@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "C:\\Schwarz\\Projetos\\FunSAPE_ARM++_Library"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"main.h": "c",
+			"stm32f1xx_hal.h": "c",
+			"stm32f1xx_hal_conf.h": "c",
+			"stm32f1xx_hal_rcc.h": "c",
+			"stm32f1xx_hal_def.h": "c",
+			"stm32f1xx.h": "c"
+		}
+	}
+}

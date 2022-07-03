@@ -1,0 +1,25 @@
+{
+    "folders": [
+        {
+            "path": ".."
+        }
+    ],
+    "settings": {
+        // C
+        "[c]": {
+            "editor.defaultFormatter": "chiehyu.vscode-astyle",
+            "editor.formatOnSave": false,
+            "editor.formatOnPaste": false,
+            "editor.formatOnSaveMode": "file",
+            "editor.formatOnType": false
+        },
+        // C ++
+        "[cpp]": {
+            "editor.defaultFormatter": "chiehyu.vscode-astyle",
+            "editor.formatOnSave": false,
+            "editor.formatOnPaste": false,
+            "editor.formatOnSaveMode": "file",
+            "editor.formatOnType": false
+        }
+    }
+}

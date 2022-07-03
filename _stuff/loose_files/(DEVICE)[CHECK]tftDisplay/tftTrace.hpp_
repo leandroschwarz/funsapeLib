@@ -1,0 +1,16 @@
+#include <stdint.h>
+#include <stdlib.h>
+#include "gpdse/globalDefines.hpp"
+
+class TftTrace
+{
+public:
+	TftTrace(uint8_t size);						// Trivial constructor
+	~TftTrace();								// Trivial destructor
+	TftTrace(const TftTrace & aux);				// Copy constructor
+
+private:
+	uint32_t	color_;
+	uint16_t *	data_;
+	uint8_t		size_;
+};

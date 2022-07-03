@@ -1,0 +1,85 @@
+\hypertarget{stm32f4xx__syscfg_8c}{}\section{\+\_\+hide/\+M\+P\+U/\+S\+T\+M32\+F4/stm32f4xx\+\_\+syscfg.c File Reference}
+\label{stm32f4xx__syscfg_8c}\index{\+\_\+hide/\+M\+P\+U/\+S\+T\+M32\+F4/stm32f4xx\+\_\+syscfg.\+c@{\+\_\+hide/\+M\+P\+U/\+S\+T\+M32\+F4/stm32f4xx\+\_\+syscfg.\+c}}
+
+
+This file provides firmware functions to manage the S\+Y\+S\+C\+F\+G peripheral.  
+
+
+{\ttfamily \#include \char`\"{}stm32f4xx\+\_\+syscfg.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}stm32f4xx\+\_\+rcc.\+h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___s_y_s_c_f_g_ga13f7abe3641989d4d063ad21962da8b0}{}\#define {\bfseries S\+Y\+S\+C\+F\+G\+\_\+\+O\+F\+F\+S\+E\+T}~(S\+Y\+S\+C\+F\+G\+\_\+\+B\+A\+S\+E -\/ \hyperlink{group___peripheral__memory__map_ga9171f49478fa86d932f89e78e73b88b0}{P\+E\+R\+I\+P\+H\+\_\+\+B\+A\+S\+E})\label{group___s_y_s_c_f_g_ga13f7abe3641989d4d063ad21962da8b0}
+
+\item 
+\hypertarget{group___s_y_s_c_f_g_ga505f7263c4ca98810cca19505752d61d}{}\#define {\bfseries P\+M\+C\+\_\+\+O\+F\+F\+S\+E\+T}~(S\+Y\+S\+C\+F\+G\+\_\+\+O\+F\+F\+S\+E\+T + 0x04)\label{group___s_y_s_c_f_g_ga505f7263c4ca98810cca19505752d61d}
+
+\item 
+\hypertarget{group___s_y_s_c_f_g_gad4a9bbd669109039291f942d923ff8ae}{}\#define {\bfseries M\+I\+I\+\_\+\+R\+M\+I\+I\+\_\+\+S\+E\+L\+\_\+\+Bit\+Number}~((uint8\+\_\+t)0x17)\label{group___s_y_s_c_f_g_gad4a9bbd669109039291f942d923ff8ae}
+
+\item 
+\hypertarget{group___s_y_s_c_f_g_ga06dbfd74f07783e68f03797038cd9457}{}\#define {\bfseries P\+M\+C\+\_\+\+M\+I\+I\+\_\+\+R\+M\+I\+I\+\_\+\+S\+E\+L\+\_\+\+B\+B}~(\hyperlink{group___peripheral__memory__map_gaed7efc100877000845c236ccdc9e144a}{P\+E\+R\+I\+P\+H\+\_\+\+B\+B\+\_\+\+B\+A\+S\+E} + (P\+M\+C\+\_\+\+O\+F\+F\+S\+E\+T $\ast$ 32) + (M\+I\+I\+\_\+\+R\+M\+I\+I\+\_\+\+S\+E\+L\+\_\+\+Bit\+Number $\ast$ 4))\label{group___s_y_s_c_f_g_ga06dbfd74f07783e68f03797038cd9457}
+
+\item 
+\hypertarget{group___s_y_s_c_f_g_ga8e5fbe846e7478d522df749672b90084}{}\#define {\bfseries C\+M\+P\+C\+R\+\_\+\+O\+F\+F\+S\+E\+T}~(S\+Y\+S\+C\+F\+G\+\_\+\+O\+F\+F\+S\+E\+T + 0x20)\label{group___s_y_s_c_f_g_ga8e5fbe846e7478d522df749672b90084}
+
+\item 
+\hypertarget{group___s_y_s_c_f_g_ga0ca336e48ea4840c7d1cde05a0e07e82}{}\#define {\bfseries C\+M\+P\+\_\+\+P\+D\+\_\+\+Bit\+Number}~((uint8\+\_\+t)0x00)\label{group___s_y_s_c_f_g_ga0ca336e48ea4840c7d1cde05a0e07e82}
+
+\item 
+\hypertarget{group___s_y_s_c_f_g_gae4516ed27e02d84d9d20c7d711b87437}{}\#define {\bfseries C\+M\+P\+C\+R\+\_\+\+C\+M\+P\+\_\+\+P\+D\+\_\+\+B\+B}~(\hyperlink{group___peripheral__memory__map_gaed7efc100877000845c236ccdc9e144a}{P\+E\+R\+I\+P\+H\+\_\+\+B\+B\+\_\+\+B\+A\+S\+E} + (C\+M\+P\+C\+R\+\_\+\+O\+F\+F\+S\+E\+T $\ast$ 32) + (C\+M\+P\+\_\+\+P\+D\+\_\+\+Bit\+Number $\ast$ 4))\label{group___s_y_s_c_f_g_gae4516ed27e02d84d9d20c7d711b87437}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{group___s_y_s_c_f_g___private___functions_gaf2f9faa2df9a59a68ae17fae23bc478e}{S\+Y\+S\+C\+F\+G\+\_\+\+De\+Init} (void)
+\begin{DoxyCompactList}\small\item\em Deinitializes the Alternate Functions (remap and E\+X\+T\+I configuration) registers to their default reset values. \end{DoxyCompactList}\item 
+void \hyperlink{group___s_y_s_c_f_g___private___functions_ga09a5712f6c66ba5f0e0eeba30bc1e20d}{S\+Y\+S\+C\+F\+G\+\_\+\+Memory\+Remap\+Config} (uint8\+\_\+t S\+Y\+S\+C\+F\+G\+\_\+\+Memory\+Remap)
+\begin{DoxyCompactList}\small\item\em Changes the mapping of the specified pin. \end{DoxyCompactList}\item 
+void \hyperlink{group___s_y_s_c_f_g___private___functions_gafedab1f64cef720aeafeafd409ba6ae7}{S\+Y\+S\+C\+F\+G\+\_\+\+E\+X\+T\+I\+Line\+Config} (uint8\+\_\+t E\+X\+T\+I\+\_\+\+Port\+Source\+G\+P\+I\+Ox, uint8\+\_\+t E\+X\+T\+I\+\_\+\+Pin\+Sourcex)
+\begin{DoxyCompactList}\small\item\em Selects the G\+P\+I\+O pin used as E\+X\+T\+I Line. \end{DoxyCompactList}\item 
+void \hyperlink{group___s_y_s_c_f_g___private___functions_gabec494266ebbbde0279ad1d16c3065d0}{S\+Y\+S\+C\+F\+G\+\_\+\+E\+T\+H\+\_\+\+Media\+Interface\+Config} (uint32\+\_\+t S\+Y\+S\+C\+F\+G\+\_\+\+E\+T\+H\+\_\+\+Media\+Interface)
+\begin{DoxyCompactList}\small\item\em Selects the E\+T\+H\+E\+R\+N\+E\+T media interface. \end{DoxyCompactList}\item 
+void \hyperlink{group___s_y_s_c_f_g___private___functions_ga85e423de2ee76b615120bde37881bb93}{S\+Y\+S\+C\+F\+G\+\_\+\+Compensation\+Cell\+Cmd} (Functional\+State New\+State)
+\begin{DoxyCompactList}\small\item\em Enables or disables the I/\+O Compensation Cell. \end{DoxyCompactList}\item 
+Flag\+Status \hyperlink{group___s_y_s_c_f_g___private___functions_ga2541640bdf35f63e4bb55f7dc8be9d16}{S\+Y\+S\+C\+F\+G\+\_\+\+Get\+Compensation\+Cell\+Status} (void)
+\begin{DoxyCompactList}\small\item\em Checks whether the I/\+O Compensation Cell ready flag is set or not. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This file provides firmware functions to manage the S\+Y\+S\+C\+F\+G peripheral. 
+
+\begin{DoxyAuthor}{Author}
+M\+C\+D Application Team 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+V1.\+0.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+30-\/\+September-\/2011 \begin{DoxyVerb}*  
+*          ===================================================================
+*                                 How to use this driver
+*          ===================================================================
+*                  
+*          This driver provides functions for:
+*          
+*          1. Remapping the memory accessible in the code area using SYSCFG_MemoryRemapConfig()
+*              
+*          2. Manage the EXTI lines connection to the GPIOs using SYSCFG_EXTILineConfig()
+*            
+*          3. Select the ETHERNET media interface (RMII/RII) using SYSCFG_ETH_MediaInterfaceConfig()
+*
+*  @note  SYSCFG APB clock must be enabled to get write access to SYSCFG registers,
+*         using RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+*                 
+*  \end{DoxyVerb}
+
+\end{DoxyDate}
+\begin{DoxyAttention}{Attention}
+
+\end{DoxyAttention}
+T\+H\+E P\+R\+E\+S\+E\+N\+T F\+I\+R\+M\+W\+A\+R\+E W\+H\+I\+C\+H I\+S F\+O\+R G\+U\+I\+D\+A\+N\+C\+E O\+N\+L\+Y A\+I\+M\+S A\+T P\+R\+O\+V\+I\+D\+I\+N\+G C\+U\+S\+T\+O\+M\+E\+R\+S W\+I\+T\+H C\+O\+D\+I\+N\+G I\+N\+F\+O\+R\+M\+A\+T\+I\+O\+N R\+E\+G\+A\+R\+D\+I\+N\+G T\+H\+E\+I\+R P\+R\+O\+D\+U\+C\+T\+S I\+N O\+R\+D\+E\+R F\+O\+R T\+H\+E\+M T\+O S\+A\+V\+E T\+I\+M\+E. A\+S A R\+E\+S\+U\+L\+T, S\+T\+M\+I\+C\+R\+O\+E\+L\+E\+C\+T\+R\+O\+N\+I\+C\+S S\+H\+A\+L\+L N\+O\+T B\+E H\+E\+L\+D L\+I\+A\+B\+L\+E F\+O\+R A\+N\+Y D\+I\+R\+E\+C\+T, I\+N\+D\+I\+R\+E\+C\+T O\+R C\+O\+N\+S\+E\+Q\+U\+E\+N\+T\+I\+A\+L D\+A\+M\+A\+G\+E\+S W\+I\+T\+H R\+E\+S\+P\+E\+C\+T T\+O A\+N\+Y C\+L\+A\+I\+M\+S A\+R\+I\+S\+I\+N\+G F\+R\+O\+M T\+H\+E C\+O\+N\+T\+E\+N\+T O\+F S\+U\+C\+H F\+I\+R\+M\+W\+A\+R\+E A\+N\+D/\+O\+R T\+H\+E U\+S\+E M\+A\+D\+E B\+Y C\+U\+S\+T\+O\+M\+E\+R\+S O\+F T\+H\+E C\+O\+D\+I\+N\+G I\+N\+F\+O\+R\+M\+A\+T\+I\+O\+N C\+O\+N\+T\+A\+I\+N\+E\+D H\+E\+R\+E\+I\+N I\+N C\+O\+N\+N\+E\+C\+T\+I\+O\+N W\+I\+T\+H T\+H\+E\+I\+R P\+R\+O\+D\+U\+C\+T\+S.
+
+\subsubsection*{\begin{center}\copyright{} C\+O\+P\+Y\+R\+I\+G\+H\+T 2011 S\+T\+Microelectronics\end{center} }

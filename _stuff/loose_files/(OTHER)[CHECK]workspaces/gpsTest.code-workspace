@@ -1,0 +1,59 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"main.h": "c",
+			"stm32f1xx_hal.h": "c",
+			"spi.h": "c"
+		},
+		"cSpell.words": [
+			"adc",
+			"ahbclk",
+			"calibration",
+			"callback",
+			"clocktype",
+			"conv",
+			"corsair",
+			"cplt",
+			"divider",
+			"doesn't",
+			"ex",
+			"funsape",
+			"gpio",
+			"gpiob",
+			"hadc",
+			"hal",
+			"half",
+			"hclk",
+			"hdma",
+			"hse",
+			"hspi",
+			"htim",
+			"huart",
+			"init",
+			"logger",
+			"mode",
+			"mosi",
+			"mx",
+			"oscillator",
+			"oscillatortype",
+			"pclk",
+			"rcc",
+			"rising",
+			"rx",
+			"s",
+			"spi",
+			"start",
+			"synchronous",
+			"type",
+			"uart",
+			"usart",
+			"vbat",
+			"xck"
+		]
+	}
+}

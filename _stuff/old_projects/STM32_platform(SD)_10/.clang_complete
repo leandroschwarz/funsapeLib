@@ -1,0 +1,14 @@
+-ID:\\Program Files Portable\\GNU Tools Windows PC\\include
+-ID:\\Program Files Portable\\GNU Tools Windows PC\\lib\\gcc\\mingw32\\6.3.0\\include
+-IFatFs
+-Igpdse
+-Igpdse/devices
+-Igpdse/util
+-ISTM32
+-ISTM32/CMSIS/Device/ST/STM32L0xx/Include
+-ISTM32/CMSIS/Include
+-ISTM32/STM32L0xx_HAL_Driver/
+-ISTM32/STM32L0xx_HAL_Driver/Legacy
+-DSTM32L053xx
+-D__GNUC__
+-D__riscv

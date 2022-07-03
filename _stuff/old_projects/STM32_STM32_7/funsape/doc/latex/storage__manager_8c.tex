@@ -1,0 +1,54 @@
+\hypertarget{storage__manager_8c}{}\section{\+\_\+hide/\+M\+P\+U/core/mllite/storage\+\_\+manager.c File Reference}
+\label{storage__manager_8c}\index{\+\_\+hide/\+M\+P\+U/core/mllite/storage\+\_\+manager.\+c@{\+\_\+hide/\+M\+P\+U/core/mllite/storage\+\_\+manager.\+c}}
+
+
+Load and Store Manager.  
+
+
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}storage\+\_\+manager.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}log.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}ml\+\_\+math\+\_\+func.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}mlmath.\+h\char`\"{}}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structdata__header__t}{data\+\_\+header\+\_\+t}
+\item 
+struct \hyperlink{structdata__storage__t}{data\+\_\+storage\+\_\+t}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___storage___manager_ga94d0ea06a79bb276020a641326ca85b8}{}\#define {\bfseries D\+E\+F\+A\+U\+L\+T\+\_\+\+K\+E\+Y}~29681\label{group___storage___manager_ga94d0ea06a79bb276020a641326ca85b8}
+
+\item 
+\#define \hyperlink{group___storage___manager_gaadd30991320c06b32469d747202380ec}{N\+U\+M\+\_\+\+S\+T\+O\+R\+A\+G\+E\+\_\+\+B\+O\+X\+E\+S}~20
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___storage___manager_ga177be890c8c5075c74c85ca4f999a61e}{}typedef \hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t}($\ast$ {\bfseries load\+\_\+func\+\_\+t}) (const unsigned char $\ast$data)\label{group___storage___manager_ga177be890c8c5075c74c85ca4f999a61e}
+
+\item 
+\hypertarget{group___storage___manager_gae647fba3c99b29ec121912dd87856779}{}typedef \hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t}($\ast$ {\bfseries save\+\_\+func\+\_\+t}) (unsigned char $\ast$data)\label{group___storage___manager_gae647fba3c99b29ec121912dd87856779}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{group___storage___manager_ga742a7f04b77a48b55db9c246a5959c21}{inv\+\_\+init\+\_\+storage\+\_\+manager} ()
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___storage___manager_ga9d663c91712d9d409afca1237a2fe7a5}{inv\+\_\+register\+\_\+load\+\_\+store} (\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t}($\ast$load\+\_\+func)(const unsigned char $\ast$data), \hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t}($\ast$save\+\_\+func)(unsigned char $\ast$data), size\+\_\+t size, unsigned int key)
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___storage___manager_ga03fa3e1879a249790c221ee198a4123d}{inv\+\_\+get\+\_\+mpl\+\_\+state\+\_\+size} (size\+\_\+t $\ast$size)
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___storage___manager_ga03e5346d03ba3104b415a1cfc2916dea}{inv\+\_\+load\+\_\+mpl\+\_\+states} (const unsigned char $\ast$data, size\+\_\+t length)
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___storage___manager_ga41944d4d55fcde98f998a1a31f6412b2}{inv\+\_\+save\+\_\+mpl\+\_\+states} (unsigned char $\ast$data, size\+\_\+t sz)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Load and Store Manager. 
+

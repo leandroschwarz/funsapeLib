@@ -1,0 +1,29 @@
+/* -----------------------------------------------------------------------------
+ * Project:			GPDSE AVR8 Library
+ * File:			spiMaster.h
+ * Module:			SPI Interface in Master Mode
+ * Author:			Leandro Schwarz
+ * Version:			1.0
+ * Last edition:	2017-09-06
+ * -------------------------------------------------------------------------- */
+
+#ifndef __SPIMASTER_H
+#define __SPIMASTER_H 10
+
+// -----------------------------------------------------------------------------
+// Header files ----------------------------------------------------------------
+
+#include "globalDefines.h"
+#if __GLOBALDEFINES_H != 130
+	#error Error 100 - globalDefines.h - wrong version (globalDefines must be version 13.0).
+#endif
+
+// -----------------------------------------------------------------------------
+// New data types --------------------------------------------------------------
+
+typedef struct spiConfiguration_t {
+	uint8 teste;
+} spiConfiguration_t;
+
+
+#endif

@@ -1,0 +1,24 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "C:/Schwarz/Projetos/git/funsapeLib-MCU"
+		}
+	],
+	"settings": {
+		"hexdump.littleEndian": true,
+		"hexdump.nibbles": 4,
+		"hexdump.uppercase": true,
+		"hexdump.width": 16,
+		"hexdump.showOffset": true,
+		"hexdump.showAddress": true,
+		"hexdump.showAscii": true,
+		"hexdump.showInspector": true,
+		"hexdump.sizeWarning": 5242880,
+		"hexdump.sizeDisplay": 5242880,
+		"hexdump.charEncoding": "utf-8",
+		"hexdump.btnEnabled": true,
+	}
+}

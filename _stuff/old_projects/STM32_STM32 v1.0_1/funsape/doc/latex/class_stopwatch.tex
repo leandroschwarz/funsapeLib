@@ -1,0 +1,120 @@
+\hypertarget{class_stopwatch}{}\section{Stopwatch Class Reference}
+\label{class_stopwatch}\index{Stopwatch@{Stopwatch}}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_stopwatch_a9ec058b9a0ee972664043d7233aa4c3f}{Stopwatch} (uint32\+\_\+t timeout\+\_\+p=0)
+\begin{DoxyCompactList}\small\item\em Construct a new \hyperlink{class_stopwatch_a9ec058b9a0ee972664043d7233aa4c3f}{Stopwatch\+::\+Stopwatch} object. \end{DoxyCompactList}\item 
+\hypertarget{class_stopwatch_a720bc3d0a4f7848968247b08982c3e51}{}\hyperlink{class_stopwatch_a720bc3d0a4f7848968247b08982c3e51}{$\sim$\+Stopwatch} (void)\label{class_stopwatch_a720bc3d0a4f7848968247b08982c3e51}
+
+\begin{DoxyCompactList}\small\item\em Destroy the \hyperlink{class_stopwatch_a9ec058b9a0ee972664043d7233aa4c3f}{Stopwatch\+::\+Stopwatch} object. \end{DoxyCompactList}\item 
+uint32\+\_\+t \hyperlink{class_stopwatch_ac823faab40c6c86e8f61fead1cf21fcf}{elapsed} (void)
+\item 
+bool \hyperlink{class_stopwatch_a19d5551772cb3d42e6edc7e77fff1120}{is\+Timed\+Out} (bool stop\+On\+Success\+\_\+p=false)
+\item 
+void \hyperlink{class_stopwatch_aeb9549ad4cf245c3bf491c8d8e6ad84a}{start} (uint32\+\_\+t timeout\+\_\+p=0)
+\item 
+bool \hyperlink{class_stopwatch_a35ce02715e10a56d39c3aaf68ccc4726}{wait\+Until\+Timed\+Out} (bool stop\+On\+Success\+\_\+p=false)
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_stopwatch_a35be1029854026928a471f5f4c6cde0b}{}bool {\bfseries \+\_\+started} = false\label{class_stopwatch_a35be1029854026928a471f5f4c6cde0b}
+
+\item 
+\hypertarget{class_stopwatch_a480ecd6f6b726622943de91dce57751d}{}uint32\+\_\+t {\bfseries \+\_\+timeout} = 0\label{class_stopwatch_a480ecd6f6b726622943de91dce57751d}
+
+\item 
+\hypertarget{class_stopwatch_a7e578a3ad54113489f5b837bea433fa0}{}uint32\+\_\+t {\bfseries \+\_\+value\+Initial} = 0\label{class_stopwatch_a7e578a3ad54113489f5b837bea433fa0}
+
+\item 
+\hypertarget{class_stopwatch_aed3fe682284fba93f0cf00ec18352c44}{}uint32\+\_\+t {\bfseries \+\_\+value\+Mark} = 0\label{class_stopwatch_aed3fe682284fba93f0cf00ec18352c44}
+
+\item 
+\hypertarget{class_stopwatch_a12bfd2102d7588a94a2fb564afd013ec}{}Error {\bfseries \+\_\+last\+Error}\label{class_stopwatch_a12bfd2102d7588a94a2fb564afd013ec}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_stopwatch_a9ec058b9a0ee972664043d7233aa4c3f}{}\index{Stopwatch@{Stopwatch}!Stopwatch@{Stopwatch}}
+\index{Stopwatch@{Stopwatch}!Stopwatch@{Stopwatch}}
+\subsubsection[{Stopwatch}]{\setlength{\rightskip}{0pt plus 5cm}Stopwatch\+::\+Stopwatch (
+\begin{DoxyParamCaption}
+\item[{uint32\+\_\+t}]{timeout\+\_\+p = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)}\label{class_stopwatch_a9ec058b9a0ee972664043d7233aa4c3f}
+
+
+Construct a new \hyperlink{class_stopwatch_a9ec058b9a0ee972664043d7233aa4c3f}{Stopwatch\+::\+Stopwatch} object. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em timeout\+\_\+p} & \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_stopwatch_ac823faab40c6c86e8f61fead1cf21fcf}{}\index{Stopwatch@{Stopwatch}!elapsed@{elapsed}}
+\index{elapsed@{elapsed}!Stopwatch@{Stopwatch}}
+\subsubsection[{elapsed}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t Stopwatch\+::elapsed (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{class_stopwatch_ac823faab40c6c86e8f61fead1cf21fcf}
+\begin{DoxyReturn}{Returns}
+uint32\+\_\+t 
+\end{DoxyReturn}
+\hypertarget{class_stopwatch_a19d5551772cb3d42e6edc7e77fff1120}{}\index{Stopwatch@{Stopwatch}!is\+Timed\+Out@{is\+Timed\+Out}}
+\index{is\+Timed\+Out@{is\+Timed\+Out}!Stopwatch@{Stopwatch}}
+\subsubsection[{is\+Timed\+Out}]{\setlength{\rightskip}{0pt plus 5cm}bool Stopwatch\+::is\+Timed\+Out (
+\begin{DoxyParamCaption}
+\item[{bool}]{stop\+On\+Success\+\_\+p = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\label{class_stopwatch_a19d5551772cb3d42e6edc7e77fff1120}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em stop\+On\+Success\+\_\+p} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true 
+
+false 
+\end{DoxyReturn}
+\hypertarget{class_stopwatch_aeb9549ad4cf245c3bf491c8d8e6ad84a}{}\index{Stopwatch@{Stopwatch}!start@{start}}
+\index{start@{start}!Stopwatch@{Stopwatch}}
+\subsubsection[{start}]{\setlength{\rightskip}{0pt plus 5cm}void Stopwatch\+::start (
+\begin{DoxyParamCaption}
+\item[{uint32\+\_\+t}]{timeout\+\_\+p = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)}\label{class_stopwatch_aeb9549ad4cf245c3bf491c8d8e6ad84a}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em timeout\+\_\+p} & \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_stopwatch_a35ce02715e10a56d39c3aaf68ccc4726}{}\index{Stopwatch@{Stopwatch}!wait\+Until\+Timed\+Out@{wait\+Until\+Timed\+Out}}
+\index{wait\+Until\+Timed\+Out@{wait\+Until\+Timed\+Out}!Stopwatch@{Stopwatch}}
+\subsubsection[{wait\+Until\+Timed\+Out}]{\setlength{\rightskip}{0pt plus 5cm}bool Stopwatch\+::wait\+Until\+Timed\+Out (
+\begin{DoxyParamCaption}
+\item[{bool}]{stop\+On\+Success\+\_\+p = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\label{class_stopwatch_a35ce02715e10a56d39c3aaf68ccc4726}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em stop\+On\+Success\+\_\+p} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true 
+
+false 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+util/funsape\+Lib\+Stopwatch.\+hpp\item 
+util/funsape\+Lib\+Stopwatch.\+cpp\end{DoxyCompactItemize}

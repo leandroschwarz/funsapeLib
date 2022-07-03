@@ -1,0 +1,114 @@
+\hypertarget{results__holder_8c}{}\section{\+\_\+hide/\+M\+P\+U/core/mllite/results\+\_\+holder.c File Reference}
+\label{results__holder_8c}\index{\+\_\+hide/\+M\+P\+U/core/mllite/results\+\_\+holder.\+c@{\+\_\+hide/\+M\+P\+U/core/mllite/results\+\_\+holder.\+c}}
+
+
+Results Holder for H\+A\+L.  
+
+
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}results\+\_\+holder.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}ml\+\_\+math\+\_\+func.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}mlmath.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}start\+\_\+manager.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}data\+\_\+builder.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}message\+\_\+layer.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}log.\+h\char`\"{}}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structresults__t}{results\+\_\+t}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___results___holder_gaae541300a003dfc3e4fa25efc3be8740}{}\#define {\bfseries I\+N\+V\+\_\+\+C\+O\+M\+P\+A\+S\+S\+\_\+\+C\+O\+R\+R\+E\+C\+T\+I\+O\+N\+\_\+\+S\+E\+T}~1\label{group___results___holder_gaae541300a003dfc3e4fa25efc3be8740}
+
+\item 
+\hypertarget{group___results___holder_ga17473caf0dc65ecd4bf89972632f852b}{}\#define {\bfseries I\+N\+V\+\_\+6\+\_\+\+A\+X\+I\+S\+\_\+\+Q\+U\+A\+T\+\_\+\+S\+E\+T}~2\label{group___results___holder_ga17473caf0dc65ecd4bf89972632f852b}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___results___holder_ga7350976bb4be8b102727cc7a1231ca07}{}void {\bfseries inv\+\_\+store\+\_\+gaming\+\_\+quaternion} (const long $\ast$quat, inv\+\_\+time\+\_\+t timestamp)\label{group___results___holder_ga7350976bb4be8b102727cc7a1231ca07}
+
+\item 
+\hypertarget{group___results___holder_ga28764005dea46648a8ced26a23d0d2ba}{}void {\bfseries inv\+\_\+set\+\_\+compass\+\_\+correction} (const long $\ast$data, inv\+\_\+time\+\_\+t timestamp)\label{group___results___holder_ga28764005dea46648a8ced26a23d0d2ba}
+
+\item 
+\hypertarget{group___results___holder_gab19044d41ca622448b97d697af75461f}{}void {\bfseries inv\+\_\+get\+\_\+compass\+\_\+correction} (long $\ast$data, inv\+\_\+time\+\_\+t $\ast$timestamp)\label{group___results___holder_gab19044d41ca622448b97d697af75461f}
+
+\item 
+int \hyperlink{group___results___holder_gafbcfea1f8b65ca4797101c9a7dd49069}{inv\+\_\+get\+\_\+large\+\_\+mag\+\_\+field} ()
+\item 
+void \hyperlink{group___results___holder_gaccb6a31ec56d903c52678ebd87cdc88b}{inv\+\_\+set\+\_\+large\+\_\+mag\+\_\+field} (int state)
+\item 
+int \hyperlink{group___results___holder_ga9b375fff8d6e0025c27e00e98a56c21e}{inv\+\_\+get\+\_\+acc\+\_\+state} ()
+\item 
+void \hyperlink{group___results___holder_ga6da7a5d593655e03f5aa6b3231dc4785}{inv\+\_\+set\+\_\+acc\+\_\+state} (int state)
+\item 
+int \hyperlink{group___results___holder_ga577cb5ab3afa04eba0d707e98a4175d7}{inv\+\_\+get\+\_\+motion\+\_\+state} (unsigned int $\ast$cntr)
+\item 
+void \hyperlink{group___results___holder_ga8a03d3ac375ecaec461318f024cda595}{inv\+\_\+set\+\_\+motion\+\_\+state} (unsigned char state)
+\item 
+void \hyperlink{group___results___holder_gabf828a9ce7306c7ac35f64485d339070}{inv\+\_\+set\+\_\+local\+\_\+field} (const long $\ast$data)
+\item 
+void \hyperlink{group___results___holder_ga0c8f1511a1bcd53154a628e7b7dd1198}{inv\+\_\+get\+\_\+local\+\_\+field} (long $\ast$data)
+\item 
+void \hyperlink{group___results___holder_ga40e3e66787ea64d6b187c2208dac800f}{inv\+\_\+set\+\_\+mag\+\_\+scale} (const long $\ast$data)
+\item 
+void \hyperlink{group___results___holder_gab5fce26e61edad75ca0a595389448e3b}{inv\+\_\+get\+\_\+mag\+\_\+scale} (long $\ast$data)
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___results___holder_ga264034b1d6823406d11066537e350cc8}{inv\+\_\+get\+\_\+gravity} (long $\ast$data)
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___results___holder_gaebcd194473a5984ace625bb55c4cb35f}{inv\+\_\+get\+\_\+6axis\+\_\+quaternion} (long $\ast$data)
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___results___holder_ga20663351325c9847af3146a8dfb95468}{inv\+\_\+get\+\_\+quaternion} (long $\ast$data)
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___results___holder_ga235bedb42155058f0b4a6e5749a9f8fd}{inv\+\_\+get\+\_\+quaternion\+\_\+float} (float $\ast$data)
+\item 
+void \hyperlink{group___results___holder_ga1408bf97496a4eee218839db21a7d29c}{inv\+\_\+get\+\_\+quaternion\+\_\+set} (long $\ast$data, int $\ast$accuracy, inv\+\_\+time\+\_\+t $\ast$timestamp)
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___results___holder_ga4e697acd0cb613486493d8325ec1ae3f}{inv\+\_\+generate\+\_\+results} (struct \hyperlink{structinv__sensor__cal__t}{inv\+\_\+sensor\+\_\+cal\+\_\+t} $\ast$sensor\+\_\+cal)
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___results___holder_ga60f6a192f82f0d24cf8ab33b94a3dd71}{inv\+\_\+start\+\_\+results\+\_\+holder} (void)
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___results___holder_gabfffdb1dee45fa023904c02d3fde8bab}{inv\+\_\+init\+\_\+results\+\_\+holder} (void)
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___results___holder_ga520cba0c6e9d511566acafa2cca30760}{inv\+\_\+enable\+\_\+results\+\_\+holder} ()
+\item 
+int \hyperlink{group___results___holder_ga21f9083e1f6c16b8de49d954bf135086}{inv\+\_\+got\+\_\+accel\+\_\+bias} ()
+\item 
+void \hyperlink{group___results___holder_ga73bde6858bc38c5754cd4a66e8eaa339}{inv\+\_\+set\+\_\+accel\+\_\+bias\+\_\+found} (int state)
+\item 
+int \hyperlink{group___results___holder_ga8bb81756098140291010751382de373a}{inv\+\_\+got\+\_\+compass\+\_\+bias} ()
+\item 
+void \hyperlink{group___results___holder_ga51533b73e50f7c5d90214d0c669d529f}{inv\+\_\+set\+\_\+compass\+\_\+bias\+\_\+found} (int state)
+\item 
+void \hyperlink{group___results___holder_ga4074973f3f8c9519998c83ac042c4a79}{inv\+\_\+set\+\_\+compass\+\_\+state} (int state)
+\item 
+int \hyperlink{group___results___holder_gabfa14633cc041554f06cb751660b30e8}{inv\+\_\+get\+\_\+compass\+\_\+state} ()
+\item 
+void \hyperlink{group___results___holder_ga4f970792b99f7576fc7872185497d8e1}{inv\+\_\+set\+\_\+compass\+\_\+bias\+\_\+error} (const long $\ast$bias\+\_\+error)
+\item 
+void \hyperlink{group___results___holder_ga59faa2dbb37d5e7157e773b11dc92bca}{inv\+\_\+get\+\_\+compass\+\_\+bias\+\_\+error} (long $\ast$bias\+\_\+error)
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___results___holder_ga452f07eec7faba819a2e612921cdaaf8}{inv\+\_\+get\+\_\+linear\+\_\+accel} (long $\ast$data)
+\begin{DoxyCompactList}\small\item\em Returns 3-\/element vector of accelerometer data in body frame with gravity removed. \end{DoxyCompactList}\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___results___holder_gaa77c2fb8eda0eb57943c3fe156403165}{inv\+\_\+get\+\_\+accel} (long $\ast$data)
+\begin{DoxyCompactList}\small\item\em Returns 3-\/element vector of accelerometer data in body frame. \end{DoxyCompactList}\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___results___holder_gac6e3b1b98ce8504be7e86da6e02b704f}{inv\+\_\+get\+\_\+accel\+\_\+float} (float $\ast$data)
+\begin{DoxyCompactList}\small\item\em Returns 3-\/element vector of accelerometer float data. \end{DoxyCompactList}\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___results___holder_gadf76b6cf23bd030655a1c9b0917d112c}{inv\+\_\+get\+\_\+gyro\+\_\+float} (float $\ast$data)
+\begin{DoxyCompactList}\small\item\em Returns 3-\/element vector of gyro float data. \end{DoxyCompactList}\item 
+void \hyperlink{group___results___holder_gae7a3af3ab04abc02d1f3aa9faf3da86d}{inv\+\_\+set\+\_\+heading\+\_\+confidence\+\_\+interval} (float ci)
+\item 
+float \hyperlink{group___results___holder_gaa5ad4a8ef56d0132117bffa7acaad01b}{inv\+\_\+get\+\_\+heading\+\_\+confidence\+\_\+interval} (void)
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___results___holder_ga99c9076caf1a6595902619d4efc3e90a}{inv\+\_\+get\+\_\+linear\+\_\+accel\+\_\+float} (float $\ast$data)
+\begin{DoxyCompactList}\small\item\em Returns 3-\/element vector of linear accel float data. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Results Holder for H\+A\+L. 
+

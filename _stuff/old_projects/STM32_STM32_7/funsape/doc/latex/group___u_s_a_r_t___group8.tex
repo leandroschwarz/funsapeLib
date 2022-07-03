@@ -1,0 +1,52 @@
+\hypertarget{group___u_s_a_r_t___group8}{}\section{D\+M\+A transfers management functions}
+\label{group___u_s_a_r_t___group8}\index{D\+M\+A transfers management functions@{D\+M\+A transfers management functions}}
+
+
+D\+M\+A transfers management functions.  
+
+
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{group___u_s_a_r_t___group8_ga902857f199ebfba21c63d725354af66f}{U\+S\+A\+R\+T\+\_\+\+D\+M\+A\+Cmd} (\hyperlink{struct_u_s_a_r_t___type_def}{U\+S\+A\+R\+T\+\_\+\+Type\+Def} $\ast$U\+S\+A\+R\+Tx, uint16\+\_\+t U\+S\+A\+R\+T\+\_\+\+D\+M\+A\+Req, Functional\+State New\+State)
+\begin{DoxyCompactList}\small\item\em Enables or disables the U\+S\+A\+R\+T's D\+M\+A interface. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+D\+M\+A transfers management functions. 
+
+\begin{DoxyVerb} ===============================================================================
+                      DMA transfers management functions
+ ===============================================================================  \end{DoxyVerb}
+ 
+
+\subsection{Function Documentation}
+\hypertarget{group___u_s_a_r_t___group8_ga902857f199ebfba21c63d725354af66f}{}\index{D\+M\+A transfers management functions@{D\+M\+A transfers management functions}!U\+S\+A\+R\+T\+\_\+\+D\+M\+A\+Cmd@{U\+S\+A\+R\+T\+\_\+\+D\+M\+A\+Cmd}}
+\index{U\+S\+A\+R\+T\+\_\+\+D\+M\+A\+Cmd@{U\+S\+A\+R\+T\+\_\+\+D\+M\+A\+Cmd}!D\+M\+A transfers management functions@{D\+M\+A transfers management functions}}
+\subsubsection[{U\+S\+A\+R\+T\+\_\+\+D\+M\+A\+Cmd}]{\setlength{\rightskip}{0pt plus 5cm}void U\+S\+A\+R\+T\+\_\+\+D\+M\+A\+Cmd (
+\begin{DoxyParamCaption}
+\item[{{\bf U\+S\+A\+R\+T\+\_\+\+Type\+Def} $\ast$}]{U\+S\+A\+R\+Tx, }
+\item[{uint16\+\_\+t}]{U\+S\+A\+R\+T\+\_\+\+D\+M\+A\+Req, }
+\item[{Functional\+State}]{New\+State}
+\end{DoxyParamCaption}
+)}\label{group___u_s_a_r_t___group8_ga902857f199ebfba21c63d725354af66f}
+
+
+Enables or disables the U\+S\+A\+R\+T's D\+M\+A interface. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em U\+S\+A\+R\+Tx} & where x can be 1, 2, 3, 4, 5 or 6 to select the U\+S\+A\+R\+T or U\+A\+R\+T peripheral. \\
+\hline
+{\em U\+S\+A\+R\+T\+\_\+\+D\+M\+A\+Req} & specifies the D\+M\+A request. This parameter can be any combination of the following values\+: \begin{DoxyItemize}
+\item U\+S\+A\+R\+T\+\_\+\+D\+M\+A\+Req\+\_\+\+Tx\+: U\+S\+A\+R\+T D\+M\+A transmit request \item U\+S\+A\+R\+T\+\_\+\+D\+M\+A\+Req\+\_\+\+Rx\+: U\+S\+A\+R\+T D\+M\+A receive request \end{DoxyItemize}
+\\
+\hline
+{\em New\+State} & new state of the D\+M\+A Request sources. This parameter can be\+: E\+N\+A\+B\+L\+E or D\+I\+S\+A\+B\+L\+E. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}

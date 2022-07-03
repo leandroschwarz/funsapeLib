@@ -1,0 +1,135 @@
+/* -----------------------------------------------------------------------------
+ * Project:			MPU-6050
+ * File:			mpu6050.c
+ * Author:			Leandro Schwarz
+ * Version:			1.0
+ * Last edition:	March 25, 2018
+ * Purpose:			What this project does.
+ * Notes:			If applicable.
+ * -------------------------------------------------------------------------- */
+
+// -----------------------------------------------------------------------------
+// System definitions ----------------------------------------------------------
+
+#define F_CPU 16000000UL
+
+// -----------------------------------------------------------------------------
+// Header files ----------------------------------------------------------------
+
+#include "globalDefines.h"
+#include "twiMaster.h"
+#include "usart.h"
+#include "timer1.h"
+
+// -----------------------------------------------------------------------------
+// Project definitions ---------------------------------------------------------
+
+#define MPU6050_SLAVE_ADDRESS				0x68
+#define MPU6050_WHOAMI_REGISTER				0x75
+#define MPU6050_ACCEL_XOUT_H_REGISTER		0x3B
+#define MPU6050_ACCEL_XOUT_L_REGISTER		0x3C
+#define MPU6050_ACCEL_YOUT_H_REGISTER		0x3D
+#define MPU6050_ACCEL_YOUT_L_REGISTER		0x3E
+#define MPU6050_ACCEL_ZOUT_H_REGISTER		0x3F
+#define MPU6050_ACCEL_ZOUT_L_REGISTER		0x40
+#define MPU6050_TEMP_OUT_H_REGISTER			0x41
+#define MPU6050_TEMP_OUT_L_REGISTER			0x42
+#define MPU6050_GYRO_XOUT_H_REGISTER		0x43
+#define MPU6050_GYRO_XOUT_L_REGISTER		0x44
+#define MPU6050_GYRO_YOUT_H_REGISTER		0x45
+#define MPU6050_GYRO_YOUT_L_REGISTER		0x46
+#define MPU6050_GYRO_ZOUT_H_REGISTER		0x47
+#define MPU6050_GYRO_ZOUT_L_REGISTER		0x48
+#define MPU6050_PWR_MGMT_1_REGISTER			0x6B
+
+// -----------------------------------------------------------------------------
+// New data types --------------------------------------------------------------
+
+typedef volatile union systemFlags_t {
+	struct {
+		bool_t	getTwiData	: 1;
+		uint8_t	unusedBits	: 7;
+	};
+	uint8_t allFlags;
+} systemFlags_t;
+
+// -----------------------------------------------------------------------------
+// Function declaration --------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+// Global variables ------------------------------------------------------------
+
+systemFlags_t systemFlags;
+
+// -----------------------------------------------------------------------------
+// Main function ---------------------------------------------------------------
+
+int main(void)
+{
+	// Variable declaration
+	uint8_t buffer[14];
+	uint8_t i = 0;
+	uint32_t time = 0;
+	int16_t accX = 0;
+	int16_t accY = 0;
+	int16_t accZ = 0;
+
+	// Variable initialization
+	systemFlags.allFlags = 0;
+
+	systemClock(16000000);
+
+	// USART configuration
+	usartInit(USART_MODE_ASYNCHRONOUS, USART_BAUD_57600, USART_DATA_BITS_8, USART_PARITY_NONE, USART_STOP_BIT_SINGLE);
+	usartEnableTransmitter();
+	usartEnableReceiver();
+	usartStdio();
+	printf("Teste da USART\r\r");
+
+	// TIMER1 configuration
+	timer1Config(TIMER1_MODE_CTC_ICR, TIMER1_PRESCALER_64);
+	timer1SetInputCaptureValue(5000);
+	timer1ClearInputCaptureInterruptRequest();
+	timer1ActivateInputCaptureInterrupt();
+
+	// TWI configuration
+	twiMasterInit(10000);
+
+	// Enable Global Interrupts
+	sei();
+
+	// MPU6050 configuration
+	buffer[0] = MPU6050_PWR_MGMT_1_REGISTER;
+	buffer[1] = 0x00;
+	twiMasterSendData(MPU6050_SLAVE_ADDRESS, TWI_WRITE, buffer, 2);	// Disable sleep
+
+	setBit(DDRB, PB5);
+	while(1) {
+		if(systemFlags.getTwiData) {
+			buffer[0] = MPU6050_ACCEL_XOUT_H_REGISTER;
+			twiMasterSendData(MPU6050_SLAVE_ADDRESS, TWI_WRITE, buffer, 1);
+			twiMasterSendData(MPU6050_SLAVE_ADDRESS, TWI_READ, buffer, 14);
+			accX = ((int16_t)buffer[0] << 8) | (int16_t)buffer[1];
+			accY = ((int16_t)buffer[2] << 8) | (int16_t)buffer[3];
+			accZ = ((int16_t)buffer[4] << 8) | (int16_t)buffer[5];
+			usartStdio();
+
+			printf("%d %d %d", accX, accY, accZ);
+			printf("\r");
+			systemFlags.getTwiData = FALSE;
+		}
+	}
+
+	return 0;
+}
+
+// -----------------------------------------------------------------------------
+// Interruption handlers -------------------------------------------------------
+
+ISR(TIMER1_CAPT_vect)
+{
+	systemFlags.getTwiData = TRUE;
+}
+
+// -----------------------------------------------------------------------------
+// Function definitions --------------------------------------------------------

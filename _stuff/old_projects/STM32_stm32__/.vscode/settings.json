@@ -1,0 +1,5 @@
+{
+	"files.associations": {
+		"rtc_stm32f1.h": "c"
+	}
+}

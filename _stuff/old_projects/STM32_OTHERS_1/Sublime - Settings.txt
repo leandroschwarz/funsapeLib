@@ -1,0 +1,45 @@
+{
+	"always_show_minimap_viewport": true,
+	"auto_complete_cycle": true,
+	"auto_complete_with_fields": true,
+	"bold_folder_labels": true,
+	"color_scheme": "Packages/Color Scheme - Default/Celeste.sublime-color-scheme",
+	"detect_indentation": false,
+	"draw_indent_guides": true,
+	"draw_minimap_border": true,
+	"draw_white_space": "all",
+	"ensure_newline_at_eof_on_save": true,
+	"fade_fold_buttons": false,
+	"font_size": 13,
+	"highlight_line": true,
+	"highlight_modified_tabs": true,
+	"ignored_packages":
+	[
+		"Vintage"
+	],
+	"indent_guide_options":
+	[
+		"draw_normal",
+		"draw_active"
+	],
+	"indent_to_bracket": true,
+	"margin": 0,
+	"match_brackets_angle": true,
+	"move_to_limit_on_up_down": true,
+	"remember_full_screen": true,
+	"rulers":
+	[
+		40,
+		50,
+		60,
+		70,
+		80
+	],
+	"shift_tab_unindent": true,
+	"show_encoding": true,
+	"show_line_endings": true,
+	"spell_check": true,
+	"theme": "Adaptive.sublime-theme",
+	"trim_automatic_white_space": true,
+	"trim_trailing_white_space_on_save": true
+}

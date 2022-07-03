@@ -1,0 +1,28 @@
+\hypertarget{group___r_n_g__interrupts__definition}{}\section{R\+N\+G\+\_\+interrupts\+\_\+definition}
+\label{group___r_n_g__interrupts__definition}\index{R\+N\+G\+\_\+interrupts\+\_\+definition@{R\+N\+G\+\_\+interrupts\+\_\+definition}}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{group___r_n_g__interrupts__definition_ga8dabf5f116a92e59d18a224d14882927}{R\+N\+G\+\_\+\+I\+T\+\_\+\+C\+E\+I}~((uint8\+\_\+t)0x20)
+\item 
+\#define \hyperlink{group___r_n_g__interrupts__definition_ga2343cb323912a036fa46b081bbe751bc}{R\+N\+G\+\_\+\+I\+T\+\_\+\+S\+E\+I}~((uint8\+\_\+t)0x40)
+\item 
+\hypertarget{group___r_n_g__interrupts__definition_gaa110e0edaec1c15ed3a9620b001f8d91}{}\#define {\bfseries I\+S\+\_\+\+R\+N\+G\+\_\+\+I\+T}(I\+T)~((((I\+T) \& (uint8\+\_\+t)0x9\+F) == 0x00) \&\& ((\+I\+T) != 0x00))\label{group___r_n_g__interrupts__definition_gaa110e0edaec1c15ed3a9620b001f8d91}
+
+\item 
+\hypertarget{group___r_n_g__interrupts__definition_gafdbf6da44cfc8f3f2be5697a8fdf0595}{}\#define {\bfseries I\+S\+\_\+\+R\+N\+G\+\_\+\+G\+E\+T\+\_\+\+I\+T}(R\+N\+G\+\_\+\+I\+T)~(((R\+N\+G\+\_\+\+I\+T) == \hyperlink{group___r_n_g__interrupts__definition_ga8dabf5f116a92e59d18a224d14882927}{R\+N\+G\+\_\+\+I\+T\+\_\+\+C\+E\+I}) $\vert$$\vert$ ((R\+N\+G\+\_\+\+I\+T) == \hyperlink{group___r_n_g__interrupts__definition_ga2343cb323912a036fa46b081bbe751bc}{R\+N\+G\+\_\+\+I\+T\+\_\+\+S\+E\+I}))\label{group___r_n_g__interrupts__definition_gafdbf6da44cfc8f3f2be5697a8fdf0595}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{group___r_n_g__interrupts__definition_ga8dabf5f116a92e59d18a224d14882927}{}\index{R\+N\+G\+\_\+interrupts\+\_\+definition@{R\+N\+G\+\_\+interrupts\+\_\+definition}!R\+N\+G\+\_\+\+I\+T\+\_\+\+C\+E\+I@{R\+N\+G\+\_\+\+I\+T\+\_\+\+C\+E\+I}}
+\index{R\+N\+G\+\_\+\+I\+T\+\_\+\+C\+E\+I@{R\+N\+G\+\_\+\+I\+T\+\_\+\+C\+E\+I}!R\+N\+G\+\_\+interrupts\+\_\+definition@{R\+N\+G\+\_\+interrupts\+\_\+definition}}
+\subsubsection[{R\+N\+G\+\_\+\+I\+T\+\_\+\+C\+E\+I}]{\setlength{\rightskip}{0pt plus 5cm}\#define R\+N\+G\+\_\+\+I\+T\+\_\+\+C\+E\+I~((uint8\+\_\+t)0x20)}\label{group___r_n_g__interrupts__definition_ga8dabf5f116a92e59d18a224d14882927}
+Clock error interrupt \hypertarget{group___r_n_g__interrupts__definition_ga2343cb323912a036fa46b081bbe751bc}{}\index{R\+N\+G\+\_\+interrupts\+\_\+definition@{R\+N\+G\+\_\+interrupts\+\_\+definition}!R\+N\+G\+\_\+\+I\+T\+\_\+\+S\+E\+I@{R\+N\+G\+\_\+\+I\+T\+\_\+\+S\+E\+I}}
+\index{R\+N\+G\+\_\+\+I\+T\+\_\+\+S\+E\+I@{R\+N\+G\+\_\+\+I\+T\+\_\+\+S\+E\+I}!R\+N\+G\+\_\+interrupts\+\_\+definition@{R\+N\+G\+\_\+interrupts\+\_\+definition}}
+\subsubsection[{R\+N\+G\+\_\+\+I\+T\+\_\+\+S\+E\+I}]{\setlength{\rightskip}{0pt plus 5cm}\#define R\+N\+G\+\_\+\+I\+T\+\_\+\+S\+E\+I~((uint8\+\_\+t)0x40)}\label{group___r_n_g__interrupts__definition_ga2343cb323912a036fa46b081bbe751bc}
+Seed error interrupt 

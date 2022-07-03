@@ -1,0 +1,172 @@
+Outras tentativas
+-------------------
+
+// --------------------------------------------
+SublimeLinter
+
+Project
+"SublimeLinter": {
+	"linters" : {
+		"clang" : {
+			"disable": false,
+			"extra_flags": "-DLLVM_TARGETS_TO_BUILD=ARM -DSTM32L053xx -D__GNUC__ -D__riscv -nostdlib -std=c99",
+			"include_dirs": [
+				"Drivers/CMSIS/Device/ST/STM32L0xx/Include",
+				"Drivers/CMSIS/Include",
+				"Drivers/STM32L0xx_HAL_Driver/Inc",
+				"Inc",
+				"Stub"
+			]
+		},
+		"gcc": {
+			"disable": true,
+			"c_executable": "arm-none-eabi-gcc",		// C files
+			"c_extra_flags": [
+				"-DSTM32L053xx",
+				"-DUSE_HAL_DRIVER",
+				"-fsyntax-only",
+				"-std=c99",
+				"-mcpu=cortex-m0plus",
+				"-mthumb",
+			],
+			"c++_executable": "arm-none-eabi-g++",		// C++ files
+			"c++_extra_flags": [
+				"-DSTM32L053xx",
+				"-DUSE_HAL_DRIVER",
+				"-fsyntax-only",
+				"-std=c++11",
+				"-mcpu=cortex-m0plus",
+				"-mthumb",
+			],
+			"include_dirs": [							// Include_dirs for both C and C++
+				"${project_path}/Inc/",
+				"${project_path}/Src/",
+				"${project_path}/Drivers/STM32L0xx_HAL_Driver/Inc",
+				"${project_path}/Drivers/STM32L0xx_HAL_Driver/Src",
+				"${project_path}/Drivers/CMSIS/Device/ST/STM32L0xx/Include",
+				"${project_path}/Drivers/CMSIS/Include",
+			],
+			"args" : [
+			],
+			"excludes" : [
+			],
+			"styles": [
+				{"icon": "diamond"}
+			]
+		}
+	},
+	"debug": false,
+	"lint_mode": "background",
+}
+
+// --------------------------------------------
+SublimeLinter-clang
+
+Settings
+"show_errors": true,
+"gutter_style": "color",
+"triggers" : [ ".", "->", "::", " ", "	", "(", "[" ],
+"use_libclang" : true,
+"verbose" : false,
+"include_file_folder" : true,
+"include_file_parent_folder" : true,
+"clang_binary" : "clang",
+"cmake_binary" : "cmake",
+"autocomplete_all" : false,
+"show_type_info": true,
+"show_type_body" : true,
+"progress_style": "Moon",
+"use_libclang_caching": true,
+"use_target_compiler_built_in_flags": true,
+
+// --------------------------------------------
+EasyClangComplete
+
+Project
+"EasyClangComplete" : {
+	"common_flags" : [
+		"$-I{project_path}/Inc/",
+		"$-I{project_path}/Src/",
+		"$-I{project_path}/Drivers/STM32L0xx_HAL_Driver/Inc",
+		"$-I{project_path}/Drivers/STM32L0xx_HAL_Driver/Src",
+		"$-I{project_path}/Drivers/CMSIS/Device/ST/STM32L0xx/Include",
+		"$-I{project_path}/Drivers/CMSIS/Include",
+		"-I/usr/local/lib/clang/4.0.1/include",
+		"-DSTM32F10X_MD"
+	],
+	"cpp_flags" : [
+		"-std=c++11",
+		"-Wall"
+	],
+	"c_flags" : [
+		"-std=c99",
+		"-Wall"
+	],
+	"errors_style": "phantoms",
+	"hide_default_completions": true,
+	"progress_style": "ColorSublime",
+	"show_type_info": false,
+}
+
+OOOOOOOOUUUUU
+
+"EasyClangComplete" : {
+	"ecc_debug" : true,
+	"ecc_clang_binary" : "clang",
+	"ecc_hide_default_completions" : true,
+	"ecc_show_type_info" : false,
+	"ecc_progress_style" : "Moon",
+	"ecc_common_flags" : [
+		"-IDrivers/CMSIS/Device/ST/STM32L0xx/Include",
+		"-IDrivers/CMSIS/Include",
+		"-IDrivers/STM32L0xx_HAL_Driver/Inc",
+		"-IInc",
+		"-IStub",
+		"-DSTM32F10X_MD",
+		"-DLLVM_TARGETS_TO_BUILD=ARM",
+		"-DSTM32L053xx",
+		"-D__GNUC__",
+		"-D__riscv",
+		"-nostdlib"
+	],
+	"ecc_cpp_flags" : [
+		"-std=c++11",
+		"-Wall"
+	],
+	"ecc_c_flags" : [
+		"-std=gnu99",
+		"-Wall"
+	],
+},
+
+// --------------------------------------------
+ClangAutoComplete
+
+Project
+"ClangAutoComplete" : {
+	"include_dirs" : [
+		"${project_path}/Inc/",
+		"${project_path}/Src/",
+		"${project_path}/Drivers/STM32L0xx_HAL_Driver/Inc",
+		"${project_path}/Drivers/STM32L0xx_HAL_Driver/Src",
+		"${project_path}/Drivers/CMSIS/Device/ST/STM32L0xx/Include",
+		"${project_path}/Drivers/CMSIS/Include",
+	],
+	"default_encoding" : "UTF-8",
+	"autocomplete_all" : "true",
+	"selectors" : [ ">","."],
+	"verbose" : "true",
+	"debug"   : "true",
+	"include_file_parent_folder" : "true",
+	"include_file_current_folder" : "true",
+	"exclude_system_folders" : "false",
+	"clang_binary" : "clang++",
+	"std_flag" : "-std=c99"
+}
+
+ColorSublime
+SublimeLinter-gcc
+gcc-arm-none-eabi-7-2017-q4-major-win32
+
+-DSTM32F10X_MD
+-DLLVM_TARGETS_TO_BUILD=ARM

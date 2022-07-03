@@ -1,0 +1,92 @@
+\hypertarget{group___start___manager}{}\section{start\+\_\+manager}
+\label{group___start___manager}\index{start\+\_\+manager@{start\+\_\+manager}}
+
+
+Motion Library -\/ Start Manager Start Manager.  
+
+
+\subsection*{Files}
+\begin{DoxyCompactItemize}
+\item 
+file \hyperlink{start__manager_8c}{start\+\_\+manager.\+c}
+\begin{DoxyCompactList}\small\item\em This handles all the callbacks when \hyperlink{group___m_p_l_ga0f2aa09b1e0db8f568bbfd94028fb246}{inv\+\_\+start\+\_\+mpl()} is called. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structinv__start__cb__t}{inv\+\_\+start\+\_\+cb\+\_\+t}
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___start___manager_ga2694369575038a51c80d63f0ea1e2d7c}{}typedef \hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t}($\ast$ {\bfseries inv\+\_\+start\+\_\+cb\+\_\+func}) ()\label{group___start___manager_ga2694369575038a51c80d63f0ea1e2d7c}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___start___manager_ga10102d9afab8730a0363ae42f23189ae}{inv\+\_\+init\+\_\+start\+\_\+manager} (void)
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___start___manager_gabe5a1073f6729f8b9c9298d88155f4f6}{inv\+\_\+unregister\+\_\+mpl\+\_\+start\+\_\+notification} (\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t}($\ast$start\+\_\+cb)(void))
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___start___manager_gabd4b991862c5333709f1093756dcea64}{inv\+\_\+register\+\_\+mpl\+\_\+start\+\_\+notification} (\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t}($\ast$start\+\_\+cb)(void))
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___start___manager_ga9534cb6d029d54e3194fb44bbb46dc7e}{inv\+\_\+execute\+\_\+mpl\+\_\+start\+\_\+notification} (void)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Motion Library -\/ Start Manager Start Manager. 
+
+
+
+\subsection{Function Documentation}
+\hypertarget{group___start___manager_ga9534cb6d029d54e3194fb44bbb46dc7e}{}\index{start\+\_\+manager@{start\+\_\+manager}!inv\+\_\+execute\+\_\+mpl\+\_\+start\+\_\+notification@{inv\+\_\+execute\+\_\+mpl\+\_\+start\+\_\+notification}}
+\index{inv\+\_\+execute\+\_\+mpl\+\_\+start\+\_\+notification@{inv\+\_\+execute\+\_\+mpl\+\_\+start\+\_\+notification}!start\+\_\+manager@{start\+\_\+manager}}
+\subsubsection[{inv\+\_\+execute\+\_\+mpl\+\_\+start\+\_\+notification}]{\setlength{\rightskip}{0pt plus 5cm}{\bf inv\+\_\+error\+\_\+t} inv\+\_\+execute\+\_\+mpl\+\_\+start\+\_\+notification (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{group___start___manager_ga9534cb6d029d54e3194fb44bbb46dc7e}
+Callback all the functions that want to be notified when \hyperlink{group___m_p_l_ga0f2aa09b1e0db8f568bbfd94028fb246}{inv\+\_\+start\+\_\+mpl()} was called. \begin{DoxyReturn}{Returns}
+Returns I\+N\+V\+\_\+\+S\+U\+C\+C\+E\+S\+S if successful or an error code if not. 
+\end{DoxyReturn}
+\hypertarget{group___start___manager_ga10102d9afab8730a0363ae42f23189ae}{}\index{start\+\_\+manager@{start\+\_\+manager}!inv\+\_\+init\+\_\+start\+\_\+manager@{inv\+\_\+init\+\_\+start\+\_\+manager}}
+\index{inv\+\_\+init\+\_\+start\+\_\+manager@{inv\+\_\+init\+\_\+start\+\_\+manager}!start\+\_\+manager@{start\+\_\+manager}}
+\subsubsection[{inv\+\_\+init\+\_\+start\+\_\+manager}]{\setlength{\rightskip}{0pt plus 5cm}{\bf inv\+\_\+error\+\_\+t} inv\+\_\+init\+\_\+start\+\_\+manager (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{group___start___manager_ga10102d9afab8730a0363ae42f23189ae}
+Initilize the start manager. Typically called by \hyperlink{group___m_p_l_ga0f2aa09b1e0db8f568bbfd94028fb246}{inv\+\_\+start\+\_\+mpl()}; \begin{DoxyReturn}{Returns}
+Returns I\+N\+V\+\_\+\+S\+U\+C\+C\+E\+S\+S if successful or an error code if not. 
+\end{DoxyReturn}
+\hypertarget{group___start___manager_gabd4b991862c5333709f1093756dcea64}{}\index{start\+\_\+manager@{start\+\_\+manager}!inv\+\_\+register\+\_\+mpl\+\_\+start\+\_\+notification@{inv\+\_\+register\+\_\+mpl\+\_\+start\+\_\+notification}}
+\index{inv\+\_\+register\+\_\+mpl\+\_\+start\+\_\+notification@{inv\+\_\+register\+\_\+mpl\+\_\+start\+\_\+notification}!start\+\_\+manager@{start\+\_\+manager}}
+\subsubsection[{inv\+\_\+register\+\_\+mpl\+\_\+start\+\_\+notification}]{\setlength{\rightskip}{0pt plus 5cm}{\bf inv\+\_\+error\+\_\+t} inv\+\_\+register\+\_\+mpl\+\_\+start\+\_\+notification (
+\begin{DoxyParamCaption}
+\item[{{\bf inv\+\_\+error\+\_\+t}($\ast$)(void)}]{start\+\_\+cb}
+\end{DoxyParamCaption}
+)}\label{group___start___manager_gabd4b991862c5333709f1093756dcea64}
+Register a callback to receive when \hyperlink{group___m_p_l_ga0f2aa09b1e0db8f568bbfd94028fb246}{inv\+\_\+start\+\_\+mpl()} is called. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em start\+\_\+cb} & Function callback that will be called when \hyperlink{group___m_p_l_ga0f2aa09b1e0db8f568bbfd94028fb246}{inv\+\_\+start\+\_\+mpl()} is called. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns I\+N\+V\+\_\+\+S\+U\+C\+C\+E\+S\+S if successful or an error code if not. 
+\end{DoxyReturn}
+\hypertarget{group___start___manager_gabe5a1073f6729f8b9c9298d88155f4f6}{}\index{start\+\_\+manager@{start\+\_\+manager}!inv\+\_\+unregister\+\_\+mpl\+\_\+start\+\_\+notification@{inv\+\_\+unregister\+\_\+mpl\+\_\+start\+\_\+notification}}
+\index{inv\+\_\+unregister\+\_\+mpl\+\_\+start\+\_\+notification@{inv\+\_\+unregister\+\_\+mpl\+\_\+start\+\_\+notification}!start\+\_\+manager@{start\+\_\+manager}}
+\subsubsection[{inv\+\_\+unregister\+\_\+mpl\+\_\+start\+\_\+notification}]{\setlength{\rightskip}{0pt plus 5cm}{\bf inv\+\_\+error\+\_\+t} inv\+\_\+unregister\+\_\+mpl\+\_\+start\+\_\+notification (
+\begin{DoxyParamCaption}
+\item[{{\bf inv\+\_\+error\+\_\+t}($\ast$)(void)}]{start\+\_\+cb}
+\end{DoxyParamCaption}
+)}\label{group___start___manager_gabe5a1073f6729f8b9c9298d88155f4f6}
+Removes a callback from start notification 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em start\+\_\+cb} & function to remove from start notification \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns I\+N\+V\+\_\+\+S\+U\+C\+C\+E\+S\+S if successful or an error code if not. 
+\end{DoxyReturn}

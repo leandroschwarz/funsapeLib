@@ -1,0 +1,117 @@
+Desenvolvimento ARM
+
+Procedimento:
+
+1 - Sublime Text Settings
+{
+	"always_show_minimap_viewport": true,
+	"auto_complete_cycle": true,
+	"auto_complete_with_fields": true,
+	"bold_folder_labels": true,
+	"color_scheme": "Packages/Color Scheme - Default/Celeste.sublime-color-scheme",
+	"detect_indentation": false,
+	"draw_indent_guides": true,
+	"draw_minimap_border": true,
+	"draw_white_space": "all",
+	"ensure_newline_at_eof_on_save": true,
+	"fade_fold_buttons": false,
+	"font_size": 13,
+	"highlight_line": true,
+	"highlight_modified_tabs": true,
+	"ignored_packages":
+	[
+		"Vintage"
+	],
+	"indent_guide_options":
+	[
+		"draw_normal",
+		"draw_active"
+	],
+	"indent_to_bracket": true,
+	"margin": 0,
+	"match_brackets_angle": true,
+	"move_to_limit_on_up_down": true,
+	"remember_full_screen": true,
+	"rulers":
+	[
+		40,
+		50,
+		60,
+		70,
+		80
+	],
+	"shift_tab_unindent": true,
+	"show_encoding": true,
+	"show_line_endings": true,
+	"spell_check": true,
+	"theme": "Adaptive.sublime-theme",
+	"trim_automatic_white_space": true,
+	"trim_trailing_white_space_on_save": true
+}
+
+2 - Instalar Pacote Package Control
+
+3 - Instalar o software Microsoft Visual C++ 2010 SP1 Redistributable Package (x64)
+
+3 - Instalar Pacote SublimeAStyleFormatter
+
+
+3 - Instalar Pacote SublimeLinter
+// SublimeLinter Settings - User
+{
+	"debug": true,
+	"no_column_highlights_line": true,
+	"statusbar.counters_template": "(W:{}|E:{})",
+	"linters": {
+		"gcc": {
+			"disable": true,
+		},
+		"clang" : {
+			"disable": true,
+		}
+	}
+}
+
+4 - Instalar Software LLVM-6.0.0-win64 e configurar PATH
+
+5 - Instalar Pacote EasyClangComplete
+// EasyClangComplete Settings - User
+{
+	"hide_default_completions": true,
+	"progress_style": "ColorSublime"
+}
+
+6 -Instalar pacote ColorSublime
+	-> Instalar tema Brogrammer
+
+7 - Criar um arquivo na raiz do projeto com nome ".clang_complete"
+-IC:/Program Files (x86)/GNU Tools ARM Embedded/7 2017-q4-major/arm-none-eabi/include
+-IDrivers/CMSIS/Device/ST/STM32L0xx/Include
+-IDrivers/CMSIS/Include
+-IDrivers/STM32L0xx_HAL_Driver/Inc
+-IInc
+-DSTM32L053xx
+-D__GNUC__
+-D__riscv
+
+8 - Arquivo de Projeto
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	]
+}
+
+9 - Copiar aquivo make.exe e configurar PATH
+
+10 - Editar makefile
+
+11 - Copiar arquivo STM32L053R8Tx_FLASH.ld
+
+12 - Copiar arquivo make_program.py para %APPDATA%\Sublime Text 3\Packages\User
+
+13 - Key Bindings
+[
+	{ "keys": ["f8"], "command": "make_program" }
+]

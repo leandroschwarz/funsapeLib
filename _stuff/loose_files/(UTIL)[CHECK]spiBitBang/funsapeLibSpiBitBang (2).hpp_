@@ -1,0 +1,232 @@
+/* =============================================================================
+ * Project:			FunSAPE++ Embedded Library
+ * File name:		funsapeLibSpiBitBang.hpp
+ * Module:			SPI Bit Bang Interface for FunSAPE++ Embedded Library
+ *					project
+ * Authors:			__AUTHORS_TO_REPLACE__
+ * Build:			__BUILD_TO_REPLACE__
+ * Last edition:	__DATE_TO_REPLACE__
+ * ========================================================================== */
+
+// =============================================================================
+// Include guard
+// =============================================================================
+
+#ifndef __FUNSAPE_LIB_SPI_BIT_BANG_HPP
+#define __FUNSAPE_LIB_SPI_BIT_BANG_HPP			__BUILD_TO_REPLACE__
+
+// =============================================================================
+// Dependencies
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Global definitions file -----------------------------------------------------
+
+#include "../funsapeLibGlobalDefines.hpp"
+#ifndef __FUNSAPE_LIB_GLOBAL_DEFINES_HPP
+#	error	[funsapeLibSpiBitBang.hpp] Error 9 - Global definitions file (funsapeLibGlobalDefines.hpp) is missing or corrupted!
+#elif __FUNSAPE_LIB_GLOBAL_DEFINES_HPP != __BUILD_TO_REPLACE__
+#	error	[funsapeLibSpiBitBang.hpp] Error 10 - Build mismatch between (funsapeLibSpiBitBang.hpp) and global definitions file (funsapeLibGlobalDefines.hpp)!
+#endif
+
+// -----------------------------------------------------------------------------
+// Header files - FunSAPE Library header files ---------------------------------
+
+#include "funsapeLibDebug.hpp"
+#ifndef __FUNSAPE_LIB_DEBUG_HPP
+#	error	[funsapeLibSpiBitBang.hpp] Error 1 - Header file (funsapeLibDebug.hpp) is missing or corrupted!
+#elif __FUNSAPE_LIB_DEBUG_HPP != __BUILD_TO_REPLACE__
+#	error	[funsapeLibSpiBitBang.hpp] Error 2 - Build mismatch between (funsapeLibSpiBitBang.hpp) and (funsapeLibDebug.hpp) header files!
+#endif
+
+#include "funsapeLibHandler.hpp"
+#ifndef __FUNSAPE_LIB_HANDLER_HPP
+#	error	[funsapeLibSpiBitBang.hpp] Error 1 - Header file (funsapeLibHandler.hpp) is missing or corrupted!
+#elif __FUNSAPE_LIB_HANDLER_HPP != __BUILD_TO_REPLACE__
+#	error	[funsapeLibSpiBitBang.hpp] Error 2 - Build mismatch between (funsapeLibSpiBitBang.hpp) and (funsapeLibDebug.hpp) header files!
+#endif
+
+// =============================================================================
+// Undefining previous definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Constant definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Macro-function definitions
+// *INDENT-OFF*
+// =============================================================================
+
+// NONE
+
+// *INDENT-ON*
+
+// =============================================================================
+// New data types
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Extern global variables
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Gpio - Class declaration
+// =============================================================================
+
+class SpiBitBang : public Handler
+{
+	// -------------------------------------------------------------------------
+	// New data types
+	// -------------------------------------------------------------------------
+
+public:
+	// NONE
+
+private:
+	// NONE
+
+protected:
+	// NONE
+
+	// -------------------------------------------------------------------------
+	// Operators overloading
+	// -------------------------------------------------------------------------
+
+public:
+	// NONE
+
+private:
+	// NONE
+
+protected:
+	// NONE
+
+	// -------------------------------------------------------------------------
+	// Constructors
+	// -------------------------------------------------------------------------
+
+public:
+	SpiBitBang(void);
+	~SpiBitBang(void);
+
+// -------------------------------------------------------------------------
+// Methods - Inherited methods
+// -------------------------------------------------------------------------
+
+public:
+	bool sendData(uint8_t *buffData, uint16_t buffSize = 1);
+	bool sendData(uint8_t *txBuffData, uint8_t *rxBuffData, uint16_t buffSize = 1);
+	bool setDevice(void (* actFunc)(void), void (* deactFunc)(void));
+	bool sendData(uint8_t reg, uint8_t *txBuffData, uint8_t *rxBuffData, uint16_t buffSize = 1);
+	bool sendData(uint8_t reg, uint8_t *buffData, uint16_t buffSize = 1);
+	Handler::handlerType_e getHandlerType(void);
+
+
+
+// NONE
+
+protected:
+// NONE
+
+// -------------------------------------------------------------------------
+// Methods - Class own methods
+// -------------------------------------------------------------------------
+
+public:
+	bool addPin(pinsMask_e pinsMask_p);
+	bool removePin(pinsMask_e pinsMask_p);
+	bool setMode(PinMode pinMode_p);
+
+#if defined(_FUNSAPE_PLATFORM_ARM_STM32)
+	bool setDriverMode(DriverMode driverMode_p);
+	bool setSpeed(PinSpeed pinSpeed_p);
+#endif
+	void set(void);
+	void reset(void);
+	void toggle(void);
+	ioPin_t read(void);
+	void write(ioPin_t value_p);
+
+private:
+// NONE
+
+protected:
+// NONE
+
+// -------------------------------------------------------------------------
+// Properties
+// -------------------------------------------------------------------------
+
+public:
+// NONE
+
+private:
+#if defined(_FUNSAPE_PLATFORM_AVR)
+	allGpioControl_s					 *_instance;
+#elif defined(_FUNSAPE_PLATFORM_ARM_STM32)
+	void								*_instance;
+#endif
+	bool								_initialized;
+	ioPin_t								_pinsMask;
+	Error								_lastError;
+
+protected:
+// NONE
+
+}; // class Gpio
+
+// =============================================================================
+// Gpio - Class overloading operators
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Global variables
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Externally defined global variables -----------------------------------------
+
+// NONE
+
+// -----------------------------------------------------------------------------
+// Internally defined global variables -----------------------------------------
+
+// NONE
+
+// =============================================================================
+// Gpio - Class inline function definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// General public functions declarations
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// General inline functions definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// External default objects
+// =============================================================================
+
+// NONE
+
+#endif // __FUNSAPE_LIB_SPI_BIT_BANG_HPP

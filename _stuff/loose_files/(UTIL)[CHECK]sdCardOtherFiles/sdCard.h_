@@ -1,0 +1,456 @@
+/* =============================================================================
+ * Project:		GPSDE++ ARM Library
+ * File name:	sdCard.h
+ * Module:		SD Card interface module for GPDSE++ ARM Library project
+ * Author:		Leandro Schwarz
+ * Build:		__BUILD_MACRO_TO_BE_CHANGED__
+ * Date:		__DATE_MACRO_TO_BE_CHANGED__
+ * ========================================================================== */
+
+// =============================================================================
+// Copyright disclaimer
+//
+// The code was modified from ChaN. The disclaimer below was witten in the
+// original files.
+// =============================================================================
+
+/*----------------------------------------------------------------------------/
+/  FatFs - Generic FAT Filesystem module  R0.13a                              /
+/-----------------------------------------------------------------------------/
+/
+/ Copyright (C) 2017, ChaN, all right reserved.
+/
+/ FatFs module is an open source software. Redistribution and use of FatFs in
+/ source and binary forms, with or without modification, are permitted provided
+/ that the following condition is met:
+
+/ 1. Redistributions of source code must retain the above copyright notice,
+/    this condition and the following disclaimer.
+/
+/ This software is provided by the copyright holder and contributors "AS IS"
+/ and any warranties related to this software are DISCLAIMED.
+/ The copyright owner or contributors be NOT LIABLE for any damages caused
+/ by use of this software.
+/
+/----------------------------------------------------------------------------*/
+
+// =============================================================================
+// File build
+// =============================================================================
+
+#ifndef __SD_CARD_H
+#define __SD_CARD_H								__BUILD_MACRO_TO_BE_CHANGED__
+
+// =============================================================================
+// System file dependencies
+// =============================================================================
+
+#include "..\gpdseArmGlobalDefines.h"
+#if __GPDSE_ARM_GLOBAL_DEFINES_H != __BUILD_MACRO_TO_BE_CHANGED__
+#	error	Global definitions file (gpdseArmGlobalDefines) must be build __BUILD_MACRO_TO_BE_CHANGED__.
+#endif
+#include "..\gpdseArmSpi.h"
+#if __GPDSE_ARM_SPI_H != __BUILD_MACRO_TO_BE_CHANGED__
+#	error	SPI interface module file (gpdseArmSpi) must be build __BUILD_MACRO_TO_BE_CHANGED__.
+#endif
+
+#include "ffconf.h"		// FatFs configuration options
+#if __FF_CONF_H != __BUILD_MACRO_TO_BE_CHANGED__
+#error Wrong configuration file (ffconf.h).
+#endif
+
+// =============================================================================
+// Undefining previous definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Constants
+// =============================================================================
+
+#define DRV_MMC 0
+#define _USE_WRITE	1	// 1: Enable disk_write function
+#define _USE_IOCTL	1	// 1: Enable disk_ioctl fucntion
+#define _USE_ISDIO	1	// 1: Enable iSDIO controls via disk_ioctl
+
+// Disk Status Bits (DSTATUS)
+#define STA_NOINIT		0x01	// Drive not initialized
+#define STA_NODISK		0x02	// No medium in the drive
+#define STA_PROTECT		0x04	// Write protected
+
+// Command code for disk_ioctrl fucntion
+
+// Generic command (Used by FatFs)
+#define CTRL_SYNC			0	// Complete pending write process (needed at _FS_READONLY == 0)
+#define GET_SECTOR_COUNT	1	// Get media size (needed at _USE_MKFS == 1)
+#define GET_SECTOR_SIZE		2	// Get sector size (needed at _MAX_SS != _MIN_SS)
+#define GET_BLOCK_SIZE		3	// Get erase block size (needed at _USE_MKFS == 1)
+#define CTRL_TRIM			4	// Inform device that the data on the block of sectors is no longer used (needed at _USE_TRIM == 1)
+
+// Generic command (Not used by FatFs)
+#define CTRL_FORMAT			5	// Create physical format on the media
+#define CTRL_POWER_IDLE		6	// Put the device idle state
+#define CTRL_POWER_OFF		7	// Put the device off state
+#define CTRL_LOCK			8	// Lock media removal
+#define CTRL_UNLOCK			9	// Unlock media removal
+#define CTRL_EJECT			10	// Eject media
+#define CTRL_GET_SMART		11	// Read SMART information
+
+// MMC/SDC specific command (Not used by FatFs)
+#define MMC_GET_TYPE		50	// Get card type
+#define MMC_GET_CSD			51	// Read CSD
+#define MMC_GET_CID			52	// Read CID
+#define MMC_GET_OCR			53	// Read OCR
+#define MMC_GET_SDSTAT		54	// Read SD status
+#define ISDIO_READ			55	// Read data form SD iSDIO register
+#define ISDIO_WRITE			56	// Write data to SD iSDIO register
+#define ISDIO_MRITE			57	// Masked write data to SD iSDIO register
+
+// ATA/CF specific command (Not used by FatFs)
+#define ATA_GET_REV			60	// Get F/W revision
+#define ATA_GET_MODEL		61	// Get model name
+#define ATA_GET_SN			62	// Get serial number
+
+// MMC card type flags (MMC_GET_TYPE)
+#define CT_MMC		0x01		// MMC ver 3
+#define CT_SD1		0x02		// SD ver 1
+#define CT_SD2		0x04		// SD ver 2
+#define CT_SDC		(CT_SD1|CT_SD2)	// SD
+#define CT_BLOCK	0x08		// Block addressing
+
+//--------------------------------------------------------------
+// Flags and offset address
+
+// File access mode and open method flags (3rd argument of f_open)
+#define	FA_READ				0x01
+#define	FA_WRITE			0x02
+#define	FA_OPEN_EXISTING	0x00
+#define	FA_CREATE_NEW		0x04
+#define	FA_CREATE_ALWAYS	0x08
+#define	FA_OPEN_ALWAYS		0x10
+#define	FA_OPEN_APPEND		0x30
+
+// Fast seek controls (2nd argument of f_lseek)
+#define CREATE_LINKMAP	((FSIZE_t)0 - 1)
+
+// Format options (2nd argument of f_mkfs)
+#define FM_FAT		0x01
+#define FM_FAT32	0x02
+#define FM_EXFAT	0x04
+#define FM_ANY		0x07
+#define FM_SFD		0x08
+
+// Filesystem type (FATFS.fs_type)
+#define FS_FAT12	1
+#define FS_FAT16	2
+#define FS_FAT32	3
+#define FS_EXFAT	4
+
+// File attribute bits for directory entry (FILINFO.fattrib)
+#define	AM_RDO	0x01	// Read only
+#define	AM_HID	0x02	// Hidden
+#define	AM_SYS	0x04	// System
+#define AM_DIR	0x10	// Directory
+#define AM_ARC	0x20	// Archive
+
+#ifndef EOF
+#	define EOF (-1)
+#endif
+
+// =============================================================================
+// Macro-functions
+// =============================================================================
+
+// Type of path name strings on FatFs API
+
+#ifndef _INC_TCHAR
+#	define _INC_TCHAR
+#	if FF_USE_LFN && FF_LFN_UNICODE == 1 	// Unicode in UTF-16 encoding
+typedef uint16_t TCHAR;
+#		define _T(x) L ## x
+#		define _TEXT(x) L ## x
+#	elif FF_USE_LFN && FF_LFN_UNICODE == 2	// Unicode in UTF-8 encoding
+typedef char TCHAR;
+#		define _T(x) u8 ## x
+#		define _TEXT(x) u8 ## x
+#	elif FF_USE_LFN && (FF_LFN_UNICODE < 0 || FF_LFN_UNICODE > 2)
+#		error Wrong FF_LFN_UNICODE setting
+#	else									// ANSI/OEM code in SBCS/DBCS
+typedef char TCHAR;
+#		define _T(x) x
+#		define _TEXT(x) x
+#	endif
+#endif
+
+#define f_eof(fp) ((int)((fp)->fptr == (fp)->obj.objsize))
+#define f_error(fp) ((fp)->err)
+#define f_tell(fp) ((fp)->fptr)
+#define f_size(fp) ((fp)->obj.objsize)
+#define f_rewind(fp) f_lseek((fp), 0)
+#define f_rewinddir(dp) f_readdir((dp), 0)
+#define f_rmdir(path) f_unlink(path)
+#define f_unmount(path) f_mount(0, path, 0)
+
+// =============================================================================
+// New data types
+// =============================================================================
+
+typedef int32_t		INT_T;				// 16-bit (AVR) or 32-bit (ARM)
+typedef uint32_t	UINT_T;				// 16-bit (AVR) or 32-bit (ARM)
+
+// Status of Disk Functions
+typedef uint8_t	DSTATUS;
+
+// Results of Disk Functions
+typedef enum DRESULT {
+	RES_OK = 0,		// 0: Successful
+	RES_ERROR,		// 1: R/W Error
+	RES_WRPRT,		// 2: Write Protected
+	RES_NOTRDY,		// 3: Not Ready
+	RES_PARERR		// 4: Invalid Parameter
+} DRESULT;
+
+// Command structure for iSDIO ioctl command
+typedef struct {
+	uint8_t	func;	// Function number: 0..7
+	uint16_t	ndata;	// Number of bytes to transfer: 1..512, or mask + data
+	uint32_t	addr;	// Register address: 0..0x1FFFF
+	void	*data;	// Pointer to the data (to be written | read buffer)
+} SDIO_CTRL;
+
+// Definitions of volume management
+
+#if FF_MULTI_PARTITION		// Multiple partition configuration
+typedef struct {
+	uint8_t pd;	// Physical drive number
+	uint8_t pt;	// Partition: 0:Auto detect, 1-4:Forced partition)
+} PARTITION;
+#endif
+
+// Type of file size variables
+
+#if FF_FS_EXFAT
+typedef uint64_t FSIZE_t;
+#else
+typedef uint32_t FSIZE_t;
+#endif
+
+
+// Object ID and allocation information (FFOBJID)
+
+typedef struct {
+	FATFS		*fs;				// Pointer to the hosting volume of this object
+	uint16_t	id;				// Hosting volume mount ID
+	uint8_t		attr;			// Object attribute
+	uint8_t		stat;			// Object chain status (b1-0: =0:not contiguous, =2:contiguous, =3:flagmented in this session, b2:sub-directory stretched)
+	uint32_t	sclust;			// Object data start cluster (0:no cluster or root directory)
+	FSIZE_t		objsize;		// Object size (valid when sclust != 0)
+#if FF_FS_EXFAT
+	uint32_t	n_cont;			// Size of first fragment - 1 (valid when stat == 3)
+	uint32_t	n_frag;			// Size of last fragment needs to be written to FAT (valid when not zero)
+	uint32_t	c_scl;			// Containing directory start cluster (valid when sclust != 0)
+	uint32_t	c_size;			// b31-b8:Size of containing directory, b7-b0: Chain status (valid when c_scl != 0)
+	uint32_t	c_ofs;			// Offset in the containing directory (valid when file object and sclust != 0)
+#endif
+#if FF_FS_LOCK
+	UINT32_T		lockid;			// File lock ID origin from 1 (index of file semaphore table Files[])
+#endif
+} FFOBJID;
+
+// File object structure (FIL)
+
+typedef struct {
+	FFOBJID	obj;			// Object identifier (must be the 1st member to detect invalid object pointer)
+	uint8_t	flag;			// File status flags
+	uint8_t	err;			// Abort flag (error code)
+	FSIZE_t	fptr;			// File read/write pointer (Zeroed on file open)
+	uint32_t	clust;			// Current cluster of fpter (invalid when fptr is 0)
+	uint32_t	sect;			// Sector number appearing in buf[] (0:invalid)
+#if !FF_FS_READONLY
+	uint32_t	dir_sect;		// Sector number containing the directory entry (not used at exFAT)
+	uint8_t	*dir_ptr;		// Pointer to the directory entry in the win[] (not used at exFAT)
+#endif
+#if FF_USE_FASTSEEK
+	uint32_t	*cltbl;			// Pointer to the cluster link map table (nulled on open, set by application)
+#endif
+#if !FF_FS_TINY
+	uint8_t	buf[FF_MAX_SS];	// File private data read/write window
+#endif
+} FIL;
+
+// Directory object structure (DIR)
+
+typedef struct {
+	FFOBJID	obj;			// Object identifier
+	uint32_t	dptr;			// Current read/write offset
+	uint32_t	clust;			// Current cluster
+	uint32_t	sect;			// Current sector (0:Read operation has terminated)
+	uint8_t	*dir;			// Pointer to the directory item in the win[]
+	uint8_t	fn[12];			// SFN (in/out) {body[8],ext[3],status[1]}
+#if FF_USE_LFN
+	uint32_t	blk_ofs;		// Offset of current entry block being processed (0xFFFFFFFF:Invalid)
+#endif
+#if FF_USE_FIND
+	const TCHAR *pat;		// Pointer to the name matching pattern
+#endif
+} DIR;
+
+// File information structure (FILINFO)
+
+typedef struct {
+	FSIZE_t	fsize;			// File size
+	uint16_t	fdate;			// Modified date
+	uint16_t	ftime;			// Modified time
+	uint8_t	fattrib;		// File attribute
+#if FF_USE_LFN
+	TCHAR	altname[FF_SFN_BUF + 1];// Altenative file name
+	TCHAR	fname[FF_LFN_BUF + 1];	// Primary file name
+#else
+	TCHAR	fname[12 + 1];	// File name
+#endif
+} FILINFO;
+
+// =============================================================================
+// Function Declarations
+// =============================================================================
+
+DSTATUS disk_initialize (uint8_t pdrv);
+DSTATUS disk_status (uint8_t pdrv);
+DRESULT disk_read (uint8_t pdrv, uint8_t *buff, uint32_t sector, UINT32_T count);
+DRESULT disk_write (uint8_t pdrv, const uint8_t *buff, uint32_t sector, UINT32_T count);
+DRESULT disk_ioctl (uint8_t pdrv, uint8_t cmd, void *buff);
+void disk_timerproc (void);
+
+//--------------------------------------------------------------
+// FatFs module application interface
+
+// FILE
+FRESULT f_open (FIL *fp, const TCHAR *path, uint8_t mode);				// Open or create a file
+FRESULT f_close (FIL *fp);											// Close an open file object
+FRESULT f_read (FIL *fp, void *buff, UINT32_T btr, UINT32_T *br);			// Read data from the file
+FRESULT f_write (FIL *fp, const void *buff, UINT32_T btw, UINT32_T *bw);	// Write data to the file
+FRESULT f_lseek (FIL *fp, FSIZE_t ofs);								// Move file pointer of the file object
+FRESULT f_truncate (FIL *fp);										// Truncate the file
+FRESULT f_sync (FIL *fp);											// Flush cached data of the writing file
+FRESULT f_forward (FIL *fp, UINT32_T(*func)(const uint8_t *, UINT32_T), UINT32_T btf, UINT32_T *bf);	// Forward data to the stream
+FRESULT f_expand (FIL *fp, FSIZE_t szf, uint8_t opt);					// Allocate a contiguous block to the file
+int f_putc (TCHAR c, FIL *fp);										// Put a character to the file
+int f_puts (const TCHAR *str, FIL *cp);								// Put a string to the file
+int f_printf (FIL *fp, const TCHAR *str, ...);						// Put a formatted string to the file
+TCHAR *f_gets (TCHAR *buff, int len, FIL *fp);						// Get a string from the file
+
+// DIRECTORY
+FRESULT f_opendir (DIR *dp, const TCHAR *path);						// Open a directory
+FRESULT f_closedir (DIR *dp);										// Close an open directory
+FRESULT f_readdir (DIR *dp, FILINFO *fno);							// Read a directory item
+FRESULT f_findfirst (DIR *dp, FILINFO *fno, const TCHAR *path, const TCHAR *pattern);	// Find first file
+FRESULT f_findnext (DIR *dp, FILINFO *fno);							// Find next file
+
+//--------------------------------------------------------------
+// Additional user defined functions
+
+// RTC function
+#if !FF_FS_READONLY && !FF_FS_NORTC
+uint32_t get_fattime (void);
+#endif
+
+// LFN support functions
+#if FF_USE_LFN >= 1						// Code conversion (defined in unicode.c)
+uint16_t ff_oem2uni (uint16_t oem, uint16_t cp);	// OEM code to Unicode conversion
+uint16_t ff_uni2oem (uint32_t uni, uint16_t cp);	// Unicode to OEM code conversion
+uint32_t ff_wtoupper (uint32_t uni);			// Unicode upper-case conversion
+#endif
+#if FF_USE_LFN == 3						// Dynamic memory allocation
+void *ff_memalloc (UINT32_T msize);			// Allocate memory block
+void ff_memfree (void *mblock);			// Free memory block
+#endif
+
+// Sync functions
+#if FF_FS_REENTRANT
+int ff_cre_syncobj (uint8_t vol, FF_SYNC_t *sobj);	// Create a sync object
+int ff_req_grant (FF_SYNC_t sobj);		// Lock sync object
+void ff_rel_grant (FF_SYNC_t sobj);		// Unlock sync object
+int ff_del_syncobj (FF_SYNC_t sobj);	// Delete a sync object
+#endif
+
+// =============================================================================
+// SdCard - Class declaration
+// =============================================================================
+
+class SdCard
+{
+	// New data types
+public:
+
+	// Constructors
+public:
+	SdCard(void);
+	~SdCard(void);						// ToDo
+
+	// Methods
+public:
+	// -------------------------------------------------------------------------
+	// Interface
+	// -------------------------------------------------------------------------
+	bool init(				Spi *spiHndlr,
+							void (*actDevFunc)(void),
+							void (*deactDevFunc)(void));
+	error_e getLastError(	void);
+
+private:
+	// Low level communication
+	bool readFromDevice_(uint8_t reg, uint8_t *buffer, uint8_t size);
+	bool writeAtDevice_(uint8_t reg, uint8_t *buffer, uint8_t size);	// To Do
+
+	unsigned char mmc_disk_initialize (void);
+	unsigned char mmc_disk_status (void);
+	DRESULT mmc_disk_read (uint8_t *buff, uint32_t sector, UINT32_T count);
+	DRESULT mmc_disk_write (const uint8_t *buff, uint32_t sector, UINT32_T count);
+	DRESULT mmc_disk_ioctl (uint8_t cmd, void *buff);
+	void mmc_disk_timerproc (void);
+
+protected:
+
+	// Data members
+public:
+
+private:
+	// Interface
+	error_e		lastError_;
+	bool		initialized_					: 1;
+	Spi			*spiHandler_;
+	void		(*activateDevice_)(void);
+	void		(*deactivateDevice_)(void);
+
+protected:
+
+}; // class Mpu9250
+
+// =============================================================================
+// Mpu9250 - Class inline function definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Extern global variables
+// =============================================================================
+
+#if FF_MULTI_PARTITION		// Multiple partition configuration
+extern PARTITION VolToPart[];	// Volume - Partition resolution table
+#endif
+
+// =============================================================================
+// General public functions declarations
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// General inline functions definitions
+// =============================================================================
+
+// NONE
+
+#endif // __SD_CARD_H

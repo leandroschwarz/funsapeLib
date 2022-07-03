@@ -1,0 +1,72 @@
+
+
+#define F_CPU 16000000UL
+
+
+#include <avr/io,h>
+#include <avr/pgmspace,h>
+#include "T6963C,h"
+#include "graphic,h"
+#include "x,h"
+
+#include "global_defines,h"
+#include "ATmega328,h"
+
+int main(void)
+{
+	uint8 i, j, byte;
+
+	usartDisableReceiver();
+	usartDisableTransmitter();
+
+	GLCD_Initalize(); // Initalize LCD
+	GLCD_ClearText(); // Clear text area
+	GLCD_ClearCG(); // Clear character generator area
+	GLCD_ClearGraphic(); // Clear graphic area
+
+	GLCD_Rectangle(0,0,240, 128); // draw rectangle
+	GLCD_Rectangle(2,2,236, 124); // draw rectangle
+	GLCD_Rectangle(4,4,232, 120); // draw rectangle
+
+
+
+	GLCD_Circle(32,32,20); // draw circle
+	GLCD_Circle(80,80,20); // draw circle
+	GLCD_Circle(100,80,20); // draw circle
+
+
+
+
+	GLCD_TextGoTo(1,1);// set text coordinates
+	GLCD_WriteString("Teste do display grafico!"); // write text
+	GLCD_TextGoTo(5,2);// set text coordinates
+	GLCD_WriteString("240 x 128 pixels"); // write text
+	GLCD_TextGoTo(1,4);// set text coordinates
+	GLCD_WriteString("Chupa Melecatronica!!!!!!"); // write text
+/*
+	for(i = 0;i < 128;i++){
+		for(j = 0;j < 30;j++){
+			if(i % 2 == 0){
+				byte = 0x00;
+			}else{
+				byte = 0xFF;
+			}
+			byte = pgm_read_byte(&img[(i * 30) + j]);
+			GLCD_SetPixel((j * 8) + 0, i, isBitSet(byte, 0));
+			GLCD_SetPixel((j * 8) + 1, i, isBitSet(byte, 1));
+			GLCD_SetPixel((j * 8) + 2, i, isBitSet(byte, 2));
+			GLCD_SetPixel((j * 8) + 3, i, isBitSet(byte, 3));
+			GLCD_SetPixel((j * 8) + 4, i, isBitSet(byte, 4));
+			GLCD_SetPixel((j * 8) + 5, i, isBitSet(byte, 5));
+			GLCD_SetPixel((j * 8) + 6, i, isBitSet(byte, 6));
+			GLCD_SetPixel((j * 8) + 7, i, isBitSet(byte, 7));
+		}
+	}
+
+*/
+
+
+
+	while(1);
+	return 0;
+}

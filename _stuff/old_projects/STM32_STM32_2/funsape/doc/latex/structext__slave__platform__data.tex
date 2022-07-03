@@ -1,0 +1,45 @@
+\hypertarget{structext__slave__platform__data}{}\section{ext\+\_\+slave\+\_\+platform\+\_\+data Struct Reference}
+\label{structext__slave__platform__data}\index{ext\+\_\+slave\+\_\+platform\+\_\+data@{ext\+\_\+slave\+\_\+platform\+\_\+data}}
+
+
+{\ttfamily \#include $<$mpu.\+h$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{structext__slave__platform__data_ae97bdc131ca5e2fd43883fe2ab8e6d25}{}\+\_\+\+\_\+u8 {\bfseries type}\label{structext__slave__platform__data_ae97bdc131ca5e2fd43883fe2ab8e6d25}
+
+\item 
+\hypertarget{structext__slave__platform__data_a3960465c7b482ff2cd34dbaa4a5d7cd2}{}\+\_\+\+\_\+u32 {\bfseries irq}\label{structext__slave__platform__data_a3960465c7b482ff2cd34dbaa4a5d7cd2}
+
+\item 
+\hypertarget{structext__slave__platform__data_ae8472a19e4a52547452221ec9ee150d9}{}\+\_\+\+\_\+u32 {\bfseries adapt\+\_\+num}\label{structext__slave__platform__data_ae8472a19e4a52547452221ec9ee150d9}
+
+\item 
+\hypertarget{structext__slave__platform__data_ad46c6ff0e38423eb7978fa246f1df73b}{}\+\_\+\+\_\+s32 {\bfseries bus}\label{structext__slave__platform__data_ad46c6ff0e38423eb7978fa246f1df73b}
+
+\item 
+\hypertarget{structext__slave__platform__data_adec33339625ad04895ed40adc9b2e29f}{}\+\_\+\+\_\+u8 {\bfseries address}\label{structext__slave__platform__data_adec33339625ad04895ed40adc9b2e29f}
+
+\item 
+\hypertarget{structext__slave__platform__data_afbb7e10273c4112acf679b39a9540c09}{}\+\_\+\+\_\+s8 {\bfseries orientation} \mbox{[}9\mbox{]}\label{structext__slave__platform__data_afbb7e10273c4112acf679b39a9540c09}
+
+\item 
+\hypertarget{structext__slave__platform__data_a1538553d11f1d479cea0fd3732672d33}{}void $\ast$ {\bfseries irq\+\_\+data}\label{structext__slave__platform__data_a1538553d11f1d479cea0fd3732672d33}
+
+\item 
+\hypertarget{structext__slave__platform__data_a11274e2e7a28f7652f0e95d7b53d94f9}{}void $\ast$ {\bfseries private\+\_\+data}\label{structext__slave__platform__data_a11274e2e7a28f7652f0e95d7b53d94f9}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+struct \hyperlink{structext__slave__platform__data}{ext\+\_\+slave\+\_\+platform\+\_\+data} -\/ Platform data for mpu3050 and mpu6050 slave devices
+
+\+: the type of slave device based on the enum ext\+\_\+slave\+\_\+type definitions. \+: the irq number attached to the slave if any. \+: the I2\+C adapter number. \+: the bus the slave is attached to\+: enum ext\+\_\+slave\+\_\+bus \+: the I2\+C slave address of the slave device. \+: the mounting matrix of the device relative to M\+P\+U. \+: private data for the slave irq handler \+: additional data, user customizable. Not touched by the M\+P\+U driver.
+
+The orientation matricies are 3x3 rotation matricies that are applied to the data to rotate from the mounting orientation to the platform orientation. The values must be one of 0, 1, or -\/1 and each row and column should have exactly 1 non-\/zero value. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\+\_\+hide/\+M\+P\+U/core/driver/include/mpu.\+h\end{DoxyCompactItemize}

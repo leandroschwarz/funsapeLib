@@ -1,0 +1,37 @@
+\hypertarget{start__manager_8c}{}\section{\+\_\+hide/\+M\+P\+U/core/mllite/start\+\_\+manager.c File Reference}
+\label{start__manager_8c}\index{\+\_\+hide/\+M\+P\+U/core/mllite/start\+\_\+manager.\+c@{\+\_\+hide/\+M\+P\+U/core/mllite/start\+\_\+manager.\+c}}
+
+
+This handles all the callbacks when \hyperlink{group___m_p_l_ga0f2aa09b1e0db8f568bbfd94028fb246}{inv\+\_\+start\+\_\+mpl()} is called.  
+
+
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}log.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}start\+\_\+manager.\+h\char`\"{}}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structinv__start__cb__t}{inv\+\_\+start\+\_\+cb\+\_\+t}
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___start___manager_ga2694369575038a51c80d63f0ea1e2d7c}{}typedef \hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t}($\ast$ {\bfseries inv\+\_\+start\+\_\+cb\+\_\+func}) ()\label{group___start___manager_ga2694369575038a51c80d63f0ea1e2d7c}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___start___manager_ga10102d9afab8730a0363ae42f23189ae}{inv\+\_\+init\+\_\+start\+\_\+manager} (void)
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___start___manager_gabe5a1073f6729f8b9c9298d88155f4f6}{inv\+\_\+unregister\+\_\+mpl\+\_\+start\+\_\+notification} (\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t}($\ast$start\+\_\+cb)(void))
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___start___manager_gabd4b991862c5333709f1093756dcea64}{inv\+\_\+register\+\_\+mpl\+\_\+start\+\_\+notification} (\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t}($\ast$start\+\_\+cb)(void))
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___start___manager_ga9534cb6d029d54e3194fb44bbb46dc7e}{inv\+\_\+execute\+\_\+mpl\+\_\+start\+\_\+notification} (void)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This handles all the callbacks when \hyperlink{group___m_p_l_ga0f2aa09b1e0db8f568bbfd94028fb246}{inv\+\_\+start\+\_\+mpl()} is called. 
+

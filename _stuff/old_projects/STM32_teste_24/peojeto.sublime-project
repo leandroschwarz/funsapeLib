@@ -1,0 +1,44 @@
+{
+	"build_systems":
+	[
+		{
+			"cmd": ["make"],
+			"name": "ARM build",
+			"working_dir": "${project_path}",
+			"file_regex": "^(.*):(\\d+):(\\d+):\\s*(.*)$"
+		}
+	],
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"path": "."
+		}
+	],
+
+	// Настройки линтеров
+	"SublimeLinter":
+	{
+		"linters":
+		{
+			"clang":
+			{
+				// Каталоги, в которых находятся файлы, анализируемые линтером
+				"include_dirs":
+				[
+					"${project}/CMSIS",
+					"${project}/StdPeriphLib",
+					"${project}/user-code",
+					"${project}/user-code/FatFs"
+				],
+				// Дополнительные флаги Clang
+				"extra_flags":"-DSTM32F10X_MD_VL"
+			}
+		}
+	},
+	"settings":
+	{
+		"sublimegdb_workingdir": "${project_path:out/hex/}",
+		"sublimegdb_commandline": "arm-none-eabi-gdb --interpreter=mi *.elf"
+	}
+}

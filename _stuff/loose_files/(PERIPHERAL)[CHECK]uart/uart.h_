@@ -1,0 +1,16 @@
+#ifndef USAT_H_
+#define USAT_H_
+
+#include "global.h"
+
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+void uartInit();
+void uartTransmit(char byte);
+void uartPrint(char* msg, unsigned char length);
+void uartPrints(char* msg);
+char uartReceive();
+void uartGets(char* msg, unsigned char length);
+
+#endif

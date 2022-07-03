@@ -1,0 +1,125 @@
+
+
+#ifndef __PACKAGE_API_HPP
+#define __PACKAGE_API_HPP	1001
+
+// -----------------------------------------------------------------------------
+// Header files ----------------------------------------------------------------
+
+#include "../globalDefines.hpp"
+#if __GLOBAL_DEFINES_HPP != 1001
+#	error [packageApi.hpp] Error 100 - Build mismatch (globalDefines must be build 1001).
+#endif
+
+// -----------------------------------------------------------------------------
+// Constant definitions --------------------------------------------------------
+
+/* NONE */
+
+// -----------------------------------------------------------------------------
+// New data types --------------------------------------------------------------
+
+typedef enum packageApiError_e {
+	PACKAGE_API_ERROR_NONE						= 0,
+	PACKAGE_API_ERROR_NULL_PACKAGE_SIZE			= 1,
+	PACKAGE_API_ERROR_PACKAGE_SIZE_TOO_SMALL	= 2,
+	PACKAGE_API_ERROR_MEMORY_ALLOCATION			= 3,
+	PACKAGE_API_ERROR_NOT_INITIALIZED			= 4,
+	PACKAGE_API_ERROR_PACKAGE_LOCKED			= 5,
+	PACKAGE_API_ERROR_NULL_PAYLOAD_SIZE			= 6,
+	PACKAGE_API_ERROR_NULL_PAYLOAD_DATA			= 7,
+	PACKAGE_API_ERROR_INVALID_SOURCE_ADDRESS	= 8,
+	PACKAGE_API_ERROR_PACKAGE_NOT_READY			= 9,
+	PACKAGE_API_ERROR_ARGUMENT_MISMATCH			= 10,
+	PACKAGE_API_ERROR_PACKAGE_DATA_FULL			= 11,
+} packageApiError_e;
+
+// -----------------------------------------------------------------------------
+// Macro-functions definitions -------------------------------------------------
+
+/* NONE */
+
+// -----------------------------------------------------------------------------
+// Extern Global Variables -----------------------------------------------------
+
+/* NONE */
+
+// -----------------------------------------------------------------------------
+// General public functions declarations ---------------------------------------
+
+/* NONE */
+
+// -----------------------------------------------------------------------------
+// General inline functions declarations ---------------------------------------
+
+/* NONE */
+
+// -----------------------------------------------------------------------------
+// PackageApi class - Class Definition -----------------------------------------
+
+class PackageApi
+{
+	// New data types
+public:
+
+	// Constructors
+public:
+	PackageApi(uint16_t packageSize = 100);
+
+	// Methods
+public:
+	bool_t createNewPackage(uint8_t id, uint8_t destAddr, uint8_t sourAddr, uint8_t * payload, uint8_t payloadSize);
+	uint8_t * getPackageData(void);
+	uint16_t getPackageSize(void);
+	bool_t setEscapeCharacters(bool_t enable, uint8_t * charList = NULL, uint8_t listSize = 0);
+	packageApiError_e getLastError(void);
+
+private:
+	bool_t checkInitilized(void);
+	bool_t checkUnlocked(void);
+	bool_t checkReady(void);
+	bool_t pushPackageData(uint8_t data);
+
+protected:
+
+	// Data members
+public:
+
+private:
+	// Package data
+	uint16_t			index_				: 12;
+	uint8_t				* data_;
+	uint16_t			size_				: 12;
+
+	// Package status
+	packageApiError_e	lastError_;
+	bool_t				initialized_		: 1;
+	bool_t				locked_				: 1;
+	bool_t				ready_				: 1;
+
+	// Package configuration
+	uint16_t			maxSize_			: 12;
+	uint8_t				startDelimiter_;
+
+	// Escape character configuration
+	bool_t				escapeEnabled_		: 1;
+	uint8_t				escapeCharacter_;
+	uint8_t				escapeXorValue_;
+	uint8_t				escapeCharSize_;
+	uint8_t				* escapeCharData_;
+
+protected:
+
+};  // class PackageApi
+
+// -----------------------------------------------------------------------------
+// PackageApi class - Inline functions definitions -----------------------------
+
+/* NONE */
+
+// -----------------------------------------------------------------------------
+// General inline functions declarations ---------------------------------------
+
+/* NONE */
+
+#endif // __PACKAGE_API_HPP

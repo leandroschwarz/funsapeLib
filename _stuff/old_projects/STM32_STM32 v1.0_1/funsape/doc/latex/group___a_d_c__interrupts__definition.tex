@@ -1,0 +1,37 @@
+\hypertarget{group___a_d_c__interrupts__definition}{}\section{A\+D\+C\+\_\+interrupts\+\_\+definition}
+\label{group___a_d_c__interrupts__definition}\index{A\+D\+C\+\_\+interrupts\+\_\+definition@{A\+D\+C\+\_\+interrupts\+\_\+definition}}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___a_d_c__interrupts__definition_ga0ad335d835f54415194d448019569e00}{}\#define {\bfseries A\+D\+C\+\_\+\+I\+T\+\_\+\+E\+O\+C}~((uint16\+\_\+t)0x0205)\label{group___a_d_c__interrupts__definition_ga0ad335d835f54415194d448019569e00}
+
+\item 
+\hypertarget{group___a_d_c__interrupts__definition_ga2f5c7f9900c24250a0c6ccaa7cbca946}{}\#define {\bfseries A\+D\+C\+\_\+\+I\+T\+\_\+\+A\+W\+D}~((uint16\+\_\+t)0x0106)\label{group___a_d_c__interrupts__definition_ga2f5c7f9900c24250a0c6ccaa7cbca946}
+
+\item 
+\hypertarget{group___a_d_c__interrupts__definition_gad439fc0cd69706704d47aeabfeddb631}{}\#define {\bfseries A\+D\+C\+\_\+\+I\+T\+\_\+\+J\+E\+O\+C}~((uint16\+\_\+t)0x0407)\label{group___a_d_c__interrupts__definition_gad439fc0cd69706704d47aeabfeddb631}
+
+\item 
+\hypertarget{group___a_d_c__interrupts__definition_gac3852b7789860e0ea79b82115ab877a0}{}\#define {\bfseries A\+D\+C\+\_\+\+I\+T\+\_\+\+O\+V\+R}~((uint16\+\_\+t)0x201\+A)\label{group___a_d_c__interrupts__definition_gac3852b7789860e0ea79b82115ab877a0}
+
+\item 
+\#define {\bfseries I\+S\+\_\+\+A\+D\+C\+\_\+\+I\+T}(I\+T)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{group___a_d_c__interrupts__definition_gaf5f8d35930becff402eeb8220641432f}{}\index{A\+D\+C\+\_\+interrupts\+\_\+definition@{A\+D\+C\+\_\+interrupts\+\_\+definition}!I\+S\+\_\+\+A\+D\+C\+\_\+\+I\+T@{I\+S\+\_\+\+A\+D\+C\+\_\+\+I\+T}}
+\index{I\+S\+\_\+\+A\+D\+C\+\_\+\+I\+T@{I\+S\+\_\+\+A\+D\+C\+\_\+\+I\+T}!A\+D\+C\+\_\+interrupts\+\_\+definition@{A\+D\+C\+\_\+interrupts\+\_\+definition}}
+\subsubsection[{I\+S\+\_\+\+A\+D\+C\+\_\+\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+S\+\_\+\+A\+D\+C\+\_\+\+I\+T(
+\begin{DoxyParamCaption}
+\item[{}]{I\+T}
+\end{DoxyParamCaption}
+)}\label{group___a_d_c__interrupts__definition_gaf5f8d35930becff402eeb8220641432f}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+(((IT) == ADC\_IT\_EOC) || ((IT) == ADC\_IT\_AWD) || \(\backslash\)
+                       ((IT) == ADC\_IT\_JEOC)|| ((IT) == ADC\_IT\_OVR))
+\end{DoxyCode}

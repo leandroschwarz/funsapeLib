@@ -1,0 +1,508 @@
+
+//     //////////////     INTERRUPT CONTROL AND STATUS     //////////////     //
+
+/**
+ * @brief		Disables the interrupt pin to relay an internal interrupt.
+ * @details		Disables the interrupt pin to relay an internal interrupt.
+ * 				// TODO: Explain the operation of the deactivation mask
+ * @note		Since its not possible to turn on or off the power on interrupt,
+ * 				the function just ignores it from the interrupt mask.
+ * @param[in]	deactivationMask_p	interrupts to be disabled.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+/*
+bool Ads1292r::disableInterrupts(InterruptFlags deactivationMask_p)
+{
+	// Local variables
+	uint8_t auxBuff[2];
+	bool intAmbient						= false;
+	bool intAlmostFull					= false;
+	bool intTempReady					= false;
+	bool intNewDataReady				= false;
+
+	// Mark passage for debugging purpose
+	debugMark("disableInterrupts(InterruptFlags)", 3);
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Populate the variables with the class members values
+	intAmbient = this->_ambLightCancOverflowInterruptEnable;
+	intAlmostFull = this->_fifoAlmostFullInterruptEnable;
+	intTempReady = this->_dieTempReadyInterruptEnable;
+	intNewDataReady = this->_newFifoDataReadyInterruptEnable;
+
+	// Process the deactivation mask
+	if(deactivationMask_p & InterruptFlags::FIFO_ALMOST_FULL_FLAG) {
+		intAlmostFull = false;
+	}
+	if(deactivationMask_p & InterruptFlags::NEW_FIFO_DATA_READY_FLAG) {
+		intNewDataReady = false;
+	}
+	if(deactivationMask_p & InterruptFlags::AMBIENT_LIGHT_CANCELLATION_FLAG) {
+		intAmbient = false;
+	}
+	if(deactivationMask_p & InterruptFlags::INTERNAL_TEMPERATURE_READY_FLAG) {
+		intTempReady  = false;
+	}
+
+	// Configure device
+	auxBuff[0] = (intAlmostFull << MAX30102_BIT_INTERRUPT_FIFO_ALMOST_FULL_ENABLE) |
+			(intNewDataReady << MAX30102_BIT_INTERRUPT_FIFO_NEW_DATA_READY_ENABLE) |
+			(intAmbient << MAX30102_BIT_INTERRUPT_AMBIENT_LIGHT_CANC_ENABLE);
+	auxBuff[1] = (intTempReady << MAX30102_BIT_INTERRUPT_DIE_TEMPERATURE_READY_ENABLE);
+	if(!this->_writeReg(MAX30102_REG_INTERRUPT_ENABLE_1, auxBuff, 2)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Update class data members
+	this->_ambLightCancOverflowInterruptEnable = intAmbient;
+	this->_fifoAlmostFullInterruptEnable = intAlmostFull;
+	this->_dieTempReadyInterruptEnable = intTempReady;
+	this->_newFifoDataReadyInterruptEnable = intNewDataReady;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+*/
+
+/**
+ * @brief		Enables the interrupt pin to relay an internal interrupt.
+ * @details		Enables the interrupt pin to relay an internal interrupt.
+ * 				// TODO: Explain the operation of the activation mask
+ * @note		Since its not possible to turn on or off the power on interrupt,
+ * 				the function just ignores it from the interrupt mask.
+ * @param[in]	activationMask_p	interrupts to be enabled.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+/*
+bool Ads1292r::enableInterrupts(InterruptFlags activationMask_p)
+{
+	// Local variables
+	uint8_t auxBuff[2];
+	bool intAmbient						= false;
+	bool intAlmostFull					= false;
+	bool intTempReady					= false;
+	bool intNewDataReady				= false;
+
+	// Mark passage for debugging purpose
+	debugMark("enableInterrupts(InterruptFlags)", 3);
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Populate the variables with the class members values
+	intAmbient = this->_ambLightCancOverflowInterruptEnable;
+	intAlmostFull = this->_fifoAlmostFullInterruptEnable;
+	intTempReady = this->_dieTempReadyInterruptEnable;
+	intNewDataReady = this->_newFifoDataReadyInterruptEnable;
+
+	// Process the deactivation mask
+	if(activationMask_p & InterruptFlags::FIFO_ALMOST_FULL_FLAG) {
+		intAlmostFull = true;
+	}
+	if(activationMask_p & InterruptFlags::NEW_FIFO_DATA_READY_FLAG) {
+		intNewDataReady = true;
+	}
+	if(activationMask_p & InterruptFlags::AMBIENT_LIGHT_CANCELLATION_FLAG) {
+		intAmbient = true;
+	}
+	if(activationMask_p & InterruptFlags::INTERNAL_TEMPERATURE_READY_FLAG) {
+		intTempReady  = true;
+	}
+
+	// Configure device
+	auxBuff[0] = (intAlmostFull << MAX30102_BIT_INTERRUPT_FIFO_ALMOST_FULL_ENABLE) |
+			(intNewDataReady << MAX30102_BIT_INTERRUPT_FIFO_NEW_DATA_READY_ENABLE) |
+			(intAmbient << MAX30102_BIT_INTERRUPT_AMBIENT_LIGHT_CANC_ENABLE);
+	auxBuff[1] = (intTempReady << MAX30102_BIT_INTERRUPT_DIE_TEMPERATURE_READY_ENABLE);
+	if(!this->_writeReg(MAX30102_REG_INTERRUPT_ENABLE_1, auxBuff, 2)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Update class data members
+	this->_ambLightCancOverflowInterruptEnable = intAmbient;
+	this->_fifoAlmostFullInterruptEnable = intAlmostFull;
+	this->_dieTempReadyInterruptEnable = intTempReady;
+	this->_newFifoDataReadyInterruptEnable = intNewDataReady;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+*/
+
+/**
+ * @brief
+ * // TODO: document this function
+ * @return true
+ * @return false
+ */
+/*
+bool Ads1292r::generalIrqHandler(void)
+{
+	// Local variables
+//	InterruptFlags auxFlags;
+
+	// Note: Since this function is called asynchroneusly, no debug mark passage
+	// was placed for caution. The same happens with the getInterruptStatus()
+	// function that is called inside this function.
+	// debugMark("generalIrqHandler(void)", 3);
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Read the interrupt status registers
+	if(!this->getInterruptStatus()) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Call callback functions
+	if(this->_ambLightCancOverflowInterruptFlag) {
+		this->_ambLightCancOverflowInterruptCallback();
+	}
+	if(this->_dieTempReadyInterruptFlag) {
+		this->_dieTempReadyInterruptCallback();
+	}
+	if(this->_fifoAlmostFullInterruptFlag) {
+		this->_fifoAlmostFullInterruptCallback();
+	}
+	if(this->_newFifoDataReadyInterruptFlag) {
+		this->_newFifoDataReadyInterruptCallback();
+	}
+	if(this->_powerReadyInterruptFlag) {
+		this->_powerReadyInterruptCallback();
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+*/
+
+/**
+ * @brief		Reads the sensor interrupt status.
+ * @details		Reads the sensor interrupt status.
+ * 				// TODO: Explain the operation of the interrupt
+ * @param[out]	interruptStatus_p	status of sensor interrupts.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+/*
+bool Ads1292r::getInterruptStatus(InterruptFlags *interruptStatus_p)
+{
+	// Local variables
+	uint8_t auxBuff[2];
+
+	// Note: This function is also called by the generalIrqHandler() function.
+	// Since the generalIrqHandler() function is called asynchroneusly,
+	// triggered by interrupts, no debug mark passage was placed for caution.
+	// debugMark("getInterruptStatus(InterruptFlags *)", 3);
+
+	// Check device's initialization
+	if(!this->_isInitialized()) {
+		// Returns error
+		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Read the interrupt status registers
+	if(!this->_readReg(MAX30102_REG_INTERRUPT_STATUS_1, auxBuff, 2)) {
+		// Returns error
+		debugMessage(this->_lastError);
+		return false;
+	}
+
+	// Update class data members
+	this->_fifoAlmostFullInterruptFlag = (bool)(auxBuff[0] & (1 << MAX30102_BIT_INTERRUPT_FIFO_ALMOST_FULL_FLAG));
+	this->_newFifoDataReadyInterruptFlag = (bool)(auxBuff[0] & (1 << MAX30102_BIT_INTERRUPT_FIFO_NEW_DATA_READY_FLAG));
+	this->_ambLightCancOverflowInterruptFlag = (bool)(auxBuff[0] & (1 << MAX30102_BIT_INTERRUPT_AMBIENT_LIGHT_CANC_FLAG));
+	this->_powerReadyInterruptFlag = (bool)(auxBuff[0] & (1 << MAX30102_BIT_INTERRUPT_POWER_READY_FLAG));
+	this->_dieTempReadyInterruptFlag = (bool)(auxBuff[1] & (1 << MAX30102_BIT_INTERRUPT_DIE_TEMPERATURE_READY_FLAG));
+
+		// Retrieve interrupt status
+	// 	if(!isPointerValid(interruptStatus_p)) {
+	// 		*interruptStatus_p = static_cast<InterruptFlags>(0);
+	// 		if(this->_fifoAlmostFullInterruptFlag) {
+	// 			*interruptStatus_p |= InterruptFlags::FIFO_ALMOST_FULL_FLAG;
+	// 		}
+	// 		if(this->_newFifoDataReadyInterruptFlag) {
+	// 			*interruptStatus_p |= InterruptFlags::NEW_FIFO_DATA_READY_FLAG;
+	// 		}
+	// 		if(this->_ambLightCancOverflowInterruptFlag) {
+	// 			*interruptStatus_p |= InterruptFlags::AMBIENT_LIGHT_CANCELLATION_FLAG;
+	// 		}
+	// 		if(this->_dieTempReadyInterruptFlag) {
+	// 			*interruptStatus_p |= InterruptFlags::INTERNAL_TEMPERATURE_READY_FLAG;
+	// 		}
+	// 		if(this->_powerReadyInterruptFlag) {
+	// 			*interruptStatus_p |= InterruptFlags::POWER_READY_FLAG;
+	// 		}
+	// 	}
+
+
+// Returns successfully
+this->_lastError = Error::NONE;
+debugMessage(Error::NONE);
+return true;
+}
+*/
+
+//     ///////////////////    INTERRUPT CALLBACKS     ///////////////////     //
+
+/**
+ * @brief
+ * // TODO: document this function
+ * @param callbackFunction_p
+ * @return true
+ * @return false
+ */
+/*
+bool Ads1292r::setInterruptCallback(void (* callbackFunction_p)(void))
+{
+	// Mark passage for debugging purpose
+	debugMark("setAmbLightCancOverflowInterruptCallback(void (*)(void))", 3);
+
+	// Check function arguments for errors
+	if(!isPointerValid(callbackFunction_p)) {
+		// Returns error
+		this->_lastError = Error::FUNCTION_POINTER_NULL;
+		debugMessage(Error::FUNCTION_POINTER_NULL);
+		return false;
+	}
+
+	// Update data members
+	this->_ambLightCancOverflowInterruptCallback = callbackFunction_p;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+*/
+
+//     //////////////////////    DEVICE STATUS     //////////////////////     //
+
+/*
+void Ads1292r::readAllRegs(uint8_t *regs_p)
+{
+	uint8_t auxBuff[11];
+
+	debugMark("readAllRegs(uint8_t *)", 3);
+
+	this->_readReg(MAX30102_REG_INTERRUPT_STATUS_1, auxBuff, 7);
+	regs_p[0]		= auxBuff[0];		// Int status 1
+	regs_p[1]		= auxBuff[1];		// Int status 2
+	regs_p[2]		= auxBuff[2];		// Int enable 1
+	regs_p[3]		= auxBuff[3];		// Int enable 2
+	regs_p[4]		= auxBuff[4];		// Fifo write
+	regs_p[5]		= auxBuff[5];		// Fifo overflow
+	regs_p[6]		= auxBuff[6];		// Fifo read
+
+	this->_readReg(MAX30102_REG_FIFO_CONFIGURATION, auxBuff, 11);
+	regs_p[7]		= auxBuff[0];		// Fifo configuration
+	regs_p[8]		= auxBuff[1];		// Mode configuration
+	regs_p[9]		= auxBuff[2];		// SpO2 configuration
+	regs_p[10]		= auxBuff[4];		// Pulse amplitude LED 1
+	regs_p[11]		= auxBuff[5];		// Pulse amplitude LED 2
+	regs_p[12]		= auxBuff[9];		// Multi-slot 1
+	regs_p[13]		= auxBuff[10];		// Multi-slot 2
+
+	this->_readReg(MAX30102_REG_DIE_TEMPERATURE_INTEGER, auxBuff, 3);
+	regs_p[14]		= auxBuff[0];		// Temperature integer
+	regs_p[15]		= auxBuff[1];		// Temperature fraction
+	regs_p[16]		= auxBuff[2];		// Temperature config
+
+	this->_readReg(MAX30102_REG_REVISION_ID, auxBuff, 2);
+	regs_p[17]		= auxBuff[0];		// Temperature integer
+	regs_p[18]		= auxBuff[1];		// Temperature fraction
+}
+*/
+
+//     /////////////////    FIFO CONTROL AND STATUS     /////////////////     //
+
+/**
+ * @brief		Reads data from device's FIFO.
+ * @details		Reads data from device's FIFO.
+ * @note		This function is private, so before calling it, the
+ * 				programmer must ensure that all parameters are checked.
+ * @param[in]	samples_p	number of samples to be read from FIFO.
+ * @param[out]	buff1		buffer to red LED values.
+ * @param[out]	buff2		buffer to infrared LED values.
+ * @param[in]	varSize		size of the variable to be stored.
+ * @return		true		Operation successfull.
+ * @return		false		Operation failed. Retrieve error calling
+ * 							getLastError() function.
+ */
+/*
+bool Ads1292r::_readRegFifoData(uint8_t samples_p, void *redLedBuffer_p, void *infraredLedBuffer_p, uint8_t varSize_p)
+{
+	// Local variables
+	uint8_t *auxBuff = nullptr;
+	uint8_t resolutionFix = 0;
+	uint16_t aux16 = 0;
+	int32_t aux32 = 0;
+	uint16_t *buff16ptr1 = (uint16_t *)redLedBuffer_p;
+	uint16_t *buff16ptr2 = (uint16_t *)infraredLedBuffer_p;
+	uint32_t *buff32ptr1 = (uint32_t *)redLedBuffer_p;
+	uint32_t *buff32ptr2 = (uint32_t *)infraredLedBuffer_p;
+
+	// Evaluate buffer size
+	switch(this->_modeControl) {
+	case ModeControl::HEART_RATE_MODE:
+		aux16 = MAX30102_BYTES_PER_CHANNEL * samples_p * 1;
+		break;
+	case ModeControl::SPO2_MODE:
+		aux16 = MAX30102_BYTES_PER_CHANNEL * samples_p * 2;
+		break;
+	case ModeControl::MULTI_LED_MODE:
+		aux16 = MAX30102_BYTES_PER_CHANNEL * samples_p * this->_activeLedsCounter;
+		break;
+	default:
+		break;
+	}
+
+	// Memory allocation
+	auxBuff = (uint8_t *)calloc(aux16, sizeof(uint8_t));
+	if(!isPointerValid(auxBuff)) {
+		// Returns error
+		this->_lastError = Error::MEMORY_ALLOCATION;
+		return false;
+	}
+
+	// Reads from device
+	if(!this->_readReg(MAX30102_REG_FIFO_DATA, auxBuff, aux16)) {
+		// Returns error
+		return false;
+	}
+
+	// Evaluates the number of shifts to fix the value due to resolution
+	switch(this->_resolution) {
+	case Resolution::RESOLUTION_15_BITS:
+		resolutionFix = 3;
+		break;
+	case Resolution::RESOLUTION_16_BITS:
+		resolutionFix = 2;
+		break;
+	case Resolution::RESOLUTION_17_BITS:
+		resolutionFix = 1;
+		break;
+	case Resolution::RESOLUTION_18_BITS:
+		resolutionFix = 0;
+		break;
+	}
+
+	// Decode data
+	aux16 = 0;
+	for(uint8_t i = 0; i < samples_p; i++) {
+		switch(this->_modeControl) {
+		case ModeControl::HEART_RATE_MODE:
+			// Process red LED value
+			aux32 = (uint32_t)(auxBuff[aux16++]);
+			aux32 <<= 8;
+			aux32 |= (uint32_t)(auxBuff[aux16++]);
+			aux32 <<= 8;
+			aux32 |= (uint32_t)(auxBuff[aux16++]);
+			aux32 >>= resolutionFix;
+			// Truncates the sample size to 16 bits
+			if((resolutionFix < 2) && (varSize_p == 2)) {
+				aux32 >>= (2 - resolutionFix);
+			}
+			// Update function arguments
+			if(isPointerValid(redLedBuffer_p)) {
+				if(varSize_p == 2) {
+					*buff16ptr1++ = (uint16_t)(aux32);
+				} else {
+					*buff32ptr1++ = (uint32_t)(aux32);
+				}
+			}
+			break;
+
+		case ModeControl::SPO2_MODE:
+			// Process red LED value
+			aux32 = (uint32_t)(auxBuff[aux16++]);
+			aux32 <<= 8;
+			aux32 |= (uint32_t)(auxBuff[aux16++]);
+			aux32 <<= 8;
+			aux32 |= (uint32_t)(auxBuff[aux16++]);
+			aux32 >>= resolutionFix;
+			// Truncates the sample size to 16 bits
+			if((resolutionFix < 2) && (varSize_p == 2)) {
+				aux32 >>= (2 - resolutionFix);
+			}
+			// Update function arguments
+			if(isPointerValid(redLedBuffer_p)) {
+				if(varSize_p == 2) {
+					*buff16ptr1++ = (uint16_t)(aux32);
+				} else {
+					*buff32ptr1++ = (uint32_t)(aux32);
+				}
+			}
+			// Process infrared LED value
+			aux32 = (uint32_t)(auxBuff[aux16++]);
+			aux32 <<= 8;
+			aux32 |= (uint32_t)(auxBuff[aux16++]);
+			aux32 <<= 8;
+			aux32 |= (uint32_t)(auxBuff[aux16++]);
+			aux32 >>= resolutionFix;
+			// Truncates the sample size to 16 bits
+			if((resolutionFix < 2) && (varSize_p == 2)) {
+				aux32 >>= (2 - resolutionFix);
+			}
+			// Update function arguments
+			if(isPointerValid(infraredLedBuffer_p)) {
+				if(varSize_p == 2) {
+					*buff16ptr2++ = (uint16_t)(aux32);
+				} else {
+					*buff32ptr2++ = (uint32_t)(aux32);
+				}
+			}
+			break;
+
+		case ModeControl::MULTI_LED_MODE:
+			// TODO: Implement this mode
+			// Returns error
+			this->_lastError = Error::UNDER_DEVELOPMENT;
+			return false;
+		}
+	}
+	free(auxBuff);
+
+	// Update data members
+	if(!this->_getFifoInfo()) {
+		// Returns error
+		return false;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	return true;
+}
+*/

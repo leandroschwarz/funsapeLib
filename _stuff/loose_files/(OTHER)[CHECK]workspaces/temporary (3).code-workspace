@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+		},
+		"astyle.cmd_options": [
+			"--max-code-length=200",
+		],
+	}
+}

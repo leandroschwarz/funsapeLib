@@ -1,0 +1,12 @@
+-ID:/Program Files Portable/GNU Tools ARM Embedded/7 2017-q4-major/arm-none-eabi/include
+-IDrivers/CMSIS/Device/ST/STM32L0xx/Include
+-IDrivers/CMSIS/Include
+-IDrivers/STM32L0xx_HAL_Driver/Inc
+-IDrivers/BSP/Adafruit_Shield
+-IDrivers/BSP/STM32L0xx_Nucleo
+-IFatFs/drivers
+-IFatFs
+-IInc
+-DSTM32L053xx
+-D__GNUC__
+-D__riscv

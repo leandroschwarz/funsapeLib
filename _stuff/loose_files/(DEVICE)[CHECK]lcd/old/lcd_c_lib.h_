@@ -1,0 +1,21 @@
+#ifndef __LCD_H__
+#define __LCD_H__
+
+void lcd_init(void);
+void delay();
+void control_word(unsigned char ch);
+void data_word(unsigned char ch);
+void wrt_value(unsigned char x);
+void cursorxy(unsigned char x, unsigned char y);
+void disp_str(unsigned char msg[]);
+void wrt_string(unsigned char *string);
+void wrt_long(unsigned long a);
+void wrt_char(unsigned char a);
+void wrt_int(unsigned int a);
+void wrt_dec_char(unsigned char x);
+void wrt_dec_long(unsigned long a);
+void wrt_dec_int(unsigned int a);
+void wrt_2dec_place(unsigned char a);
+void wrt_float(float a);
+
+#endif

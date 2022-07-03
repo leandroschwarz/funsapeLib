@@ -1,0 +1,346 @@
+
+
+#include "tft.hpp"
+
+void setIoPinMode(ioReg_t GPIOx, ioPin_t GPIO_Pin, PinDirection direction)
+{
+	uint8_t currentPin = 0;
+	bool isLowerPins = false;
+	uint32_t auxCrl = GPIOx->CRL;
+	uint32_t auxCrh = GPIOx->CRH;
+	uint8_t auxPin = 0;
+
+	// Loop between selected pins
+	while(GPIO_Pin >> currentPin) {				// There are pins to configure
+		if(isBitSet(GPIO_Pin, currentPin)) {	// Current pin is set
+			isLowerPins = (currentPin < 8) ? true : false;
+			auxPin = (currentPin < 8) ? currentPin : (currentPin - 8);
+			if(direction == PinDirection::OUTPUT) {
+				if(isLowerPins) {
+					setMask(auxCrl, 0x03, (4 * auxPin));
+					clrMask(auxCrl, 0x03, ((4 * auxPin) + 2));
+				} else {
+					setMask(auxCrh, 0x03, (4 * auxPin));
+					clrMask(auxCrh, 0x03, ((4 * auxPin) + 2));
+				}
+			} else {
+				if(isLowerPins) {
+					clrMask(auxCrl, 0x03, (4 * auxPin));
+					clrMask(auxCrl, 0x03, ((4 * auxPin) + 2));
+					setMask(auxCrl, 0x01, ((4 * auxPin) + 2));
+				} else {
+					clrMask(auxCrh, 0x03, (4 * auxPin));
+					clrMask(auxCrh, 0x03, ((4 * auxPin) + 2));
+					setMask(auxCrh, 0x01, ((4 * auxPin) + 2));
+				}
+			}
+		}
+		currentPin++;							// Look for next pin
+	}
+
+	// Update registers
+	GPIOx->CRL = auxCrl;
+	GPIOx->CRH = auxCrh;
+
+	// Returns
+	return;
+}
+
+Tft::Tft(Controller controllerModel_p)
+{
+	// Reset data members
+	this->_initialized = false;
+	this->_dataPortSet = false;
+	this->_controlPortSet = false;
+	this->_controllerSet = false;
+
+	// Update data members
+	this->setControllerModel(controllerModel_p);
+
+	// Returns (previous function already updated error information)
+	return;
+}
+
+bool Tft::setControllerModel(Controller controllerModel_p)
+{
+	// Reset data members
+	this->_controllerSet = false;
+
+	// Update data members
+	switch(controllerModel_p) {			// Display size
+	case Controller::PCF8833:
+		this->_displayMaxX = 127;
+		this->_displayMaxY = 127;
+		break;
+	case Controller::HX8353C:
+	case Controller::ST7735:
+		this->_displayMaxX = 127;
+		this->_displayMaxY = 159;
+		break;
+	case Controller::HX8340B_8:
+	case Controller::HX8340B_S:
+	case Controller::S6D0164:
+		this->_displayMaxX = 175;
+		this->_displayMaxY = 219;
+		break;
+	case Controller::HX8347A:
+	case Controller::ILI9325C:
+	case Controller::ILI9325D_16:
+	case Controller::ILI9325D_16ALT:
+	case Controller::ILI9325D_8:
+	case Controller::ILI9341_16:
+	case Controller::ILI9341_8:
+	case Controller::ILI9341_S4P:
+	case Controller::ILI9341_S5P:
+	case Controller::S1D19122:
+	case Controller::S6D1121_16:
+	case Controller::S6D1121_8:
+	case Controller::SSD1289_8:
+	case Controller::SSD1289:
+	case Controller::SSD1289LATCHED:
+		this->_displayMaxX = 239;
+		this->_displayMaxY = 319;
+		break;
+	case Controller::HX8352A:
+	case Controller::ILI9327:
+		this->_displayMaxX = 239;
+		this->_displayMaxY = 399;
+		break;
+	case Controller::SSD1963_480:
+		this->_displayMaxX = 271;
+		this->_displayMaxY = 479;
+		break;
+	case Controller::ILI9481:
+	case Controller::ILI9486:
+	case Controller::R61581:
+		this->_displayMaxX = 319;
+		this->_displayMaxY = 479;
+		break;
+	case Controller::SSD1963_800:
+	case Controller::SSD1963_800ALT:
+		this->_displayMaxX = 479;
+		this->_displayMaxY = 799;
+		break;
+	case Controller::CPLD:
+		this->_displayMaxX = 799;
+		this->_displayMaxY = 479;
+		break;
+	default:
+		// Returns error
+		this->_lastError = Error::CONTROLLER_UNSUPPORTED;
+		debugMessage(Error::CONTROLLER_UNSUPPORTED);
+		this->_displayMaxX = 0;
+		this->_displayMaxY = 0;
+		return false;
+	}
+	switch(controllerModel_p) {			// Controller interface
+	case Controller::HX8340B_8:
+	case Controller::ILI9325C:
+	case Controller::ILI9325D_8:
+	case Controller::ILI9341_8:
+	case Controller::S6D0164:
+	case Controller::S6D1121_8:
+	case Controller::SSD1289_8:
+		InterfaceMode::PARALLEL_8_BITS;
+		break;
+	case Controller::CPLD:
+	case Controller::HX8347A:
+	case Controller::HX8352A:
+	case Controller::ILI9325D_16:
+	case Controller::ILI9325D_16ALT:
+	case Controller::ILI9327:
+	case Controller::ILI9341_16:
+	case Controller::ILI9481:
+	case Controller::ILI9486:
+	case Controller::R61581:
+	case Controller::S1D19122:
+	case Controller::S6D1121_16:
+	case Controller::SSD1289:
+	case Controller::SSD1963_480:
+	case Controller::SSD1963_800:
+	case Controller::SSD1963_800ALT:
+		InterfaceMode::PARALLEL_16_BITS;
+		break;
+	case Controller::SSD1289LATCHED:
+		InterfaceMode::PARALLEL_16_BITS_LATCHED;
+		break;
+	case Controller::HX8340B_S:
+	case Controller::ILI9341_S4P:
+		InterfaceMode::SERIAL_4_PINS;
+		break;
+	case Controller::HX8353C:
+	case Controller::ILI9341_S5P:
+	case Controller::PCF8833:
+	case Controller::ST7735:
+		InterfaceMode::SERIAL_5_PINS;
+		break;
+	}
+	this->_controllerSet = true;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return;
+}
+
+bool Tft::setDataPort8Bits(ioReg_t dataPort_p, ioPin_t dataFirst_p, ioPin_t dataOffset_p)
+{
+	// Clears data members
+	this->_dataPortSet = false;
+
+	// Check for errors
+	if(!isGpioValid(dataPort_p, dataFirst_p, dataOffset_p, 8)) {
+		// Returns error
+		this->_lastError = Error::GPIO_PORT_INVALID;
+		debugMessage(Error::GPIO_PORT_INVALID);
+		return false;
+	}
+
+	// Update data members
+	this->_dataPort = dataPort_p;
+	this->_dataFirst = dataFirst_p;
+	this->_dataOffset = dataOffset_p;
+	this->_dataPortSet = true;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+bool Tft::setControlPort(ioReg_t controlPort_p, ioPin_t controlCs_p, ioPin_t controlRd_p, ioPin_t controlRs_p, ioPin_t controlRst_p, ioPin_t controlWr_p)
+{
+	// Clears data members
+	this->_controlPortSet = false;
+
+	// Check for errors
+	if(!isGpioValid(controlPort_p, controlCs_p, 0, 1)) {		// CS pin
+		// Returns error
+		this->_lastError = Error::GPIO_PORT_INVALID;
+		debugMessage(Error::GPIO_PORT_INVALID);
+		return false;
+	}
+	if(!isGpioValid(controlPort_p, controlRd_p, 0, 1)) {		// RD pin
+		// Returns error
+		this->_lastError = Error::GPIO_PORT_INVALID;
+		debugMessage(Error::GPIO_PORT_INVALID);
+		return false;
+	}
+	if(!isGpioValid(controlPort_p, controlRs_p, 0, 1)) {		// RS pin
+		// Returns error
+		this->_lastError = Error::GPIO_PORT_INVALID;
+		debugMessage(Error::GPIO_PORT_INVALID);
+		return false;
+	}
+	if(!isGpioValid(controlPort_p, controlRst_p, 0, 1)) {		// RST pin
+		// Returns error
+		this->_lastError = Error::GPIO_PORT_INVALID;
+		debugMessage(Error::GPIO_PORT_INVALID);
+		return false;
+	}
+	if(!isGpioValid(controlPort_p, controlWr_p, 0, 1)) {		// WR pin
+		// Returns error
+		this->_lastError = Error::GPIO_PORT_INVALID;
+		debugMessage(Error::GPIO_PORT_INVALID);
+		return false;
+	}
+
+	// Update data members
+	this->_controlPort = controlPort_p;
+	this->_controlCs = controlCs_p;
+	this->_controlRd = controlRd_p;
+	this->_controlRs = controlRs_p;
+	this->_controlRst = controlRst_p;
+	this->_controlWr = controlWr_p;
+	this->_controlPortSet = true;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	debugMessage(Error::NONE);
+	return true;
+}
+
+Error Tft::getLastError(void)
+{
+	return this->_lastError;
+}
+
+bool Tft::init(DisplayOrientation orientation_p)
+{
+	uint16_t auxControl = 0;
+	uint16_t auxDataHigh = 0;
+	uint16_t auxDataLow = 0;
+
+	// Clears data members
+	this->_initialized = false;
+
+	// Check for errors
+	if(!this->_controllerSet) {
+		// Returns error
+		this->_lastError = Error::CONTROLLER_UNSUPPORTED;
+		debugMessage(Error::CONTROLLER_UNSUPPORTED);
+		return false;
+	}
+	if((!this->_controlPortSet) || (!this->_dataPortSet)) {
+		// Returns error
+		this->_lastError = Error::GPIO_PORT_INVALID;
+		debugMessage(Error::GPIO_PORT_INVALID);
+		return false;
+	}
+
+	// Update data members
+	this->_displayOrientation = orientation_p;
+
+	// Prepare interface ports
+	auxControl = 0;
+	auxDataHigh = 0;
+	auxDataLow = 0;
+	setBit(auxControl, this->_controlRst);
+	setBit(auxControl, this->_controlRs);
+	setBit(auxControl, this->_controlWr);
+	setBit(auxControl, this->_controlCs);
+	setMask(auxDataLow, 0xFF, this->_dataLowFirst);
+	setMask(auxDataHigh, 0xFF, this->_dataHighFirst);
+
+	// Configure interface ports
+	setIoPinMode(this->_controlPort, auxControl, PinDirection::OUTPUT);
+	switch(this->_interfaceMode) {
+	case InterfaceMode::PARALLEL_8_BITS:
+		setIoPinMode(this->_dataLowPort, auxDataLow, PinDirection::OUTPUT);
+		break;
+	case InterfaceMode::PARALLEL_16_BITS_LATCHED:
+		setIoPinMode(this->_controlPort, (1 >> this->_controlSer), PinDirection::OUTPUT);
+	case InterfaceMode::PARALLEL_16_BITS:
+		setIoPinMode(this->_dataLowPort, auxDataLow, PinDirection::OUTPUT);
+		setIoPinMode(this->_dataHighPort, auxDataHigh, PinDirection::OUTPUT);
+		break;
+	case InterfaceMode::SERIAL_5_PINS:	// TODO: Implement
+		setIoPinMode(this->_controlPort, (1 >> this->_controlSer), PinDirection::OUTPUT);
+	case InterfaceMode::SERIAL_4_PINS:	// TODO: Implement
+		break;
+	}
+
+	// Reset display
+	setIoPin(this->_controlPort, this->_controlRst);
+	delayMs(5);
+	clrIoPin(this->_controlPort, this->_controlRst);
+	delayMs(15);
+	setIoPin(this->_controlPort, this->_controlRst);
+	delayMs(15);
+
+	// Initialization routine
+	clrIoPin(this->_controlPort, this->_controlCs);
+//	switch(display_model) {
+//	}
+
+	setIoPin(this->_controlPort, this->_controlCs);
+//	setColor(255, 255, 255);
+//	setBackColor(0, 0, 0);
+//	cfont.font = 0;
+//	_transparent = false;
+
+}
+
+
+
+

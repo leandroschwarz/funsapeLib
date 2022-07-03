@@ -1,0 +1,44 @@
+Know Information
+================
+
+ADC
+	Number of regular channels					5
+	Size of each channel in bytes				2
+	Sample frequency							400 Hz
+MPU
+	Number of accel axis						3
+	Size of each data in bytes					2
+	Number of devices							4
+	Sample frequency							400 Hz
+PPG
+	Number of PPG channels						1
+	Size of each channel in bytes				4
+	Sample frequency							400 Hz
+SD Card
+	Max time to process/write 100 bytes			
+	Max time to process/write 200 bytes			
+	Max time to process/write 300 bytes			
+	Max time to process/write 400 bytes			
+	Max time to process/write 500 bytes			
+	Max time to process/write 750 bytes			
+	Max time to process/write 1000 bytes		
+	Max time to process/write 1500 bytes		
+	Max time to process/write 2000 bytes		
+	Max time to process/write 2500 bytes		
+	Max time to process/write 3000 bytes		
+
+
+	
+1. How many bytes are acquired per second?
+
+ADC = 400 * 5 * 2		= 4000 B/s
+MPU = 400 * 4 * 3 * 2	= 4800 B/s
+PPG = 400 * 4 * 1		= 1200 B/s
+TOTAL					= 10000 B/s
+
+2. How many bytes are acquired in a 200ms period?
+
+ADC = 4000 / 5			= 800 B
+MPU = 4800 / 5			= 960 B
+PPG = 1200 / 5			= 240 B
+TOTAL					= 2000 B

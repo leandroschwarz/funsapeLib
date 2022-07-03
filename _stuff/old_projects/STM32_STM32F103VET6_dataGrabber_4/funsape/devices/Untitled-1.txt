@@ -1,0 +1,735 @@
+
+
+// TODO Slots
+
+
+bool Max30102::getFifoData(uint8_t samplesCount, uint16_t *redLedBuffer,
+		uint16_t *infraredLedBuffer)
+{
+	// TODO Check for errors
+	_readFifoData(samplesCount, redLedBuffer, infraredLedBuffer, sizeof(uint16_t));
+	return true;
+}
+
+bool Max30102::getFifoData(uint8_t samplesCount, uint32_t *redLedBuffer,
+		uint32_t *infraredLedBuffer)
+{
+	// TODO Check for errors
+	_readFifoData(samplesCount, redLedBuffer, infraredLedBuffer, sizeof(uint32_t));
+	return true;
+}
+
+bool Max30102::getNewestSample(uint16_t *redValue, uint16_t *infraredValue)
+{
+	uint8_t samples;
+	uint16_t *auxBuff1 = NULL;
+	uint16_t *auxBuff2 = NULL;
+
+	this->getFifoOccupation(&samples);
+
+	if(samples == 0) {
+		return false;
+	}
+	auxBuff1 = (uint16_t *)calloc(samples, sizeof(uint16_t));
+	if(auxBuff1 == NULL) {
+		return false;
+	}
+	if(infraredValue != NULL) {
+		auxBuff2 = (uint16_t *)calloc(samples, sizeof(uint16_t));
+		if(auxBuff2 == NULL) {
+			free(auxBuff1);
+			return false;
+		}
+	}
+
+	if(infraredValue == NULL) {
+		_readFifoData(samples, auxBuff1, NULL, sizeof(uint16_t));
+		*redValue = auxBuff1[samples - 1];
+	} else {
+		_readFifoData(samples, auxBuff1, auxBuff2, sizeof(uint16_t));
+		*redValue = auxBuff1[samples - 1];
+		*infraredValue = auxBuff2[samples - 1];
+	}
+
+	free(auxBuff1);
+	if(auxBuff2 != NULL) {
+		free(auxBuff2);
+	}
+
+	return true;
+}
+
+bool Max30102::getNewestSample(uint32_t *redValue, uint32_t *infraredValue)
+{
+	return true;
+}
+
+//Report the most recent red value
+uint32_t Max30102::getRed(void)
+{
+	//Check the sensor for new data for 250ms
+	if(safeCheck(250)) {
+		return (sense.red[sense.head]);
+	} else {
+		return (0);    //Sensor failed to find new data
+	}
+
+}
+
+//Report the most recent Green value
+uint32_t Max30102::getGreen(void)
+{
+	//Check the sensor for new data for 250ms
+	if(safeCheck(250)) {
+		return (sense.green[sense.head]);
+	} else {
+		return (0);
+	} //Sensor failed to nd new data
+}
+
+//Report the next Red value in the FIFO
+uint32_t Max30102::getFIFORed(void)
+{
+	return (sense.red[sense.tail]);
+}
+
+// Report the next IR value in the FIFO
+uint32_t Max30102::getFIFOIR(void)
+{
+	return (sense.IR[sense.tail]);
+}
+
+// Report the next Green value in the FIFO
+uint32_t Max30102::getFIFOGreen(void)
+{
+	return (sense.green[sense.tail]);
+}
+
+// Call regularly
+// If new data is available, it updates the head and tail in the main struct
+// Returns number of new samples obtained
+
+uint16_t Max30102::check(void)
+{
+	// Read register FIDO_DATA in (3-byte * number of active LED) chunks
+	// Until FIFO_RD_PTR = FIFO_WR_PTR
+
+	uint8_t readPointer = getReadPointer();
+	uint8_t writePointer = getWritePointer();
+	int numberOfSamples = 0;
+
+	// Do we have new data?
+	if(readPointer != writePointer) {
+		// Calculate the number of readings we need to get from sensor
+		numberOfSamples = writePointer - readPointer;
+		i(numberOfSamples < 0) {
+			numberOfSamples += 32;		// Wrap condition
+		}
+
+		// We now have the number of readings, now calc bytes to read
+		// or this example we are just doing Red and IR(3  bytes each)
+	}
+	int bytesLeftToRead = numberOfSamples * activeLEDs * 3;
+
+
+	//Get ready to read a burst of data from the FIFO register
+	_i2cPort->beginTransmission(Max30102_ADDRESS);
+	_i2cPort->write(Max30102_FIFODATA);
+	_i2cPort->endTransmission();
+
+	//We may need to read as many as 288 bytes so we read in blocks no larger than I2C_BUFFER_LENGTH
+	//I2C_BUFFER_LENGTH changes based on the platform. 64 bytes for SAMD21, 32 bytes for Uno.
+	//Wire.requestFrom() is limited to BUFFER_LENGTH which is 32 on the Uno
+	while(bytesLeftToRead > 0) {
+		int toGet = bytesLeftToRead;
+		if(toGet > I2C_BUFFER_LENGTH) {
+			//I toGet is 32 this is bad because we read 6 bytes (Red+IR * 3 = 6) at a time
+			//32 % 6 = 2 left over. We don't want to request 32 bytes, we want to request 30.
+			// 32 % 9(Red + IR + GREEN) = 5 left over. We want to request 27.
+
+			toGet = I2C_BUFFER_LENGTH - (I2C_BUFFER_LENGTH % (activeLEDs *
+									3)); //Trim toGet to be a multiple of the samples we need to read
+
+
+			bytesLeftToRead -= toGet;
+
+
+			//Request toGet number of bytes from sensor
+			_i2cPort->requestFrom(Max30102_ADDRESS, toGet);
+
+			while(toGet > 0) {
+				sense.head++; //Advance the head of the storage struct
+				sense.head %= STORAGE_SIZE; //Wrap condition
+
+				byte temp[sizeof(uint32_t)]; //Array of 4 bytes that we will convert into long
+				uint32_t tempLong;
+
+				//Burst read three bytes - RED
+				temp[3] = 0;
+				temp[2] = _i2cPort->read();
+				temp[1] = _i2cPort->read();
+				temp[0] = _i2cPort->read();
+
+				//Convert array to long
+				memcpy(&tempLong, temp, sizeof(tempLong));
+
+				tempLong &= 0x3FFFF; //Zero out all but 18 bits
+
+				sense.red[sense.head] = tempLong; //Store this reading into the sense array
+
+				if(activeLEDs > 1) {
+					//Burst read three more bytes - IR
+					temp[3] = 0;
+					tmp[2] = _i2cPort->read();
+					temp[1] = _i2cPort->read();
+					temp[0] = _i2cPort->read();
+
+					//Convert array to long
+					memcpy(&tempLong, temp, sizeof(tempLong));
+
+					tempLong &= 0x3FFFF; //Zero out all but 18 bits
+
+					sense.IR[sense.head] = tempLong;
+
+
+					if(activeLEDs > 2) {
+						//Burst read three more bytes - Green
+						temp[3] = 0;
+						tmp[2] = _i2cPort->read();
+						temp[1] = _i2cPort->read();
+						temp[0] = _i2cPort->read();
+
+						//Convert array to long
+						memcpy(&tempLong, temp, sizeof(tempLong));
+
+						tempLong &= 0x3FFFF; //Zero out all but 18 bits
+
+						sense.green[sense.head] = tempLong;
+					}
+
+					toGet -= activeLEDs * 3;
+
+
+				} //End while (bytesLeftToRead > 0)
+
+			} //End readPtr != writePtr
+
+			return (numberOfSamples); //Let the world know how much new data we found
+
+
+			/ Check for new data but give up after a certain amount of time
+			/ Returns true if new data was found
+//Returns false if new data was not found
+				bool Max30102::safeCheck(uint8_t maxTimeToCheck) {
+					uint32_t markTime = millis();
+
+					while(1) {
+
+						if(millis() - markTime > maxTimeToCheck) {
+							return (false);
+						}
+
+						if(heck() == true) { //We found new data!
+							eturn(true);
+						}
+
+
+
+						deay(1); {
+						}
+
+					}
+				}
+		}
+	}
+}
+
+
+bool Max30102::_readFifoData(uint8_t nSamples, void *buff1, void *buff2, uint8_t varSize)
+{
+	uint8_t *auxBuff = NULL;
+	uint8_t aux8 = 0;
+	uint16_t aux16 = 0;
+	int32_t aux32 = 0;
+	uint16_t *buff16ptr1 = (uint16_t *)buff1;
+	uint16_t *buff16ptr2 = (uint16_t *)buff2;
+	uint32_t *buff32ptr1 = (uint32_t *)buff1;
+	uint32_t *buff32ptr2 = (uint32_t *)buff2;
+
+	// Set device's register address pointer
+	aux8 = MAX30102_REG_FIFO_DATA;
+	twi.sendData(MAX30102_DEVICE_ADDRESS, TWI_WRITE, &aux8, 1);
+
+	// Evaluate buffer size
+	switch(this->_modeControl) {
+	case MAX30102_HEART_RATE_MODE:
+		aux16 = MAX30102_BYTES_PER_CHANNEL * nSamples * 1;
+		break;
+	case MAX30102_SPO2_MODE:
+		aux16 = MAX30102_BYTES_PER_CHANNEL * nSamples * 2;
+		break;
+	case MAX30102_MULTI_LED_MODE:
+		aux16 = MAX30102_BYTES_PER_CHANNEL * nSamples * this->enabledSlotsCounter_;
+		break;
+	default:
+		break;
+	}
+
+	// Memory allocation
+	auxBuff = (uint8_t *)calloc(aux16, sizeof(uint8_t));
+	if(auxBuff == NULL) {
+		return false;
+	}
+
+	// Read data
+	twi.sendData(MAX30102_DEVICE_ADDRESS, TWI_READ, auxBuff, aux16);
+
+	// Evaluate resolution fix
+	switch(this->_sensorResolution) {
+	case MAX30102_SENSOR_RESOLUTION_15_BITS:
+		aux8 = 3;
+		break;
+	case MAX30102_SENSOR_RESOLUTION_16_BITS:
+		aux8 = 2;
+		break;
+	case MAX30102_SENSOR_RESOLUTION_17_BITS:
+		aux8 = 1;
+		break;
+	case MAX30102_SENSOR_RESOLUTION_18_BITS:
+		aux8 = 0;
+		break;
+	default:
+		free(auxBuff);
+		return false;
+	}
+
+	// Decode data
+	aux8 = 0;	////////////////////////////////////////
+	aux16 = 0;
+	for(uint8_t i = 0; i < nSamples; i++) {
+		switch(this->_modeControl) {
+
+		case MAX30102_HEART_RATE_MODE:
+			aux32 = (uint32_t)(auxBuff[aux16++]);
+			aux32 <<= 8;
+			aux32 |= (uint32_t)(auxBuff[aux16++]);
+			aux32 <<= 8;
+			aux32 |= (uint32_t)(auxBuff[aux16++]);
+			if(varSize == 2) {
+				*buff16ptr1++ = (uint16_t)(aux32 >> aux8);
+			} else {
+				*buff32ptr1++ = (aux32 >> aux8);
+			}
+			break;
+
+		case MAX30102_SPO2_MODE:
+			aux32 = (uint32_t)(auxBuff[aux16++]);
+			aux32 <<= 8;
+			aux32 |= (uint32_t)(auxBuff[aux16++]);
+			aux32 <<= 8;
+			aux32 |= (uint32_t)(auxBuff[aux16++]);
+			if(varSize == 2) {
+				*buff16ptr1++ = (uint16_t)(aux32 >> aux8);
+			} else {
+				*buff32ptr1++ = (aux32 >> aux8);
+			}
+			aux32 = (uint32_t)(auxBuff[aux16++]);
+			aux32 <<= 8;
+			aux32 |= (uint32_t)(auxBuff[aux16++]);
+			aux32 <<= 8;
+			aux32 |= (uint32_t)(auxBuff[aux16++]);
+			if(varSize == 2) {
+				*buff16ptr2++ = (uint16_t)(aux32 >> aux8);
+			} else {
+				*buff32ptr2++ = (aux32 >> aux8);
+			}
+			break;
+
+		case MAX30102_MULTI_LED_MODE:
+			// TODO
+			break;
+		}
+	}
+	free(auxBuff);
+
+	// Update data members
+	this->_getFifoInfo();
+
+	return true;
+}
+
+bool Max30102::readNewestSample_(void *redValue, void *infraredValue, uint8_t varSize)
+{
+	uint8_t samples;
+
+	this->getFifoOccupation(&samples);
+
+	if(samples == 0) {
+		return false;
+	}
+
+	if(varSize == sizeof(uint16_t)) {
+
+		// Local variables
+		uint16_t *auxBuff1 = NULL;
+		uint16_t *auxBuff2 = NULL;
+
+		// Red LED memory allocation
+		auxBuff1 = (uint16_t *)calloc(samples, sizeof(uint16_t));
+		if(auxBuff1 == NULL) {
+			return false;
+		}
+
+		// Infrared LED memory allocation
+		if(infraredValue != NULL) {
+			auxBuff2 = (uint16_t *)calloc(samples, sizeof(uint16_t));
+			if(auxBuff2 == NULL) {
+				free(auxBuff1);
+				return false;
+			}
+		}
+
+		// Retrieve FIFO data
+		if(infraredValue == NULL) {
+			_readFifoData(samples, auxBuff1, NULL, sizeof(uint16_t));
+			(uint16_t *)*redValue = auxBuff1[samples - 1];
+		} else {
+			_readFifoData(samples, auxBuff1, auxBuff2, sizeof(uint16_t));
+			*redValue = auxBuff1[samples - 1];
+			*infraredValue = auxBuff2[samples - 1];
+		}
+		free(auxBuff1);
+		if(auxBuff2 != NULL) {
+			free(auxBuff2);
+		}
+
+	} else if(varSize == sizeof(uint32_t)) {
+		uint32_t *auxBuff1 = NULL;
+		uint32_t *auxBuff2 = NULL;
+	} else {
+
+	}
+	return true;
+}
+
+void Max30102::softReset(void)
+{
+	bitMask(MAX30102_REG_MODECONFIG, MAX30102_REG_RESET_MASK, MAX30102_REG_RESET);
+
+	// Poll for bit to clear, reset is then complete
+	// Timeout after 100ms
+	unsigned long startTime = millis();
+	while(millis() - startTime < 100) {
+		uint8_t response = readRegister8(_i2caddr, MAX30102_REG_MODECONFIG);
+		if((response & MAX30102_REG_RESET) == 0) {
+			break;    //We're done!
+		}
+		delay(1); //Let's not over burden the I2C bus
+	}
+}
+
+void Max30102::setADCRange(uint8_t adcRange)
+{
+	// adcRange: one of MAX30102_REG_ADCRANGE_2048, _4096, _8192, _16384
+	bitMask(MAX30102_REG_PARTICLECONFIG, MAX30102_REG_ADCRANGE_MASK, adcRange);
+}
+
+void Max30102::setSampleRate(uint8_t sampleRate)
+{
+	// sampleRate: one of MAX30102_REG_SAMPLERATE_50, _100, _200, _400, _800, _1000, _1600, _3200
+	bitMask(MAX30102_REG_PARTICLECONFIG, MAX30102_REG_SAMPLERATE_MASK, sampleRate);
+}
+
+void Max30102::setPulseWidth(uint8_t pulseWidth)
+{
+	// pulseWidth: one of MAX30102_REG_PULSEWIDTH_69, _188, _215, _411
+	bitMask(MAX30102_REG_PARTICLECONFIG, MAX30102_REG_PULSEWIDTH_MASK, pulseWidth);
+}
+
+void Max30102::setProximityThreshold(uint8_t threshMSB)
+{
+	// Set the IR ADC count that will trigger the beginning of particle-sensing mode.
+	// The threshMSB signifies only the 8 most significant-bits of the ADC count.
+	// See datasheet, page 24.
+	writeRegister8(_i2caddr, MAX30102_REG_PROXINTTHRESH, threshMSB);
+}
+
+//Given a slot number assign a thing to it
+//Devices are SLOT_RED_LED or SLOT_RED_PILOT (proximity)
+//Assigning a SLOT_RED_LED will pulse LED
+//Assigning a SLOT_RED_PILOT will ??
+void Max30102::enableSlot(uint8_t slotNumber, uint8_t device)
+{
+
+	uint8_t originalContents;
+
+	switch(slotNumber) {
+	case(1):
+		bitMask(MAX30102_REG_MULTILEDCONFIG1, MAX30102_REG_SLOT1_MASK, device);
+		break;
+	case(2):
+		bitMask(MAX30102_REG_MULTILEDCONFIG1, MAX30102_REG_SLOT2_MASK, device << 4);
+		break;
+	case(3):
+		bitMask(MAX30102_REG_MULTILEDCONFIG2, MAX30102_REG_SLOT3_MASK, device);
+		break;
+	case(4):
+		bitMask(MAX30102_REG_MULTILEDCONFIG2, MAX30102_REG_SLOT4_MASK, device << 4);
+		break;
+	default:
+		//Shouldn't be here!
+		break;
+	}
+}
+
+//Clears all slot assignments
+void Max30102::disableSlots(void)
+{
+	writeRegister8(_i2caddr, MAX30102_REG_MULTILEDCONFIG1, 0);
+	writeRegister8(_i2caddr, MAX30102_REG_MULTILEDCONFIG2, 0);
+}
+
+//
+// FIFO Configuration
+//
+
+
+// Die Temperature
+// Returns temp in C
+float Max30102::readTemperature()
+{
+	// Step 1: Config die temperature register to take 1 temperature sample
+	writeRegister8(_i2caddr, MAX30102_REG_DIETEMPCONFIG, 0x01);
+
+	// Poll for bit to clear, reading is then complete
+	// Timeout after 100ms
+	unsigned long startTime = millis();
+	while(millis() - startTime < 100) {
+		uint8_t response = readRegister8(_i2caddr, MAX30102_REG_DIETEMPCONFIG);
+		if((response & 0x01) == 0) {
+			break;    //We're done!
+		}
+		delay(1); //Let's not over burden the I2C bus
+	}
+	//TODO How do we want to fail? With what type of error?
+	//? if(millis() - startTime >= 100) return(-999.0);
+
+	// Step 2: Read die temperature register (integer)
+	int8_t tempInt = readRegister8(_i2caddr, MAX30102_REG_DIETEMPINT);
+	uint8_t tempFrac = readRegister8(_i2caddr, MAX30102_REG_DIETEMPFRAC);
+
+	// Step 3: Calculate temperature (datasheet pg. 23)
+	return (float)tempInt + ((float)tempFrac * 0.0625);
+}
+
+// Returns die temp in F
+float Max30102::readTemperatureF()
+{
+	float temp = readTemperature();
+
+	if(temp != -999.0) {
+		temp = temp * 1.8 + 32.0;
+	}
+
+	return (temp);
+}
+
+// Set the PROX_INT_THRESHold
+void Max30102::setPROXINTTHRESH(uint8_t val)
+{
+	writeRegister8(_i2caddr, MAX30102_REG_PROXINTTHRESH, val);
+}
+
+//Setup the sensor
+//The Max30102 has many settings. By default we select:
+// Sample Average = 4
+// Mode = MultiLED
+// ADC Range = 16384 (62.5pA per LSB)
+// Sample rate = 50
+//Use the default setup if you are just getting started with the Max30102 sensor
+void Max30102::setup(uint8_t powerLevel, uint8_t sampleAverage, uint8_t ledMode, int sampleRate, int pulseWidth,
+		int adcRange)
+{
+	softReset(); //Reset all configuration, threshold, and data registers to POR values
+
+	//FIFO Configuration
+	//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	//The chip will average multiple samples of same type together if you wish
+	if(sampleAverage == 1) {
+		setFIFOAverage(MAX30102_REG_SAMPLEAVG_1);    //No averaging per FIFO record
+	} else if(sampleAverage == 2) {
+		setFIFOAverage(MAX30102_REG_SAMPLEAVG_2);
+	} else if(sampleAverage == 4) {
+		setFIFOAverage(MAX30102_REG_SAMPLEAVG_4);
+	} else if(sampleAverage == 8) {
+		setFIFOAverage(MAX30102_REG_SAMPLEAVG_8);
+	} else if(sampleAverage == 16) {
+		setFIFOAverage(MAX30102_REG_SAMPLEAVG_16);
+	} else if(sampleAverage == 32) {
+		setFIFOAverage(MAX30102_REG_SAMPLEAVG_32);
+	} else {
+		setFIFOAverage(MAX30102_REG_SAMPLEAVG_4);
+	}
+
+	//setFIFOAlmostFull(2); //Set to 30 samples to trigger an 'Almost Full' interrupt
+	enableFIFORollover(); //Allow FIFO to wrap/roll over
+	//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+	//Mode Configuration
+	//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	if(ledMode == 3) {
+		setLEDMode(MAX30102_REG_MODE_MULTILED);    //Watch all three LED channels
+	} else if(ledMode == 2) {
+		setLEDMode(MAX30102_REG_MODE_REDIRONLY);    //Red and IR
+	} else {
+		setLEDMode(MAX30102_REG_MODE_REDONLY);    //Red only
+	}
+	activeLEDs = ledMode; //Used to control how many uint8_ts to read from FIFO buffer
+	//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+	//Particle Sensing Configuration
+	//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	if(adcRange < 4096) {
+		setADCRange(MAX30102_REG_ADCRANGE_2048);    //7.81pA per LSB
+	} else if(adcRange < 8192) {
+		setADCRange(MAX30102_REG_ADCRANGE_4096);    //15.63pA per LSB
+	} else if(adcRange < 16384) {
+		setADCRange(MAX30102_REG_ADCRANGE_8192);    //31.25pA per LSB
+	} else if(adcRange == 16384) {
+		setADCRange(MAX30102_REG_ADCRANGE_16384);    //62.5pA per LSB
+	} else {
+		setADCRange(MAX30102_REG_ADCRANGE_2048);
+	}
+
+	if(sampleRate < 100) {
+		setSampleRate(MAX30102_REG_SAMPLERATE_50);    //Take 50 samples per second
+	} else if(sampleRate < 200) {
+		setSampleRate(MAX30102_REG_SAMPLERATE_100);
+	} else if(sampleRate < 400) {
+		setSampleRate(MAX30102_REG_SAMPLERATE_200);
+	} else if(sampleRate < 800) {
+		setSampleRate(MAX30102_REG_SAMPLERATE_400);
+	} else if(sampleRate < 1000) {
+		setSampleRate(MAX30102_REG_SAMPLERATE_800);
+	} else if(sampleRate < 1600) {
+		setSampleRate(MAX30102_REG_SAMPLERATE_1000);
+	} else if(sampleRate < 3200) {
+		setSampleRate(MAX30102_REG_SAMPLERATE_1600);
+	} else if(sampleRate == 3200) {
+		setSampleRate(MAX30102_REG_SAMPLERATE_3200);
+	} else {
+		setSampleRate(MAX30102_REG_SAMPLERATE_50);
+	}
+
+	//The longer the pulse width the longer range of detection you'll have
+	//At 69us and 0.4mA it's about 2 inches
+	//At 411us and 0.4mA it's about 6 inches
+	if(pulseWidth < 118) {
+		setPulseWidth(MAX30102_REG_PULSEWIDTH_69);    //Page 26, Gets us 15 bit resolution
+	} else if(pulseWidth < 215) {
+		setPulseWidth(MAX30102_REG_PULSEWIDTH_118);    //16 bit resolution
+	} else if(pulseWidth < 411) {
+		setPulseWidth(MAX30102_REG_PULSEWIDTH_215);    //17 bit resolution
+	} else if(pulseWidth == 411) {
+		setPulseWidth(MAX30102_REG_PULSEWIDTH_411);    //18 bit resolution
+	} else {
+		setPulseWidth(MAX30102_REG_PULSEWIDTH_69);
+	}
+	//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+	//LED Pulse Amplitude Configuration
+	//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	//Default is 0x1F which gets us 6.4mA
+	//powerLevel = 0x02, 0.4mA - Presence detection of ~4 inch
+	//powerLevel = 0x1F, 6.4mA - Presence detection of ~8 inch
+	//powerLevel = 0x7F, 25.4mA - Presence detection of ~8 inch
+	//powerLevel = 0xFF, 50.0mA - Presence detection of ~12 inch
+
+	setPulseAmplitudeRed(powerLevel);
+	setPulseAmplitudeIR(powerLevel);
+	setPulseAmplitudeGreen(powerLevel);
+	setPulseAmplitudeProximity(powerLevel);
+	//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+	//Multi-LED Mode Configuration, Enable the reading of the three LEDs
+	//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	enableSlot(1, SLOT_RED_LED);
+	if(ledMode > 1) {
+		enableSlot(2, SLOT_IR_LED);
+	}
+	if(ledMode > 2) {
+		enableSlot(3, SLOT_GREEN_LED);
+	}
+	//enableSlot(1, SLOT_RED_PILOT);
+	//enableSlot(2, SLOT_IR_PILOT);
+	//enableSlot(3, SLOT_GREEN_PILOT);
+	//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+	clearFIFO(); //Reset the FIFO before we begin checking the sensor
+}
+
+//
+// Data Collection
+//
+
+//Given a register, read it, mask it, and then set the thing
+void Max30102::bitMask(uint8_t reg, uint8_t mask, uint8_t thing)
+{
+	// Grab current register context
+	uint8_t originalContents = readRegister8(_i2caddr, reg);
+
+	// Zero-out the portions of the register we're interested in
+	originalContents = originalContents & mask;
+
+	// Change contents
+	writeRegister8(_i2caddr, reg, originalContents | thing);
+}
+
+//
+// Low-level I2C Communication
+//
+uint8_t Max30102::readRegister8(uint8_t address, uint8_t reg)
+{
+	_i2cPort->beginTransmission(address);
+	_i2cPort->write(reg);
+	_i2cPort->endTransmission(false);
+
+	_i2cPort->requestFrom((uint8_t)address, (uint8_t)1); // Request 1 uint8_t
+	if(_i2cPort->available()) {
+		return (_i2cPort->read());
+	}
+
+	return (0); //Fail
+
+}
+
+void Max30102::writeRegister8(uint8_t address, uint8_t reg, uint8_t value)
+{
+	_i2cPort->beginTransmission(address);
+	_i2cPort->write(reg);
+	_i2cPort->write(value);
+	_i2cPort->endTransmission();
+}
+
+
+uint8_t Max30102::getReadPointer()
+{
+	uint8_t auxBuff[2];
+
+	auxBuff[0] = MAX30102_REG_FIFO_READ_POINTER;
+	twi.sendData(MAX30102_DEVICE_ADDRESS, TWI_WRITE, auxBuff, 1);
+	twi.sendData(MAX30102_DEVICE_ADDRESS, TWI_READ, auxBuff, 1);
+
+	return auxBuff[0];
+}
+
+uint8_t Max30102::getWritePointer()
+{
+	uint8_t auxBuff[2];
+
+	auxBuff[0] = MAX30102_REG_FIFO_WRITE_POINTER;
+	twi.sendData(MAX30102_DEVICE_ADDRESS, TWI_WRITE, auxBuff, 1);
+	twi.sendData(MAX30102_DEVICE_ADDRESS, TWI_READ, auxBuff, 1);
+
+	return auxBuff[0];
+}

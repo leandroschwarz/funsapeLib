@@ -1,0 +1,17 @@
+Central
+
+S.I.						USART		USART1
+Matrix						USART		USART3
+GPS							USART		USART4
+I.E. (Comm)					USART		USART5
+I.E. (Sync)					EXTINT		EXTI7
+Hall (Right Front)			EXTINT		EXTI8
+Hall (Left Front)			EXTINT		EXTI9
+Accelerometer				I2C			I2C1
+S.D.						SPI			SPI2
+Steering Wheel				ADC			IN10
+Brake						ADC			IN11
+Accelerator					ADC			IN12
+Suspension (Front Right)	ADC			IN13
+Suspension (Front Left)		ADC			IN14
+Battery (LiIon)				ADC			IN15

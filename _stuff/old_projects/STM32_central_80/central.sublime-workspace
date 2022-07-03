@@ -1,0 +1,1073 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"e",
+				"error\tint error"
+			],
+			[
+				"aux",
+				"aux16\tint aux16"
+			],
+			[
+				"au",
+				"auxStr\tchar [200] auxStr"
+			],
+			[
+				"auxS",
+				"auxStr\tchar [200] auxStr"
+			],
+			[
+				"sdCa",
+				"sdCard\tint sdCard"
+			],
+			[
+				"sd",
+				"sdCardInit\tint sdCardInit()"
+			],
+			[
+				"ma",
+				"main\tmain()"
+			],
+			[
+				"cir",
+				"circularBuffer8"
+			],
+			[
+				"_chan",
+				"_changeDataFormat\tbool _changeDataFormat()"
+			],
+			[
+				"ucsr",
+				"ucsr0c\tuint8_t ucsr0c"
+			],
+			[
+				"USC",
+				"ucsr0c\tuint8_t ucsr0c"
+			],
+			[
+				"doub",
+				"doubleSpeedEnabled\tbool doubleSpeedEnabled"
+			],
+			[
+				"TWI0_INT",
+				"TWI0_INT_FLAG_BIT\tTWI0_INT_FLAG_BIT"
+			],
+			[
+				"TWI0_SEN",
+				"TWI0_SEND_ACK_REG\tTWI0_SEND_ACK_REG"
+			],
+			[
+				"TWI0_IN",
+				"TWI0_INT_ENABLE_BIT\tTWI0_INT_ENABLE_BIT"
+			],
+			[
+				"TWI0_SLAVE_",
+				"TWI0_SLAVE_MASK_REG\tTWI0_SLAVE_MASK_REG"
+			],
+			[
+				"TWI0_GEN",
+				"TWI0_ANSWER_GENERAL_CALL_BIT\tTWI0_ANSWER_GENERAL_CALL_BIT"
+			],
+			[
+				"TWI0_SLA",
+				"TWI0_SLAVE_ADDRESS_BIT\tTWI0_SLAVE_ADDRESS_BIT"
+			],
+			[
+				"TWI0_SLAVE_A",
+				"TWI0_SLAVE_ADDRESS_REG\tTWI0_SLAVE_ADDRESS_REG"
+			],
+			[
+				"rega",
+				"regAddress\tuint8_t regAddress"
+			],
+			[
+				"_initia",
+				"_initialized\tbool _initialized"
+			],
+			[
+				"Syste",
+				"SystemStatus"
+			],
+			[
+				"_las",
+				"_lastError\terror_e _lastError"
+			],
+			[
+				"retu",
+				"Return"
+			],
+			[
+				"TWI0_CLOCK",
+				"TWI0_CLOCK_PRESCALER_BIT\tTWI0_CLOCK_PRESCALER_BIT"
+			],
+			[
+				"TWI0_CLOCK_PRESCA",
+				"TWI0_CLOCK_PRESCALER_REG\tTWI0_CLOCK_PRESCALER_REG"
+			],
+			[
+				"_bi",
+				"_bitRatePrescaler\tuint8_t _bitRatePrescaler"
+			],
+			[
+				"initialized",
+				"_initialized"
+			],
+			[
+				"err",
+				"error"
+			],
+			[
+				"_reset",
+				"_resetRegisters\tvoid _resetRegisters()"
+			],
+			[
+				"_rese",
+				"_resetData\tvoid _resetData()"
+			],
+			[
+				"_buf",
+				"_bufferData\tuint8_t * _bufferData"
+			],
+			[
+				"_bu",
+				"_bufferData\tuint8_t * _bufferData"
+			],
+			[
+				"funsape",
+				"funsapeLibTwi"
+			],
+			[
+				"use",
+				"usepackage"
+			],
+			[
+				"attentionIconSha",
+				"attentionIconShapeMinimumSize"
+			],
+			[
+				"attentionIconOffset",
+				"attentionIconOffsetHorizontal"
+			],
+			[
+				"ebGeometryPa",
+				"ebGeometryPageType"
+			],
+			[
+				"bar",
+				"barIndex\tuint8_t barIndex"
+			],
+			[
+				"di",
+				"digit\tchar [7] digit"
+			],
+			[
+				"per",
+				"percentage\tuint32_t percentage"
+			],
+			[
+				"uin",
+				"uint8_t\tuint8_t"
+			],
+			[
+				"progress",
+				"barProgress\tuint32_t barProgress"
+			],
+			[
+				"ba",
+				"barIndex\tuint8_t barIndex"
+			],
+			[
+				"_barB",
+				"_barBufferData\tchar * _barBufferData"
+			],
+			[
+				"_",
+				"_barBufferData\tchar * _barBufferData"
+			],
+			[
+				"Pro",
+				"ProgressBar"
+			],
+			[
+				"total",
+				"totalItens\tuint8_t totalItens"
+			],
+			[
+				"tot",
+				"totalItens\tuint8_t totalItens"
+			],
+			[
+				"uit",
+				"uint8_t\tuint8_t"
+			],
+			[
+				"uint",
+				"uint8_t\tuint8_t"
+			],
+			[
+				"timer0",
+				"timer0TurnOn\tvoid timer0TurnOn()"
+			],
+			[
+				"timer0Tur",
+				"timer0TurnOff\tvoid timer0TurnOff()"
+			],
+			[
+				"ST",
+				"STATE_SHOW_TEST_RESULTS"
+			],
+			[
+				"STAT",
+				"STATE_STARTING_TEST"
+			],
+			[
+				"stat",
+				"state\tvolatile states_m state"
+			],
+			[
+				"timer",
+				"timer0TurnOn"
+			],
+			[
+				"timer0Turn",
+				"timer0TuernOff\tvoid timer0TuernOff()"
+			],
+			[
+				"tes",
+				"runningTest\tbool runningTest"
+			],
+			[
+				"bytes",
+				"bytesSent\tvuint16_t bytesSent"
+			],
+			[
+				"move",
+				"moveCursorHome\tbool moveCursorHome()"
+			],
+			[
+				"data",
+				"lastDataSent\tvuint8_t lastDataSent"
+			],
+			[
+				"setIn",
+				"setInterruptReceptionComplete\tvoid setInterruptReceptionComplete(bool enabled)"
+			],
+			[
+				"sent",
+				"bytesSent\tvuint16_t bytesSent"
+			],
+			[
+				"vuint",
+				"vuint16_t\tvuint16_t"
+			],
+			[
+				"vui",
+				"vuint8_t\tvuint8_t"
+			],
+			[
+				"TIMS",
+				"TIMSK1\tTIMSK1"
+			],
+			[
+				"ssye",
+				"systemHalt\tsystemHalt()"
+			],
+			[
+				"lcdDe",
+				"lcdDefaultHandler\tLcd * lcdDefaultHandler"
+			],
+			[
+				"usart",
+				"usart0\tUsart0 usart0"
+			],
+			[
+				"_disp",
+				"_displayColumns\tuint8_t _displayColumns"
+			],
+			[
+				"_displ",
+				"_displayLines\tuint8_t _displayLines"
+			],
+			[
+				"moce",
+				"moveCursorHome\tbool moveCursorHome()"
+			],
+			[
+				"_OFFSE",
+				"_OFFSET_1_RIGHT_0_LEFT\t_OFFSET_1_RIGHT_0_LEFT"
+			],
+			[
+				"_OFFS",
+				"_OFFSET_1_DISPLAY_0_CURSOR\t_OFFSET_1_DISPLAY_0_CURSOR"
+			],
+			[
+				"_OFFSET_S",
+				"_OFFSET_CONFIG_SHIFTS\t_OFFSET_CONFIG_SHIFTS"
+			],
+			[
+				"cur",
+				"_cursorColumn\tuint8_t _cursorColumn"
+			],
+			[
+				"curs",
+				"_cursorLine\tuint8_t _cursorLine"
+			],
+			[
+				"sendC",
+				"_sendCommand\tvoid _sendCommand(uint8_t command)"
+			],
+			[
+				"_dis",
+				"_displayLines\tuint8_t _displayLines"
+			],
+			[
+				"ret",
+				"return\treturn"
+			],
+			[
+				"dataPo",
+				"_dataPort\tvuint8_t * _dataPort"
+			],
+			[
+				"_cont",
+				"_controlRw\tuint8_t _controlRw"
+			],
+			[
+				"_display",
+				"_displaySize\tlcdDisplaySize_e _displaySize"
+			],
+			[
+				"de",
+				"default\tdefault:"
+			],
+			[
+				"_se",
+				"_sendCommand8Bits\tvoid _sendCommand8Bits(uint8_t command)"
+			],
+			[
+				"_displa",
+				"_displaySize\tlcdDisplaySize_e _displaySize"
+			],
+			[
+				"error",
+				"error_e\terror_e"
+			],
+			[
+				"contrl",
+				"_controlPortSet\tbool _controlPortSet"
+			],
+			[
+				"Last",
+				"_lastError\terror_e _lastError"
+			],
+			[
+				"_hold",
+				"_holdingGpio\tbool _holdingGpio"
+			],
+			[
+				"_contr",
+				"_controlPort\tvuint8_t * _controlPort"
+			],
+			[
+				"brek",
+				"break\tbreak"
+			],
+			[
+				"_data",
+				"_dataPortSet\tbool _dataPortSet"
+			],
+			[
+				"_con",
+				"_controlEn\tuint8_t _controlEn"
+			],
+			[
+				"in",
+				"_interfaceMode\tlcdInterfaceMode_e _interfaceMode"
+			],
+			[
+				"set",
+				"setDataPort\tbool setDataPort(vuint8_t *dataReg)"
+			],
+			[
+				"prin",
+				"printf\tint printf(const char *__fmt, ...)"
+			],
+			[
+				"daa",
+				"dataReg\tvuint8_t * dataReg"
+			],
+			[
+				"PO",
+				"PORTC"
+			],
+			[
+				"_da",
+				"_dataDdr\tvuint8_t * _dataDdr"
+			],
+			[
+				"LCD_FONT",
+				"LCD_FUNCTION_5x8_FONT\tLCD_FUNCTION_5x8_FONT"
+			],
+			[
+				"lcd",
+				"Lcd"
+			],
+			[
+				"LCD_DI",
+				"LCD_DISPLAY_ON\tLCD_DISPLAY_ON"
+			],
+			[
+				"lcdC",
+				"lcdCursorState_e\tlcdCursorState_e"
+			],
+			[
+				"LCD_INTERCA",
+				"LCD_INTERFACE_8_BITS_FLAGGED"
+			],
+			[
+				"setD",
+				"setDisplaySize\tbool setDisplaySize(lcdDisplaySize_e displaySize)"
+			],
+			[
+				"setPi",
+				"setPinout\tbool setPinout(char *pinout)"
+			],
+			[
+				"twi",
+				"twiHandler\tTwi0 * twiHandler"
+			],
+			[
+				"led",
+				"ledTurnOff\tledTurnOff()"
+			],
+			[
+				"le",
+				"ledToggle\tledToggle()"
+			],
+			[
+				"_delay",
+				"_delay_ms\tvoid _delay_ms(double __ms)"
+			],
+			[
+				"ge",
+				"getStopwatch\tbool getStopwatch(uint32_t *stopwatch)"
+			],
+			[
+				"_cpuCLo",
+				"_cpuClockPrescaler\tcpuClockPrescaler_e _cpuClockPrescaler"
+			],
+			[
+				"_stop",
+				"_stopwatchMark\tvolatile uint32_t _stopwatchMark"
+			],
+			[
+				"_st",
+				"_stopwatchValue\tvolatile uint32_t _stopwatchValue"
+			],
+			[
+				"_ma",
+				"_cpuClockMainSourceValue\tuint32_t _cpuClockMainSourceValue"
+			],
+			[
+				"_cpuClo",
+				"_cpuClockPrescaler\tcpuClockPrescaler_e _cpuClockPrescaler"
+			],
+			[
+				"_cpu",
+				"_cpuClock\tuint32_t _cpuClock"
+			],
+			[
+				"Twi",
+				"Twi0"
+			],
+			[
+				"ena",
+				"enabled\tbool enabled"
+			],
+			[
+				"enable",
+				"enabled\tbool enabled"
+			],
+			[
+				"_inte",
+				"_intEnabled\tbool _intEnabled"
+			],
+			[
+				"_validateCl",
+				"_validateClock\tbool _validateClock(uint32_t clock)"
+			],
+			[
+				"twa",
+				"twamrRegister\tuint8_t twamrRegister"
+			],
+			[
+				"tw",
+				"twarRegister\tuint8_t twarRegister"
+			],
+			[
+				"twsar",
+				"twamrRegister\tuint8_t twamrRegister"
+			],
+			[
+				"twsr",
+				"twsrRegister\tuint8_t twsrRegister"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"Packages/LaTeXTools/LaTeX.sublime-build",
+					""
+				],
+				[
+					"Packages/LaTeXTools/LaTeX.sublime-build",
+					"Traditional"
+				],
+				[
+					"Packages/LaTeXTools/LaTeX.sublime-build",
+					"PdfLaTeX"
+				],
+				[
+					"Packages/LaTeXTools/LaTeX.sublime-build",
+					"XeLaTeX"
+				],
+				[
+					"Packages/LaTeXTools/LaTeX.sublime-build",
+					"LuaLaTeX"
+				],
+				[
+					"Packages/LaTeXTools/LaTeX.sublime-build",
+					"Basic Builder"
+				],
+				[
+					"Packages/LaTeXTools/LaTeX.sublime-build",
+					"Basic Builder - PdfLaTeX"
+				],
+				[
+					"Packages/LaTeXTools/LaTeX.sublime-build",
+					"Basic Builder - XeLaTeX"
+				],
+				[
+					"Packages/LaTeXTools/LaTeX.sublime-build",
+					"Basic Builder - LuaLaTeX"
+				],
+				[
+					"Packages/LaTeXTools/LaTeX.sublime-build",
+					"Script Builder"
+				]
+			],
+			[
+				"Packages/LaTeXTools/LaTeX.sublime-build",
+				"PdfLaTeX"
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"remo",
+				"Package Control: Remove Package"
+			],
+			[
+				"rei",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"rem",
+				"Package Control: Remove Package"
+			],
+			[
+				"inc",
+				"Increment Selection"
+			],
+			[
+				"color",
+				"Colorsublime: Install Theme"
+			],
+			[
+				"incr",
+				"Increment Selection"
+			],
+			[
+				"incre",
+				"Increment Selection"
+			],
+			[
+				"color sc",
+				"UI: Select Color Scheme"
+			],
+			[
+				"Package Control: rem",
+				"Package Control: Remove Package"
+			],
+			[
+				"easycl",
+				"EasyClangComplete: Show all errors"
+			],
+			[
+				"remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"res",
+				"PackageResourceViewer: Open Resource"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"colo",
+				"Colorsublime: Install Theme"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 396.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Inc",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Src"
+	],
+	"file_history":
+	[
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Inc/ffconf.h",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Src/main.cpp",
+		"/C/Schwarz/Projetos/ZZZ_formula_UFSC/electronics/documents/readme.txt",
+		"/D/FORMULA.HDR",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Src/myFunctions.cpp",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Inc/main.h",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Src/setup.h",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Src/myFunctions.hpp",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Src/setup.c",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Src/mpu9250.cpp",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/central.sublime-project",
+		"/C/Schwarz/Projetos/SD/Projects/STM32F091RC-Nucleo/Applications/FatFs/FatFs_uSD/Src/main.c",
+		"/D/FORMULA.TXT",
+		"/C/Schwarz/Projetos/SD/Drivers/BSP/STM32F0xx-Nucleo/stm32f0xx_nucleo.c",
+		"/C/Schwarz/Projetos/SD/Middlewares/Third_Party/FatFs/src/drivers/sd_diskio.h",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Src/diskio.c",
+		"/C/Schwarz/Projetos/SD/Middlewares/Third_Party/FatFs/src/ffconf_template.h",
+		"/C/Schwarz/Projetos/SD/Middlewares/Third_Party/FatFs/src/ff_gen_drv.h",
+		"/C/Schwarz/Projetos/SD/Drivers/BSP/STM32072B_EVAL/stm32072b_eval.c",
+		"/C/Schwarz/Projetos/SD/Drivers/BSP/Adafruit_Shield/stm32_adafruit_sd.c",
+		"/C/Schwarz/Projetos/SD/Projects/STM32F091RC-Nucleo/Applications/FatFs/FatFs_uSD/Inc/usart.h",
+		"/D/STM32.TXT",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/sdCard/Src/main.c_",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Src/myInterruptHandlers.cpp",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Central.txt",
+		"/C/Schwarz/Projetos/SD/Drivers/BSP/STM32F0xx-Nucleo/stm32f0xx_nucleo.h",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/sdCard/Inc/main.h",
+		"/C/Schwarz/Projetos/SD/Projects/STM32F091RC-Nucleo/Applications/FatFs/FatFs_uSD/Src/usart.c",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Src/sd_card.c",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Src/eval.c",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Src/system_stm32f0xx.c",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Inc/myFunctions.hpp",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Src/pastebin.txt",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/sdCard/Src/main.c",
+		"/C/Schwarz/Projetos/SD/Drivers/BSP/STM32072B_EVAL/stm32072b_eval.h",
+		"/C/Schwarz/Projetos/SD/sd.sublime-project",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Src/main.c__",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Inc/sd_card.h",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Inc/eval.h",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Src/functions.cpp",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Src/functions.hpp",
+		"/C/Schwarz/Projetos/SD/Resumido/Src/main.c",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Src/stm32l0xx_nucleo.c",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/central/Inc/stm32l0xx_nucleo.h",
+		"/C/Schwarz/Projetos/SD/Resumido/FatFs/src/drivers/sd_diskio_template.h",
+		"/C/Schwarz/Projetos/SD/Resumido/FatFs/src/integer.h",
+		"/C/Schwarz/Projetos/SD/Resumido/FatFs/src/ffconf_template.h",
+		"/C/Schwarz/Projetos/SD/Resumido/FatFs/src/ff_gen_drv.h",
+		"/C/Schwarz/Projetos/SD/Resumido/FatFs/src/ff_gen_drv.c",
+		"/C/Schwarz/Projetos/SD/Resumido/FatFs/src/ff.h",
+		"/C/Schwarz/Projetos/SD/Resumido/FatFs/src/ff.c",
+		"/C/Schwarz/Projetos/SD/Resumido/FatFs/src/diskio.h",
+		"/C/Schwarz/Projetos/SD/Resumido/FatFs/src/diskio.c",
+		"/C/Schwarz/Projetos/SD/Resumido/FatFs/src/drivers/sd_diskio_template.c",
+		"/C/Schwarz/Projetos/SD/Resumido/Src/sd_diskio.c",
+		"/C/Schwarz/Projetos/SD/Resumido/Src/stm32l0xx_it.c",
+		"/C/Schwarz/Projetos/SD/Resumido/Src/system_stm32l0xx.c",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_ll_wwdg.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_adc.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_adc_ex.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_comp_ex.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_comp.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_conf_template.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_cortex.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_crc_ex.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_cryp.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_cryp_ex.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_crc.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_dac.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_def.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_dac_ex.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_dma.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_firewall.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_flash.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_flash_ramfunc.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_flash_ex.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_gpio.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_gpio_ex.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_i2c_ex.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_i2c.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_i2s.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_irda.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_iwdg.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_irda_ex.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_lptim.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_lcd.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_lptim_ex.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_pcd_ex.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_pcd.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_pwr_ex.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_pwr.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rcc.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rcc_ex.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rng.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rtc.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rtc_ex.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_smartcard.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_smartcard_ex.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_smbus.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_spi.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_tim.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_tim_ex.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_tsc.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart_ex.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_usart_ex.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_usart.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_wwdg.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_ll_adc.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_ll_bus.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_ll_comp.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_ll_cortex.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_ll_crc.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_ll_crs.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Src/stm32l0xx_hal.c",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Src/stm32l0xx_ll_utils.c",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Src/stm32l0xx_hal_adc.c",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Src/stm32l0xx_hal_adc_ex.c",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Src/stm32l0xx_hal_comp_ex.c",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Src/stm32l0xx_hal_comp.c",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Src/stm32l0xx_hal_crc.c",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Src/stm32l0xx_hal_cortex.c",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h",
+		"/C/Schwarz/Projetos/Formula_UFSC/electronics/firmware/dotMatrixDisplay_/caracteres.txt",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_ll_dac.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_ll_dma.h",
+		"/C/Schwarz/Projetos/SD/Resumido/STM32L0xx_HAL_Driver/Inc/stm32l0xx_ll_gpio.h"
+	],
+	"find":
+	{
+		"height": 41.0
+	},
+	"find_in_files":
+	{
+		"height": 144.0,
+		"where_history":
+		[
+			"<project>",
+			"<open files>"
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"SDPath",
+			"SD_IO_CS",
+			"SD_Driver",
+			"SDPath",
+			"FATFS_LinkDriver",
+			"stm32f0xx_nucleo.h",
+			"USER_BUTTON_GPIO_PORT",
+			"SD_CS_LOW",
+			"SD_CS_GPIO_PORT",
+			"SD_CS_HIGH",
+			"SD_IO_CSState",
+			"CS",
+			"SD_SPI_CS_PIN",
+			"CS",
+			"SD_SPI_CS_PIN",
+			"*/",
+			"/*",
+			"*/",
+			"/*",
+			" - +",
+			" - ",
+			"/**",
+			" */",
+			" #",
+			"##",
+			"//##-",
+			"*/",
+			"/*",
+			"*/",
+			"/*",
+			"*/",
+			"/*",
+			"SPIx_In",
+			"SPI_In",
+			"SPIx_Error",
+			"hnucleo_Spi",
+			"SPIx_Err",
+			"NUCLEO_SPIx_TIMEOUT_MAX",
+			"SD_IO_CSState",
+			"/*",
+			"*/",
+			"/*",
+			"*/",
+			"/*",
+			"SD_IO_WriteByte",
+			"__HAL_PWR_VOLTAGESCALING_CONFIG",
+			"HAL_ADC_MODULE_ENABLED",
+			"hnucleo_Adc",
+			"Diskio_drvTypeDef",
+			"CMSIS",
+			"cmSIS",
+			"hnucleo_Spi",
+			"include",
+			"spi",
+			"HAL_ADC_MODULE_ENABLED",
+			"HAL_MODULE_ENABLED",
+			"include",
+			"HAL",
+			"twiOp",
+			">\n",
+			"CircularBuffer8",
+			"AdcHandle",
+			"write",
+			" {",
+			"inline __attribute__((always_inline))",
+			"moveReadPointer_",
+			"moveBothPointers_",
+			"moveWritePointer_",
+			"checkWriteProtected_",
+			"checkReadProtected_",
+			"checkLocked_",
+			"checkInitialized_",
+			"lastError_",
+			"overwriting_",
+			"full_",
+			"empty_",
+			"data_",
+			"occupation_",
+			"maxSize_",
+			"wrIndex_",
+			"rdIndex_",
+			"initialized_",
+			"wrProtected_",
+			"rdProtected_",
+			"locked_",
+			"FORMAT_",
+			"Template0",
+			"FRAME_FORMAT",
+			"usartFrameFormat_e",
+			"TEMPLATE_HPP",
+			"TWI_HPP",
+			"Twi",
+			"TWI_HPP",
+			"TWI",
+			"ACK_BIT",
+			"\t\t",
+			"NACK",
+			"masterEn",
+			"sendData",
+			"_masterEnabled",
+			"ERROR_MASTER_NOT_ENABLED",
+			"config",
+			"lastError_",
+			"timeOut_",
+			"bufferLength_",
+			"bufferData_",
+			"lastError_",
+			"initialized_",
+			"_lastTransOK",
+			"lastError_",
+			"state_",
+			"lastTransOK_",
+			"bufferData_",
+			"bufferLength_",
+			"stopwatchValue_",
+			"lastError_",
+			"stopwatchHalted_",
+			"stopwatchMark_",
+			"clockPrescaler_",
+			"mainSourceClock_",
+			"cpuClock_",
+			"clock",
+			"TWI_0",
+			"Céu",
+			"Usart0",
+			"GPDSE_AVR_USART",
+			"gpdseAvrUsart",
+			"GPDSE++ AVR"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"USART_HPP",
+			"(s):\t__AUTHORS_MACRO_TO_BE_CHANGED__",
+			"FunSAPE++",
+			"funsapeLib",
+			"_FUNSAPE_LIB_"
+		],
+		"reverse": false,
+		"show_context": false,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 41.0
+	},
+	"input":
+	{
+		"height": 51.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.astyle_error_message":
+	{
+		"height": 0.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.latextools":
+	{
+		"height": 160.0
+	},
+	"output.mdpopups":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "Packages/LaTeXTools/LaTeX.sublime-build",
+	"project": "central.sublime-project",
+	"replace":
+	{
+		"height": 78.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"C:\\Schwarz\\Projetos\\gpdseLib\\gpdseLib.sublime-workspace"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 392.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 592.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 272.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

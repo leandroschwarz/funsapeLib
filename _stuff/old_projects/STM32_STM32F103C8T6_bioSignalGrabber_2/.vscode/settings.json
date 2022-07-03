@@ -1,0 +1,10 @@
+{
+	"files.exclude": {
+		"*.pdsprj": true,
+		"*.code-workspace": true,
+		"*.pdsprj*workspace": true,
+		".vscode/": true,
+		"_hide/": true
+	},
+	"C_Cpp.intelliSenseEngineFallback": "Disabled"
+}

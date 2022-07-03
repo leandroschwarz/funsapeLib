@@ -1,0 +1,44 @@
+
+
+#include "tftTrace.hpp"
+#include <stdlib.h>
+#include <string.h>
+
+
+TftTrace::TftTrace(uint8_t size)
+{
+	// Reset data members
+	this->color_ = 0x000000;
+
+	// Get value from arguments
+	this->size_ = size;
+
+	// Allocate memory for data array
+	this->data_ = new uint16_t[size]();
+
+	// Return successfully
+	return;
+}
+
+TftTrace::~TftTrace()
+{
+	// Allocate data array from memory
+	delete [] this->data_;
+
+	// Return successfully
+	return;
+}
+
+TftTrace::TftTrace(const TftTrace & aux)
+{
+	// Copy values from source instance
+	this->color_ = aux.color_;
+	this->size_  = aux.size_;
+
+	// Creates a new array and copies source instance data
+	this->data_ = new uint16_t[aux.size_];
+	memcpy(this->data_, aux.data_, (this->size_ * sizeof(uint16_t)));
+
+	// Return successfully
+	return;
+}

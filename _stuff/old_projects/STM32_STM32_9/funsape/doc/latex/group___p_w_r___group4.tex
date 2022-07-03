@@ -1,0 +1,97 @@
+\hypertarget{group___p_w_r___group4}{}\section{Main and Backup Regulators configuration functions}
+\label{group___p_w_r___group4}\index{Main and Backup Regulators configuration functions@{Main and Backup Regulators configuration functions}}
+
+
+Main and Backup Regulators configuration functions.  
+
+
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{group___p_w_r___group4_ga83a4d6c5b048f2dab18e8fb04f5368d7}{P\+W\+R\+\_\+\+Backup\+Regulator\+Cmd} (Functional\+State New\+State)
+\begin{DoxyCompactList}\small\item\em Enables or disables the Backup Regulator. \end{DoxyCompactList}\item 
+void \hyperlink{group___p_w_r___group4_gada193dea79762f379d4e666a98f28d89}{P\+W\+R\+\_\+\+Main\+Regulator\+Mode\+Config} (uint32\+\_\+t P\+W\+R\+\_\+\+Regulator\+\_\+\+Voltage)
+\begin{DoxyCompactList}\small\item\em Configures the main internal regulator output voltage. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Main and Backup Regulators configuration functions. 
+
+\begin{DoxyVerb} ===============================================================================
+                    Main and Backup Regulators configuration functions
+ ===============================================================================  
+
+ - The backup domain includes 4 Kbytes of backup SRAM accessible only from the 
+   CPU, and address in 32-bit, 16-bit or 8-bit mode. Its content is retained 
+   even in Standby or VBAT mode when the low power backup regulator is enabled. 
+   It can be considered as an internal EEPROM when VBAT is always present.
+   You can use the PWR_BackupRegulatorCmd() function to enable the low power
+   backup regulator and use the PWR_GetFlagStatus(PWR_FLAG_BRR) to check if it is
+   ready or not. 
+
+ - When the backup domain is supplied by VDD (analog switch connected to VDD) 
+   the backup SRAM is powered from VDD which replaces the VBAT power supply to 
+   save battery life.
+
+ - The backup SRAM is not mass erased by an tamper event. It is read protected 
+   to prevent confidential data, such as cryptographic private key, from being 
+   accessed. The backup SRAM can be erased only through the Flash interface when
+   a protection level change from level 1 to level 0 is requested. 
+   Refer to the description of Read protection (RDP) in the Flash programming manual.
+
+ - The main internal regulator can be configured to have a tradeoff between performance
+   and power consumption when the device does not operate at the maximum frequency. 
+   This is done through PWR_MainRegulatorModeConfig() function which configure VOS bit
+   in PWR_CR register: 
+      - When this bit is set (Regulator voltage output Scale 1 mode selected) the System
+        frequency can go up to 168 MHz. 
+      - When this bit is reset (Regulator voltage output Scale 2 mode selected) the System
+        frequency can go up to 144 MHz. 
+   Refer to the datasheets for more details.\end{DoxyVerb}
+ 
+
+\subsection{Function Documentation}
+\hypertarget{group___p_w_r___group4_ga83a4d6c5b048f2dab18e8fb04f5368d7}{}\index{Main and Backup Regulators configuration functions@{Main and Backup Regulators configuration functions}!P\+W\+R\+\_\+\+Backup\+Regulator\+Cmd@{P\+W\+R\+\_\+\+Backup\+Regulator\+Cmd}}
+\index{P\+W\+R\+\_\+\+Backup\+Regulator\+Cmd@{P\+W\+R\+\_\+\+Backup\+Regulator\+Cmd}!Main and Backup Regulators configuration functions@{Main and Backup Regulators configuration functions}}
+\subsubsection[{P\+W\+R\+\_\+\+Backup\+Regulator\+Cmd}]{\setlength{\rightskip}{0pt plus 5cm}void P\+W\+R\+\_\+\+Backup\+Regulator\+Cmd (
+\begin{DoxyParamCaption}
+\item[{Functional\+State}]{New\+State}
+\end{DoxyParamCaption}
+)}\label{group___p_w_r___group4_ga83a4d6c5b048f2dab18e8fb04f5368d7}
+
+
+Enables or disables the Backup Regulator. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em New\+State} & new state of the Backup Regulator. This parameter can be\+: E\+N\+A\+B\+L\+E or D\+I\+S\+A\+B\+L\+E. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+\hypertarget{group___p_w_r___group4_gada193dea79762f379d4e666a98f28d89}{}\index{Main and Backup Regulators configuration functions@{Main and Backup Regulators configuration functions}!P\+W\+R\+\_\+\+Main\+Regulator\+Mode\+Config@{P\+W\+R\+\_\+\+Main\+Regulator\+Mode\+Config}}
+\index{P\+W\+R\+\_\+\+Main\+Regulator\+Mode\+Config@{P\+W\+R\+\_\+\+Main\+Regulator\+Mode\+Config}!Main and Backup Regulators configuration functions@{Main and Backup Regulators configuration functions}}
+\subsubsection[{P\+W\+R\+\_\+\+Main\+Regulator\+Mode\+Config}]{\setlength{\rightskip}{0pt plus 5cm}void P\+W\+R\+\_\+\+Main\+Regulator\+Mode\+Config (
+\begin{DoxyParamCaption}
+\item[{uint32\+\_\+t}]{P\+W\+R\+\_\+\+Regulator\+\_\+\+Voltage}
+\end{DoxyParamCaption}
+)}\label{group___p_w_r___group4_gada193dea79762f379d4e666a98f28d89}
+
+
+Configures the main internal regulator output voltage. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em P\+W\+R\+\_\+\+Regulator\+\_\+\+Voltage} & specifies the regulator output voltage to achieve a tradeoff between performance and power consumption when the device does not operate at the maximum frequency (refer to the datasheets for more details). This parameter can be one of the following values\+: \begin{DoxyItemize}
+\item P\+W\+R\+\_\+\+Regulator\+\_\+\+Voltage\+\_\+\+Scale1\+: Regulator voltage output Scale 1 mode, System frequency up to 168 M\+Hz. \item P\+W\+R\+\_\+\+Regulator\+\_\+\+Voltage\+\_\+\+Scale2\+: Regulator voltage output Scale 2 mode, System frequency up to 144 M\+Hz. \end{DoxyItemize}
+\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}

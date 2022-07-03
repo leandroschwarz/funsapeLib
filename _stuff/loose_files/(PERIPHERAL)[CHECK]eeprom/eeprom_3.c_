@@ -1,0 +1,92 @@
+/* -----------------------------------------------------------------------------
+ * Project:			GPDSE AVR8 Library
+ * File:			eeprom.c
+ * Module:			EEPROM interface
+ * Authors:			Hazael dos Santos Batista
+ *					Leandro Schwarz
+ * Build:			1
+ * Last edition:	March 18, 2018
+ * -------------------------------------------------------------------------- */
+
+// -----------------------------------------------------------------------------
+// Header files ----------------------------------------------------------------
+
+#include "eeprom.h"
+#if __EEPROM_H != 1
+	#error Error 101 - Build mismatch on header and source code files (eeprom).
+#endif
+
+/* -----------------------------------------------------------------------------
+ * Changes the EEPROM operation mode
+ * -------------------------------------------------------------------------- */
+
+void eepromSetOperationMode(eepromMode_t mode)
+{
+	uint8_t aux8 = 0;
+
+	aux8 = EECR & ~(0x03 << EEPM0);
+	aux8 |= (mode << EEPM0);
+	EECR = aux8;
+
+	return;
+}
+
+/* -----------------------------------------------------------------------------
+ * Activates the EEPROM ready interrupt
+ * -------------------------------------------------------------------------- */
+
+void eepromReadyActivateInterrupt(void)
+{
+	setBit(EECR, EERIE);
+	return;
+}
+
+/* -----------------------------------------------------------------------------
+ * Deactivates the EEPROM ready interrupt
+ * -------------------------------------------------------------------------- */
+
+void eepromReadyDeactivateInterrupt(void)
+{
+	clrBit(EECR, EERIE);
+
+	return;
+}
+
+/* -----------------------------------------------------------------------------
+ * Writes a byte in the specified address in the EEPROM
+ * -------------------------------------------------------------------------- */
+ 
+#if EEPROM_SIZE <= 256
+void eepromWrite(uint8_t address, uint8_t data)
+#else
+void eepromWrite(uint16_t address, uint8_t data)
+#endif
+{
+	waitUntilBitIsClear(EECR, EEPE);
+	waitUntilBitIsClear(SPMEN, SPMCSR);
+	EEAR = (address & EEPROM_ADDRESS_MASK);
+	EEDR = data;
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE){
+		setBit(EECR, EEMPE);
+		setBit(EECR, EEPE);
+	}
+
+	return;
+}
+
+/* -----------------------------------------------------------------------------
+ * Reads a byte from the specified address in the EEPROM
+ * -------------------------------------------------------------------------- */
+
+ #if EEPROM_SIZE <= 256
+uint8_t eepromRead(uint8_t address)
+#else
+uint8_t eepromRead(uint16_t address)
+#endif
+{
+	waitUntilBitIsClear(EECR, EEPE);
+	EEAR = (address & EEPROM_ADDRESS_MASK);
+	setBit(EECR, EERE);
+
+	return EEDR;
+}

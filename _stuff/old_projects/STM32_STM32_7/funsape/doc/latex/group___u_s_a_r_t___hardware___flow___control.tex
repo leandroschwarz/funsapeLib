@@ -1,0 +1,39 @@
+\hypertarget{group___u_s_a_r_t___hardware___flow___control}{}\section{U\+S\+A\+R\+T\+\_\+\+Hardware\+\_\+\+Flow\+\_\+\+Control}
+\label{group___u_s_a_r_t___hardware___flow___control}\index{U\+S\+A\+R\+T\+\_\+\+Hardware\+\_\+\+Flow\+\_\+\+Control@{U\+S\+A\+R\+T\+\_\+\+Hardware\+\_\+\+Flow\+\_\+\+Control}}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___u_s_a_r_t___hardware___flow___control_gaf3deaf4429b88db7753ee203f4797bd3}{}\#define {\bfseries U\+S\+A\+R\+T\+\_\+\+Hardware\+Flow\+Control\+\_\+\+None}~((uint16\+\_\+t)0x0000)\label{group___u_s_a_r_t___hardware___flow___control_gaf3deaf4429b88db7753ee203f4797bd3}
+
+\item 
+\hypertarget{group___u_s_a_r_t___hardware___flow___control_ga22d4339693e3356d992abca259b0418e}{}\#define {\bfseries U\+S\+A\+R\+T\+\_\+\+Hardware\+Flow\+Control\+\_\+\+R\+T\+S}~((uint16\+\_\+t)0x0100)\label{group___u_s_a_r_t___hardware___flow___control_ga22d4339693e3356d992abca259b0418e}
+
+\item 
+\hypertarget{group___u_s_a_r_t___hardware___flow___control_ga4d989f112f94009c0849fe4dbe829d81}{}\#define {\bfseries U\+S\+A\+R\+T\+\_\+\+Hardware\+Flow\+Control\+\_\+\+C\+T\+S}~((uint16\+\_\+t)0x0200)\label{group___u_s_a_r_t___hardware___flow___control_ga4d989f112f94009c0849fe4dbe829d81}
+
+\item 
+\hypertarget{group___u_s_a_r_t___hardware___flow___control_ga2986aed8c6cba414ac8afe0180ab553e}{}\#define {\bfseries U\+S\+A\+R\+T\+\_\+\+Hardware\+Flow\+Control\+\_\+\+R\+T\+S\+\_\+\+C\+T\+S}~((uint16\+\_\+t)0x0300)\label{group___u_s_a_r_t___hardware___flow___control_ga2986aed8c6cba414ac8afe0180ab553e}
+
+\item 
+\#define {\bfseries I\+S\+\_\+\+U\+S\+A\+R\+T\+\_\+\+H\+A\+R\+D\+W\+A\+R\+E\+\_\+\+F\+L\+O\+W\+\_\+\+C\+O\+N\+T\+R\+O\+L}(C\+O\+N\+T\+R\+O\+L)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{group___u_s_a_r_t___hardware___flow___control_ga9b905eb465780173a2e98bc8b602c030}{}\index{U\+S\+A\+R\+T\+\_\+\+Hardware\+\_\+\+Flow\+\_\+\+Control@{U\+S\+A\+R\+T\+\_\+\+Hardware\+\_\+\+Flow\+\_\+\+Control}!I\+S\+\_\+\+U\+S\+A\+R\+T\+\_\+\+H\+A\+R\+D\+W\+A\+R\+E\+\_\+\+F\+L\+O\+W\+\_\+\+C\+O\+N\+T\+R\+O\+L@{I\+S\+\_\+\+U\+S\+A\+R\+T\+\_\+\+H\+A\+R\+D\+W\+A\+R\+E\+\_\+\+F\+L\+O\+W\+\_\+\+C\+O\+N\+T\+R\+O\+L}}
+\index{I\+S\+\_\+\+U\+S\+A\+R\+T\+\_\+\+H\+A\+R\+D\+W\+A\+R\+E\+\_\+\+F\+L\+O\+W\+\_\+\+C\+O\+N\+T\+R\+O\+L@{I\+S\+\_\+\+U\+S\+A\+R\+T\+\_\+\+H\+A\+R\+D\+W\+A\+R\+E\+\_\+\+F\+L\+O\+W\+\_\+\+C\+O\+N\+T\+R\+O\+L}!U\+S\+A\+R\+T\+\_\+\+Hardware\+\_\+\+Flow\+\_\+\+Control@{U\+S\+A\+R\+T\+\_\+\+Hardware\+\_\+\+Flow\+\_\+\+Control}}
+\subsubsection[{I\+S\+\_\+\+U\+S\+A\+R\+T\+\_\+\+H\+A\+R\+D\+W\+A\+R\+E\+\_\+\+F\+L\+O\+W\+\_\+\+C\+O\+N\+T\+R\+O\+L}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+S\+\_\+\+U\+S\+A\+R\+T\+\_\+\+H\+A\+R\+D\+W\+A\+R\+E\+\_\+\+F\+L\+O\+W\+\_\+\+C\+O\+N\+T\+R\+O\+L(
+\begin{DoxyParamCaption}
+\item[{}]{C\+O\+N\+T\+R\+O\+L}
+\end{DoxyParamCaption}
+)}\label{group___u_s_a_r_t___hardware___flow___control_ga9b905eb465780173a2e98bc8b602c030}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+(((CONTROL) == USART\_HardwareFlowControl\_None) || \(\backslash\)
+                               ((CONTROL) == USART\_HardwareFlowControl\_RTS) || \(\backslash\)
+                               ((CONTROL) == USART\_HardwareFlowControl\_CTS) || \(\backslash\)
+                               ((CONTROL) == USART\_HardwareFlowControl\_RTS\_CTS))
+\end{DoxyCode}

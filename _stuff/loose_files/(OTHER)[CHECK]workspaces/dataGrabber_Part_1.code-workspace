@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"name": "dataGrabber Project Files",
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+		},
+		"astyle.cmd_options": [
+			"--max-code-length=200",
+		],
+	}
+}

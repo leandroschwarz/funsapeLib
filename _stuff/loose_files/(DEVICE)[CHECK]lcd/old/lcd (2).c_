@@ -1,0 +1,458 @@
+/* -----------------------------------------------------------------------------
+ * Project:			GPDSE AVR8 Library
+ * File:			lcd.c
+ * Module:			Character LCD interface
+ * Author:			Leandro Schwarz
+ * Version:			1.0
+ * Last edition:	2015-08-31
+ * -------------------------------------------------------------------------- */
+
+// -----------------------------------------------------------------------------
+// Header files ----------------------------------------------------------------
+
+#include "lcd.h"
+#if __LCD_H != 10
+	#error Error 101 - Version mismatch on header and source code files (lcd).
+#endif
+
+// -----------------------------------------------------------------------------
+// Global variables ------------------------------------------------------------
+
+FILE lcdStream = FDEV_SETUP_STREAM(lcdWriteStd, NULL, _FDEV_SETUP_WRITE);
+volatile lcdConfiguration_t * lcdDefault = NULL;
+
+// -----------------------------------------------------------------------------
+// Static function declarations ------------------------------------------------
+
+static void lcdWriteData(volatile lcdConfiguration_t * lcd, int8 data);
+static void lcdWriteCommand(volatile lcdConfiguration_t * lcd, int8 command);
+static void lcdWaitWhileIsBusy(volatile lcdConfiguration_t * lcd);
+
+/* -----------------------------------------------------------------------------
+ * Resets the LCD configuration.
+ * -------------------------------------------------------------------------- */
+
+lcdResult_t lcdResetConfiguration(volatile lcdConfiguration_t * lcd)
+{
+	lcd->dataDDR = NULL;
+	lcd->dataPORT = NULL;
+	lcd->dataPIN = NULL;
+	lcd->controlDDR = NULL;
+	lcd->controlPORT = NULL;
+	lcd->dataFirst = 0;
+	lcd->controlE = 0;
+	lcd->controlRS = 0;
+	lcd->controlRW = 0;
+	lcd->displayOn = FALSE;
+	lcd->cursorOn = FALSE;
+	lcd->cursorBlink = FALSE;
+	lcd->portConfigured = FALSE;
+	lcd->initialized = FALSE;
+	lcd->enableBusyFlag = FALSE;
+	lcd->lines = 0;
+	lcd->columns = 0;
+	lcd->cursorLine = 0;
+	lcd->cursorColumn = 0;
+	lcd->functionFontSize = LCD_FONT_5x8;
+	lcd->entryIncDec = LCD_INCREMENT;
+	lcd->entryShiftDisplay = FALSE;
+	lcd->functionInterface = LCD_8_BITS_MODE;
+	lcd->functionDisplayLines = LCD_8_BITS_MODE;
+	lcd->functionDisplayLines = LCD_TWO_LINES;
+
+	return LCD_OK;
+}
+
+/* -----------------------------------------------------------------------------
+ * Sets the default output of the printf function.
+ * -------------------------------------------------------------------------- */
+
+lcdResult_t lcdSetDefaultOutput(volatile lcdConfiguration_t * lcd)
+{
+	stdin = stdout = stderr = &lcdStream;
+	lcdDefault = lcd;
+
+	return LCD_OK;
+}
+
+/* -----------------------------------------------------------------------------
+ * Configures the port I/O.
+ * -------------------------------------------------------------------------- */
+
+lcdResult_t lcdSetPort(volatile lcdConfiguration_t * lcd, volatile uint8 * dataDDR, volatile uint8 * dataPORT, volatile uint8 * dataPIN, uint8 dataFirst, volatile uint8 * controlDDR, volatile uint8 * controlPORT, uint8 controlE, uint8 controlRS, uint8 controlRW)
+{
+	lcd->dataDDR = dataDDR;
+	lcd->dataPORT = dataPORT;
+	lcd->dataPIN = dataPIN;
+	lcd->controlDDR = controlDDR;
+	lcd->controlPORT = controlPORT;
+	lcd->dataFirst = dataFirst;
+	lcd->controlE = controlE;
+	lcd->controlRS = controlRS;
+	lcd->controlRW = controlRW;
+	lcd->portConfigured = TRUE;
+
+	return LCD_OK;
+}
+
+/* -----------------------------------------------------------------------------
+ * Clears the LCD screen.
+ * -------------------------------------------------------------------------- */
+
+lcdResult_t lcdClearScreen(volatile lcdConfiguration_t * lcd)
+{
+	lcdWriteCommand(lcd, LCD_CLEAR_DISPLAY);
+	lcd->cursorLine = 0;
+	lcd->cursorColumn = 0;
+
+	return LCD_OK;
+}
+
+/* -----------------------------------------------------------------------------
+ * Moves the LCD cursor to home position.
+ * -------------------------------------------------------------------------- */
+
+lcdResult_t lcdCursorHome(volatile lcdConfiguration_t * lcd)
+{
+	lcdWriteCommand(lcd, LCD_CURSOR_HOME);
+	lcd->cursorLine = 0;
+	lcd->cursorColumn = 0;
+
+	return LCD_OK;
+}
+
+/* -----------------------------------------------------------------------------
+ * Controls the display activation.
+ * -------------------------------------------------------------------------- */
+
+lcdResult_t lcdDisplay(volatile lcdConfiguration_t * lcd, logic_t state)
+{
+	if(state > 1)
+		return LCD_UNSUPPORTED_PARAMETER;
+
+	lcd->displayOn = state;
+	lcdWriteCommand(lcd, LCD_DISPLAY_CONTROL | ((lcd->displayOn) << LCD_DISPLAY_BIT) | ((lcd->cursorOn) << LCD_CURSOR_BIT) | ((lcd->cursorBlink) << LCD_BLINK_BIT));
+
+	return LCD_OK;
+}
+
+/* -----------------------------------------------------------------------------
+ * Controls the cursor activation.
+ * -------------------------------------------------------------------------- */
+
+lcdResult_t lcdCursor(volatile lcdConfiguration_t * lcd, logic_t state)
+{
+	if(state > 1)
+		return LCD_UNSUPPORTED_PARAMETER;
+
+	lcd->cursorOn = state;
+	lcdWriteCommand(lcd, LCD_DISPLAY_CONTROL | ((lcd->displayOn) << LCD_DISPLAY_BIT) | ((lcd->cursorOn) << LCD_CURSOR_BIT) | ((lcd->cursorBlink) << LCD_BLINK_BIT));
+
+	return LCD_OK;
+}
+
+/* -----------------------------------------------------------------------------
+ * Controls the cursor blink activation.
+ * -------------------------------------------------------------------------- */
+
+lcdResult_t lcdCursorBlink(volatile lcdConfiguration_t * lcd, logic_t state)
+{
+	if(state > 1)
+		return LCD_UNSUPPORTED_PARAMETER;
+
+	lcd->cursorBlink = state;
+	lcdWriteCommand(lcd, LCD_DISPLAY_CONTROL | ((lcd->displayOn) << LCD_DISPLAY_BIT) | ((lcd->cursorOn) << LCD_CURSOR_BIT) | ((lcd->cursorBlink) << LCD_BLINK_BIT));
+
+	return LCD_OK;
+}
+
+/* -----------------------------------------------------------------------------
+ * Moves the cursor.
+ * -------------------------------------------------------------------------- */
+
+lcdResult_t lcdCursorGoTo(volatile lcdConfiguration_t * lcd, uint8 line, uint8 column)
+{
+	uint8 pos = 0x00;
+
+	if(column >= lcd->columns)
+		return LCD_UNSUPPORTED_PARAMETER;
+
+	if(line >= lcd->lines)
+		return LCD_UNSUPPORTED_PARAMETER;
+
+	switch(line){
+		case 0:	pos = 0x00;	break;
+		case 1:	pos = 0x40;	break;
+		case 2:	pos = 0x14;	break;
+		case 3:	pos = 0x54;	break;
+	}
+	pos += column;
+	lcdWriteCommand(lcd, LCD_SET_DDRAM_ADDRESS | pos);
+	lcd->cursorLine = line;
+	lcd->cursorColumn = column;
+
+	return LCD_OK;
+}
+
+/* -----------------------------------------------------------------------------
+ * Performs the LCD initialization.
+ * -------------------------------------------------------------------------- */
+
+lcdResult_t lcdInit(volatile lcdConfiguration_t * lcd, lcdSize_t size, lcdFont_t font, lcdInterface_t interface)
+{
+	// LCD font
+	switch(font){
+		case LCD_FONT_5x8:	lcd->functionFontSize = LCD_FONT_5x8;	break;
+		case LCD_FONT_5x10:	lcd->functionFontSize = LCD_FONT_5x10;	break;
+		default:			return LCD_UNSUPPORTED_FONT_SIZE;
+	}
+
+	// LCD interface mode
+	switch(interface){
+		case LCD_4_BITS_TIMMED_MODE:	lcd->functionInterface = LCD_4_BITS_MODE;	lcd->enableBusyFlag = LCD_TIMMED;		break;
+		case LCD_8_BITS_TIMMED_MODE:	lcd->functionInterface = LCD_8_BITS_MODE;	lcd->enableBusyFlag = LCD_TIMMED;		break;
+		case LCD_4_BITS_BF_MODE:		lcd->functionInterface = LCD_4_BITS_MODE;	lcd->enableBusyFlag = LCD_BUSY_FLAG;	break;
+		case LCD_8_BITS_BF_MODE:		lcd->functionInterface = LCD_8_BITS_MODE;	lcd->enableBusyFlag = LCD_BUSY_FLAG;	break;
+		default:						return LCD_UNSUPPORTED_INTERFACE_MODE;
+	}
+
+	// LCD size
+	switch(size){
+		case LCD_8X1:	lcd->lines = 1;	lcd->columns = 8;	break;
+		case LCD_8X2:	lcd->lines = 2;	lcd->columns = 8;	break;
+		case LCD_12X2:	lcd->lines = 2;	lcd->columns = 12;	break;
+		case LCD_16X1:	lcd->lines = 1;	lcd->columns = 16;	break;
+		case LCD_16X2:	lcd->lines = 2;	lcd->columns = 16;	break;
+		case LCD_16X4:	lcd->lines = 4;	lcd->columns = 16;	break;
+		case LCD_20X1:	lcd->lines = 1;	lcd->columns = 20;	break;
+		case LCD_20X2:	lcd->lines = 2;	lcd->columns = 20;	break;
+		case LCD_20X4:	lcd->lines = 4;	lcd->columns = 20;	break;
+		case LCD_24X2:	lcd->lines = 2;	lcd->columns = 24;	break;
+		case LCD_40X2:	lcd->lines = 2;	lcd->columns = 40;	break;
+		case LCD_40X4:	lcd->lines = 4;	lcd->columns = 40;	break;
+		default:		return LCD_UNSUPPORTED_DISPLAY_SIZE;
+	}
+
+	// I/O initialization
+	if(lcd->portConfigured == FALSE)
+		return LCD_PORTS_NOT_CONFIGURED;
+	// LCD control lines to output low
+	clrBit(*(lcd->controlPORT), lcd->controlE);
+	clrBit(*(lcd->controlPORT), lcd->controlRS);
+	clrBit(*(lcd->controlPORT), lcd->controlRW);
+	setBit(*(lcd->controlDDR), lcd->controlE);
+	setBit(*(lcd->controlDDR), lcd->controlRS);
+	setBit(*(lcd->controlDDR), lcd->controlRW);
+	// LCD data lines to input pull-up
+	if(lcd->functionInterface == LCD_8_BITS_MODE){
+		*(lcd->dataDDR) = 0x00;
+		*(lcd->dataPORT) = 0xFF;
+	}else{
+		clrMask(*(lcd->dataDDR), 0x0F, lcd->dataFirst);
+		setMask(*(lcd->dataPORT), 0x0F, lcd->dataFirst);
+	}
+
+	// LCD function set
+	if(lcd->lines == 1)
+		lcdWriteCommand(lcd, LCD_FUNCTION_SET | (lcd->functionInterface << LCD_INTERFACE_BITS) | (lcd->functionFontSize << LCD_FONT_BITS));
+	else
+		lcdWriteCommand(lcd, LCD_FUNCTION_SET | (lcd->functionInterface << LCD_INTERFACE_BITS) | (1 << LCD_LINES_BITS) | (lcd->functionFontSize << LCD_FONT_BITS));
+	lcd->initialized = TRUE;
+
+	// Clear LCD
+	lcdWriteCommand(lcd, LCD_CLEAR_DISPLAY);
+	_delay_ms(60);
+
+	// Cursor control
+	lcdWriteCommand(lcd, LCD_CURSOR_CONTROL | (lcd->entryIncDec << LCD_INCREMENT_BIT) | (lcd->entryShiftDisplay << LCD_DISPLAY_SHIFT_BIT));
+
+	// Turns display on
+	lcdDisplay(lcd, ON);
+
+	// Moves cursor to home position
+	lcdCursorHome(lcd);
+
+	return LCD_OK;
+}
+
+/* -----------------------------------------------------------------------------
+ * Moves the cursor to first line.
+ * -------------------------------------------------------------------------- */
+
+lcdResult_t lcdCursorMoveFirstLine(volatile lcdConfiguration_t * lcd)
+{
+	lcdCursorGoTo(lcd, 0, 0);
+
+	return LCD_OK;
+}
+
+/* -----------------------------------------------------------------------------
+ * Moves the cursor to next line.
+ * -------------------------------------------------------------------------- */
+
+lcdResult_t lcdCursorMoveNextLine(volatile lcdConfiguration_t * lcd)
+{
+	uint8 line = 0;
+
+	line = lcd->cursorLine + 1;
+	if(line >= lcd->lines){
+		line = 0;
+	}
+	lcdCursorGoTo(lcd, line, 0);
+
+	return LCD_OK;
+}
+
+/* -----------------------------------------------------------------------------
+ * Writes a character in the LCD.
+ * -------------------------------------------------------------------------- */
+
+static void lcdWriteData(volatile lcdConfiguration_t * lcd, int8 data)
+{
+	lcdWaitWhileIsBusy(lcd);
+	// Set RS to data
+	setBit(*(lcd->controlPORT), lcd->controlRS);
+	// Set RW to write
+	clrBit(*(lcd->controlPORT), lcd->controlRW);
+	// Sends data
+	setBit(*(lcd->controlPORT), lcd->controlE);
+	if(lcd->functionInterface == LCD_8_BITS_MODE){
+		// Set data to output
+		*(lcd->dataDDR) = 0xFF;
+		// Write data - 8 bits 
+		*(lcd->dataPORT) = data;
+	}else{
+		// Set data to output
+		setMask(*(lcd->dataDDR), 0x0F, lcd->dataFirst);
+		// Write data - 4 bits high
+		clrMask(*(lcd->dataPORT), 0x0F, lcd->dataFirst);
+		*(lcd->dataPORT) |= ((data >> 4) << lcd->dataFirst);
+		// Enable pulse
+		_delay_us(2);
+		clrBit(*(lcd->controlPORT), lcd->controlE);
+		_delay_us(2);
+		setBit(*(lcd->controlPORT), lcd->controlE);
+		// Write data - 4 bits low
+		clrMask(*(lcd->dataPORT), 0x0F, lcd->dataFirst);
+		*(lcd->dataPORT) |= ((data & 0x0F) << lcd->dataFirst);
+	}
+	// Enable pulse
+	_delay_us(2);
+	clrBit(*(lcd->controlPORT), lcd->controlE);
+	// Leave data lines as input pull-up
+	if(lcd->functionInterface == LCD_8_BITS_MODE){
+		*(lcd->dataDDR) = 0x00;
+		*(lcd->dataPORT) = 0xFF;
+	}else{
+		clrMask(*(lcd->dataDDR), 0x0F, lcd->dataFirst);
+		setMask(*(lcd->dataPORT), 0x0F, lcd->dataFirst);
+	}
+
+	return;
+}
+
+/* -----------------------------------------------------------------------------
+ * Writes a command in the LCD.
+ * -------------------------------------------------------------------------- */
+
+static void lcdWriteCommand(volatile lcdConfiguration_t * lcd, int8 command)
+{
+	lcdWaitWhileIsBusy(lcd);
+	// Set RS to command
+	clrBit(*(lcd->controlPORT), lcd->controlRS);
+	// Set RW to write
+	clrBit(*(lcd->controlPORT), lcd->controlRW);
+	// Sends data
+	setBit(*(lcd->controlPORT), lcd->controlE);
+	if(lcd->functionInterface == LCD_8_BITS_MODE){
+		// Set data to output
+		*(lcd->dataDDR) = 0xFF;
+		// Write command - 8 bits 
+		*(lcd->dataPORT) = command;
+	}else{
+		// Set data to output
+		setMask(*(lcd->dataDDR), 0x0F, lcd->dataFirst);
+		// Write command - 4 bits high
+		clrMask(*(lcd->dataPORT), 0x0F, lcd->dataFirst);
+		*(lcd->dataPORT) |= ((command >> 4) << lcd->dataFirst);
+		// Enable pulse
+		_delay_us(2);
+		clrBit(*(lcd->controlPORT), lcd->controlE);
+		_delay_us(2);
+		setBit(*(lcd->controlPORT), lcd->controlE);
+		// Write command - 4 bits low
+		clrMask(*(lcd->dataPORT), 0x0F, lcd->dataFirst);
+		*(lcd->dataPORT) |= ((command & 0x0F) << lcd->dataFirst);
+	}
+	// Enable pulse
+	_delay_us(2);
+	clrBit(*(lcd->controlPORT), lcd->controlE);
+	// Leave data lines as input pull-up
+	if(lcd->functionInterface == LCD_8_BITS_MODE){
+		*(lcd->dataDDR) = 0x00;
+		*(lcd->dataPORT) = 0xFF;
+	}else{
+		clrMask(*(lcd->dataDDR), 0x0F, lcd->dataFirst);
+		setMask(*(lcd->dataPORT), 0x0F, lcd->dataFirst);
+	}
+
+	return;
+}
+
+/* -----------------------------------------------------------------------------
+ * Wait while the LCD is busy.
+ * -------------------------------------------------------------------------- */
+
+static void lcdWaitWhileIsBusy(volatile lcdConfiguration_t * lcd)
+{
+	uint8 busyBit = 7;
+
+	// Set RS to command
+	clrBit(*(lcd->controlPORT), lcd->controlRS);
+	// Sets data port to input pull-up
+	if(lcd->functionInterface == LCD_8_BITS_MODE){
+		*(lcd->dataDDR) = 0x00;
+		*(lcd->dataPORT) = 0xFF;
+	}else{
+		busyBit = lcd->dataFirst + 3;
+		clrMask(*(lcd->dataDDR), 0x0F, lcd->dataFirst);
+		setMask(*(lcd->dataPORT), 0x0F, lcd->dataFirst);
+	}
+	// Set RW to read
+	setBit(*(lcd->controlPORT), lcd->controlRW);
+	// Set E
+	setBit(*(lcd->controlPORT), lcd->controlE);
+	_delay_us(1);
+	// Pulling busy flag
+	while(isBitSet(*(lcd->dataPIN), busyBit)){
+		clrBit(*(lcd->controlPORT), lcd->controlE);
+		_delay_us(2);
+		setBit(*(lcd->controlPORT), lcd->controlE);
+		_delay_us(2);
+		if(lcd->functionInterface == LCD_4_BITS_MODE){
+			clrBit(*(lcd->controlPORT), lcd->controlE);
+			_delay_us(2);
+			setBit(*(lcd->controlPORT), lcd->controlE);
+			_delay_us(2);
+		}
+	}
+	clrBit(*(lcd->controlPORT), lcd->controlE);
+
+	return;
+}
+
+
+
+
+int16	lcdWriteStd(int8 c, FILE * stream)
+{
+	return 0;
+}
+
+
+void lcdWrite(volatile lcdConfiguration_t * lcd, int8 data)
+{
+	lcdWriteData(lcd, data);
+
+	return;
+}

@@ -1,0 +1,30 @@
+
+// Writing data
+for(uint8_t i = 0; i < (SD_CARD_BUFFER_SIZE / 8); i++)
+{
+	sdCardBuffer[(8 * i) + 0] = 'a';
+	sdCardBuffer[(8 * i) + 1] = 'b';
+	sdCardBuffer[(8 * i) + 2] = 'c';
+	sdCardBuffer[(8 * i) + 3] = 'd';
+	sdCardBuffer[(8 * i) + 4] = 'e';
+	sdCardBuffer[(8 * i) + 5] = 'f';
+	sdCardBuffer[(8 * i) + 6] = 'g';
+	sdCardBuffer[(8 * i) + 7] = 'h';
+}
+do
+{
+	UINT auxInt1;
+	sprintf(auxBuff, "Wrinting data.................");
+	HAL_UART_Transmit(&huart3, (uint8_t *)auxBuff, strlen(auxBuff), 100);
+	sdCardResult = f_write(&sdCardFile, sdCardBuffer, 512, &auxInt1);
+	if(sdCardResult) {
+		sprintf(auxBuff, "[FAILED]! Error = %u\r", sdCardResult);
+	} else {
+		sprintf(auxBuff, "[  OK  ]!\r");
+	}
+	HAL_UART_Transmit(&huart3, (uint8_t *)auxBuff, strlen(auxBuff), 100);
+	sprintf(auxBuff, "\t%u bytes written.\r", auxInt1);
+	HAL_UART_Transmit(&huart3, (uint8_t *)auxBuff, strlen(auxBuff), 100);
+} while(0);
+f_sync(&sdCardFile);
+systemHalt();

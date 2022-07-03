@@ -1,0 +1,69 @@
+{
+    "configurations": [
+        {
+            "name": "STM32F091xC toolchain",
+            "compilerArgs": ["mcpu=cortex-m3", "-mthumb"],
+            "compilerPath": "${execPath}/../toolchains/GNU Tools ARM Embedded/10.3-2021.10/bin/arm-none-eabi-g++.exe",
+            "cppStandard": "c++17",
+            "cStandard": "gnu11",
+            "defines": ["_DEBUG", "UNICODE", "_UNICODE", "STM32F091xC", "USE_HAL_DRIVER", "USE_FUNSAPE_LIB"],
+            "includePath": [
+                "${workspaceFolder}/**",
+                "D:/Schwarz/Projects/STM32/funsapeLib/**"
+            ],
+            "intelliSenseMode": "gcc-arm"
+        },
+        {
+            "name": "STM32F103xB toolchain",
+            "compilerArgs": ["-mcpu=cortex-m3", "-mthumb"],
+            "compilerPath": "${execPath}/../toolchains/GNU Tools ARM Embedded/10.3-2021.10/bin/arm-none-eabi-g++.exe",
+            "cppStandard": "c++17",
+            "cStandard": "gnu11",
+            "defines": ["_DEBUG", "UNICODE", "_UNICODE", "STM32F103xE", "USE_HAL_DRIVER", "USE_FUNSAPE_LIB"],
+            "includePath": [
+                "${workspaceFolder}/**",
+                "D:/Schwarz/Projects/STM32/funsapeLib/**"
+            ],
+            "intelliSenseMode": "gcc-arm"
+        },
+        {
+            "name": "STM32F103xE toolchain",
+            "compilerArgs": [
+                "mcpu=cortex-m3",
+                "-mthumb"
+            ],
+            "compilerPath": "${execPath}/../toolchains/GNU Tools ARM Embedded/10.3-2021.10/bin/arm-none-eabi-g++.exe",
+            "cppStandard": "c++17",
+            "cStandard": "gnu11",
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "STM32F103xE",
+                "USE_HAL_DRIVER",
+                "USE_FUNSAPE_LIB"
+            ],
+            "includePath": [
+                "D:/Schwarz/Projects/STM32/funsapeLib/**",
+                "D:/Schwarz/Projects/STM32/STM32F103_bioSignalGrabber/**"
+            ],
+            "intelliSenseMode": "gcc-arm"
+        },
+        {
+            "name": "AVR Toolchain",
+            "compilerPath": "${execPath}/../toolchains/GNU Tools AVR Embedded/bin/avr-g++.exe",
+            "cppStandard": "c++17",
+            "cStandard": "gnu11",
+            "defines": ["__AVR_ATmega328P__", "__USE_FUNSAPE_LIB__"],
+            "includePath": [
+                "${execPath}/../toolchains/GNU Tools AVR Embedded/avr/include/",
+                "${execPath}/../toolchains/GNU Tools AVR Embedded/lib/gcc/avr/4.9.2/include",
+                "${workspaceFolder}/**"
+            ],
+            "intelliSenseMode": "gcc-x64"
+        }
+    ],
+    "enableConfigurationSquiggles": true,
+    "env": {},
+    "version": 4
+}

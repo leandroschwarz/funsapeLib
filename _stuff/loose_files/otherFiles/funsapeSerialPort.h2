@@ -1,0 +1,185 @@
+//---------------------------------------------------------------------------
+
+#ifndef funsapeSerialPortH
+#define funsapeSerialPortH
+//---------------------------------------------------------------------------
+
+#include <windows.h>
+#include <fileapi.h>
+#include <synchapi.h>
+#include <process.h>
+#include <vector>
+#include <System.Classes.hpp>
+#include "circularBuffer.h"
+
+#define SERIAL_SIGNAL_NBR           7       // number of events in the thread
+#define SERIAL_MAX_RX               256     // Input buffer max size
+#define SERIAL_MAX_TX               256     // output buffer max size
+
+#define SERIAL_CONNECTED            0
+#define SERIAL_DISCONNECTED         1
+#define SERIAL_DATA_SENT            2
+#define SERIAL_DATA_ARRIVAL         3
+#define SERIAL_RING                 4
+#define SERIAL_CD_ON                5
+#define SERIAL_CD_OFF               6
+
+class funsapeSerialPort
+{
+	// New data types
+public:
+	enum class PortDirection : uint8_t {
+		RX_ONLY		= 0,
+		TX_ONLY		= 1,
+		TX_RX		= 2
+	};
+	enum class PortSharing : uint8_t {
+		NO_SHARE		= 0,
+		ALLOW_DELETE	= 4,
+		ALLOW_READ		= 1,
+		ALLOW_WRITE		= 2,
+	};
+	enum class ParityMode : uint8_t {
+		NO_PARITY	= 0,
+		ODD			= 1,
+		EVEN		= 2,
+		MARK		= 3,
+		SPACE		= 4,
+	};
+	enum class FlowControl : uint8_t {
+		NO_CONTROL	= 0,
+		CTS_RTS		= 1,
+		DSR_DTR		= 2,
+		XON_XOFF	= 4,
+	};
+	enum class StopBits : uint8_t {
+		ONE			= 0,
+		ONE_HALF	= 1,
+		TWO			= 2,
+	};
+	enum class DataBits : uint8_t {
+		DATA_BITS_5 = 5,
+		DATA_BITS_6 = 6,
+		DATA_BITS_7 = 7,
+		DATA_BITS_8 = 8,
+	};
+	enum class ErrorCode : uint16_t {
+		NONE                                        = 0,
+		POINTER_NULL                                = 1,
+		PORT_NUMBER_INVALID                         = 2,
+		BAUD_RATE_INVALID                           = 3,
+		CREATE_HANDLER_ERROR                        = 4,
+		SET_EVENT_MASK_ERROR                        = 5,
+		SET_TIMEOUTS_ERROR                          = 6,
+		SET_COMM_STATE_ERROR                        = 7,
+		CREATE_EVENT_ERROR                          = 8,
+		READ_FILE_ERROR                             = 9,
+		GET_OVERLAPPED_RESULT_ERROR                 = 10,
+		WRITE_FILE_ERROR                            = 11,
+		FUNCTION_POINTER_NULL                       = 12,
+	};
+
+	// Methods
+public:
+	//     /////////////////////    CONSTRUCTOR     /////////////////////     //
+	funsapeSerialPort(
+		CircularBuffer<uint8_t> * rxBuffer_p
+	);
+	~funsapeSerialPort(
+		void
+	);
+
+	//     ///////////////////////     STATUS     ///////////////////////     //
+	ErrorCode getLastError(
+		void
+	);
+	int getNbrOfBytes(
+		void
+	);
+
+	//     ////////////////////    CONFIGURATION     ////////////////////     //
+	bool connect(
+		uint16_t        portNumber_p,
+		uint32_t        baudRate_p      = 9'600,
+		DataBits        dataBits_p      = DataBits::DATA_BITS_8,
+		ParityMode      parityMode_p    = ParityMode:: NO_PARITY,
+		StopBits        stopBits_p      = StopBits::ONE,
+		PortDirection   direction_p     = PortDirection::TX_RX,
+		FlowControl     flowControl_p   = FlowControl::NO_CONTROL,
+		PortSharing     sharingFlags_p  = PortSharing::NO_SHARE
+	);
+	void run(
+		void
+	);
+	bool setManagerFunction(
+		void (*managerFunction_p)(uint32_t object_p, uint32_t event_p)
+	);
+	bool setOnConnectCallback(
+		void (*callbackFunction_p)(void)
+	);
+	bool setOnDisconnectCallback(
+		void (*callbackFunction_p)(void)
+	);
+	bool setOnRescanPortCallback(
+		void (*callbackFunction_p)(void)
+	);
+	bool scan(
+		std::vector<AnsiString> *ports_p
+	);
+	char * getDataInBuffer(void) {
+		return(this->_rxTempBuffer);
+	}
+	int getDataInSize(void) {
+		return(this->_rxTempBufferLength);
+	}
+	void dataHasBeenRead(
+		void
+	);
+	bool disconnect(
+		void
+	);
+
+private:
+
+	// Properties
+private:
+	//     ///////////////////////     STATUS     ///////////////////////     //
+	ErrorCode               _lastError;
+	bool                    _isOpenned                      : 1;
+	bool                    _isReady                        : 1;
+	bool                    _isRxInProgress                 : 1;
+	bool                    _isTxInProgress                 : 1;
+	bool                    _isWaitCommEventInProgress      : 1;
+
+	//     ////////////////////    CONFIGURATION     ////////////////////     //
+	PortDirection               _direction;
+	PortSharing                 _sharingFlags;
+	ParityMode                  _parityMode;
+	FlowControl                 _flowControl;
+	StopBits                    _stopBits;
+	DataBits                    _dataBits;
+	uint32_t                    _baudRate;
+	CircularBuffer<uint8_t>     *_rxBuffer;
+	char                        _rxTempBuffer[SERIAL_MAX_RX];
+	char                        _txTempBuffer[SERIAL_MAX_TX];
+	uint16_t                    _maxRxTempBuffer;
+	uint16_t                    _rxTempBufferLength;
+	uint16_t                    _txTempBufferLength;
+	void (*_managerFunction)(uint32_t object_p, uint32_t event_p);
+	void (*_onConnectCallback)(void);
+	void (*_onDisconnectCallback)(void);
+	void (*_onRescanPortCallback)(void);
+
+
+	//     //////////////////    WINDOWS VARIABLES     //////////////////     //
+	HANDLE                      _serialEvents[SERIAL_SIGNAL_NBR];
+	HANDLE                      _threadHandler;
+	unsigned int                _threadId;
+	HANDLE                      _serialHandler;
+	DCB                         _dcb;
+	OVERLAPPED                  _ovReader;      // Overlapped structure for ReadFile
+	OVERLAPPED                  _ovWriter;      // Overlapped structure for WriteFile
+	OVERLAPPED                  _ovWaitEvent;   // Overlapped structure for WaitCommEvent
+};
+
+#endif

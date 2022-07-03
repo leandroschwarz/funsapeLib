@@ -1,0 +1,69 @@
+{
+	"configurations": [
+		{
+			"name": "STM32 Toolchain",
+			"intelliSenseMode": "gcc-x64",
+			"compilerPath": "C:/vscode/toolchains/GNU Tools ARM Embedded/7 2017-q4-major/bin/arm-none-eabi-gcc.exe",
+			"cppStandard": "c++11",
+			"cStandard": "c11",
+			"defines": [
+				"STM32F103xB",
+				"USE_HAL_DRIVER",
+				"USE_FUNSAPE_LIB"
+			],
+			"includePath": [
+				"C:/Schwarz/Projetos/git/funsapeLib-MCU/funsapeLib",
+				"${workspaceFolder}/Drivers/CMSIS/Device/ST/STM32F1xx/Include",
+				"${workspaceFolder}/Drivers/CMSIS/Include",
+				"${workspaceFolder}/Drivers/STM32F1xx_HAL_Driver/Inc",
+				"${workspaceFolder}/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy",
+				"${workspaceFolder}/Inc",
+				"${workspaceFolder}/**"
+			],
+			"browse": {
+				"databaseFilename": "C_CPP_DATABASE.DB",
+				"path": [
+					"toolchains/GNU Tools ARM Embedded/7 2017-q4-major/arm-none-eabi/include/",
+					"toolchains/GNU Tools ARM Embedded/7 2017-q4-major/arm-none-eabi/include/c++/7.2.1",
+					"toolchains/GNU Tools ARM Embedded/7 2017-q4-major/arm-none-eabi/include/c++/7.2.1/arm-none-eabi/",
+					"toolchains/GNU Tools ARM Embedded/7 2017-q4-major/arm-none-eabi/include/c++/7.2.1/backward/",
+					"toolchains/GNU Tools ARM Embedded/7 2017-q4-major/arm-none-eabi/include/c++/7.2.1/tr1",
+					"toolchains/GNU Tools ARM Embedded/7 2017-q4-major/arm-none-eabi/include/sys",
+					"toolchains/GNU Tools ARM Embedded/7 2017-q4-major/lib/gcc/arm-none-eabi/7.2.1/include-fixed/",
+					"toolchains/GNU Tools ARM Embedded/7 2017-q4-major/lib/gcc/arm-none-eabi/7.2.1/include/"
+				],
+				"limitSymbolsToIncludedHeaders": true
+			}
+		},
+		{
+			"name": "AVR Toolchain",
+			"intelliSenseMode": "gcc-x64",
+			"compilerPath": "C:/vscode/toolchains/GNU Tools AVR Embedded/bin/avr-g++.exe",
+			"cppStandard": "c++11",
+			"cStandard": "c11",
+			"defines": [
+				"__AVR_ATmega328P__",
+				"__USE_FUNSAPE_LIB__"
+			],
+			"includePath": [
+				"C:/Portable/Embedded ToolChain/GNU Tools AVR Embedded/avr/include/",
+				"C:/Portable/Embedded Toolchain/GNU Tools AVR Embedded/lib/gcc/avr/4.9.2/include",
+				"C:/Schwarz/Projetos/git/funsapeLib-MCU/funsapeLib",
+				"${workspaceFolder}/**"
+			],
+			"browse": {
+				"databaseFilename": "C_CPP_DATABASE.DB",
+				"path": [
+					"C:/Portable/Embedded ToolChain/GNU Tools AVR Embedded/avr/include/",
+					"C:/Portable/Embedded Toolchain/GNU Tools AVR Embedded/lib/gcc/avr/4.9.2/include",
+					"C:/Schwarz/Projetos/git/funsapeLib-MCU/funsapeLib"
+				],
+				"limitSymbolsToIncludedHeaders": true
+			}
+		}
+	],
+	"enableConfigurationSquiggles": true,
+	"env": {
+	},
+	"version": 4
+}

@@ -1,0 +1,36 @@
+\hypertarget{e_m_p_l__outputs_8h}{}\section{\+\_\+hide/\+M\+P\+U/core/e\+M\+P\+L-\/hal/e\+M\+P\+L\+\_\+outputs.h File Reference}
+\label{e_m_p_l__outputs_8h}\index{\+\_\+hide/\+M\+P\+U/core/e\+M\+P\+L-\/hal/e\+M\+P\+L\+\_\+outputs.\+h@{\+\_\+hide/\+M\+P\+U/core/e\+M\+P\+L-\/hal/e\+M\+P\+L\+\_\+outputs.\+h}}
+
+
+Embedded M\+P\+L outputs.  
+
+
+{\ttfamily \#include \char`\"{}mltypes.\+h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{group___h_a_l___outputs_gae6dcc7d91aa334a0554bcaabf3fb5b67}{inv\+\_\+get\+\_\+sensor\+\_\+type\+\_\+accel} (long $\ast$data, int8\+\_\+t $\ast$accuracy, inv\+\_\+time\+\_\+t $\ast$timestamp)
+\begin{DoxyCompactList}\small\item\em Acceleration (g's) in body frame. Embedded M\+P\+L defines gravity as positive acceleration pointing away from the Earth. \end{DoxyCompactList}\item 
+int \hyperlink{group___h_a_l___outputs_ga3cbfd5cecb5384666e56a6d884e5bfbf}{inv\+\_\+get\+\_\+sensor\+\_\+type\+\_\+gyro} (long $\ast$data, int8\+\_\+t $\ast$accuracy, inv\+\_\+time\+\_\+t $\ast$timestamp)
+\begin{DoxyCompactList}\small\item\em Angular velocity (degrees per second) in body frame. \end{DoxyCompactList}\item 
+int \hyperlink{group___h_a_l___outputs_gab3cbbf82144161df8d44b678e3bb85bf}{inv\+\_\+get\+\_\+sensor\+\_\+type\+\_\+compass} (long $\ast$data, int8\+\_\+t $\ast$accuracy, inv\+\_\+time\+\_\+t $\ast$timestamp)
+\begin{DoxyCompactList}\small\item\em Magnetic field strength in body frame. \end{DoxyCompactList}\item 
+int \hyperlink{group___h_a_l___outputs_ga99995e075d45fad2aeddbcddf8928922}{inv\+\_\+get\+\_\+sensor\+\_\+type\+\_\+quat} (long $\ast$data, int8\+\_\+t $\ast$accuracy, inv\+\_\+time\+\_\+t $\ast$timestamp)
+\begin{DoxyCompactList}\small\item\em Body-\/to-\/world frame quaternion. The elements are output in the following order\+: W, X, Y, Z. \end{DoxyCompactList}\item 
+int \hyperlink{group___h_a_l___outputs_ga202e377615952cb554dd34fbcb7d61e6}{inv\+\_\+get\+\_\+sensor\+\_\+type\+\_\+euler} (long $\ast$data, int8\+\_\+t $\ast$accuracy, inv\+\_\+time\+\_\+t $\ast$timestamp)
+\begin{DoxyCompactList}\small\item\em Body-\/to-\/world frame euler angles. The euler angles are output with the following convention\+: Pitch\+: -\/180 to 180 Roll\+: -\/90 to 90 Yaw\+: -\/180 to 180. \end{DoxyCompactList}\item 
+int \hyperlink{group___h_a_l___outputs_ga3cda80cba458b79355eee7038a8763d7}{inv\+\_\+get\+\_\+sensor\+\_\+type\+\_\+rot\+\_\+mat} (long $\ast$data, int8\+\_\+t $\ast$accuracy, inv\+\_\+time\+\_\+t $\ast$timestamp)
+\begin{DoxyCompactList}\small\item\em Body-\/to-\/world frame rotation matrix. \end{DoxyCompactList}\item 
+int \hyperlink{group___h_a_l___outputs_gae250961472f44ce3d44b69763ce1effc}{inv\+\_\+get\+\_\+sensor\+\_\+type\+\_\+heading} (long $\ast$data, int8\+\_\+t $\ast$accuracy, inv\+\_\+time\+\_\+t $\ast$timestamp)
+\begin{DoxyCompactList}\small\item\em Quaternion-\/derived heading. \end{DoxyCompactList}\item 
+\hypertarget{group___h_a_l___outputs_ga8aa88c770eec6737fd8fb50c3bf3fbfc}{}\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___h_a_l___outputs_ga8aa88c770eec6737fd8fb50c3bf3fbfc}{inv\+\_\+enable\+\_\+e\+M\+P\+L\+\_\+outputs} (void)\label{group___h_a_l___outputs_ga8aa88c770eec6737fd8fb50c3bf3fbfc}
+
+\begin{DoxyCompactList}\small\item\em Turns on creation and storage of H\+A\+L type results. \end{DoxyCompactList}\item 
+\hypertarget{group___h_a_l___outputs_ga4d38f74ae55bc4f417cea810f865d3ea}{}\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___h_a_l___outputs_ga4d38f74ae55bc4f417cea810f865d3ea}{inv\+\_\+disable\+\_\+e\+M\+P\+L\+\_\+outputs} (void)\label{group___h_a_l___outputs_ga4d38f74ae55bc4f417cea810f865d3ea}
+
+\begin{DoxyCompactList}\small\item\em Turns off creation and storage of H\+A\+L type results. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Embedded M\+P\+L outputs. 
+

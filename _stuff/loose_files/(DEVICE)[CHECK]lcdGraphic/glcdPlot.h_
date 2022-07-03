@@ -1,0 +1,79 @@
+/* -----------------------------------------------------------------------------
+ * Project:			GPDSE AVR8 Library
+ * File:			glcdPlot.h
+ * Module:			Plot window for Graphic LCD
+ * Author:			Leandro Schwarz
+ * Version:			1.0
+ * Last edition:	2016-05-23
+ * Purpose:			Create and controls a plot window on a graphic LCD. This
+ *					window can be used to plot a graph.
+ * -------------------------------------------------------------------------- */
+
+#ifndef GLCDPLOT_H_
+#define GLCDPLOT_H_ 10
+
+// -----------------------------------------------------------------------------
+// Header files ----------------------------------------------------------------
+
+#include "globalDefines.h"
+#if __GLOBALDEFINES_H < 123
+	#error Error 100 - The defintion file is outdated (globalDefines must be version 12.3 or greater).
+#endif
+#include "glcd.h"
+#if __GLCD_H < 10
+	#error Error 102 - A dependant file is outdated (glcd must be version 1.0 or greater).
+#endif
+
+// -----------------------------------------------------------------------------
+// Constant definitions --------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+// New data types --------------------------------------------------------------
+
+typedef struct glcdPlotConfiguration_t{
+	// Display pointer
+	volatile glcdConfiguration_t * display;
+	// Position
+	uint16 positionX		: 9;
+	uint8 positionY			: 8;
+	// Size
+	uint16 width			: 9;
+	uint8 height			: 8;
+	// Internal counter
+	uint16 counter			: 9;
+	uint8 lastPoint			: 8;
+	// Flags
+	uint8 initialized		: 1;
+	// Unused bits
+	uint8 unusedBits		: 4;
+} glcdPlotConfiguration_t;
+
+typedef enum glcdPlotResult_t{
+	GLCD_PLOT_OK = 0,
+	GLCD_PLOT_PARAMETER_OUT_OF_RANGE
+} glcdPlotResult_t;
+
+// -----------------------------------------------------------------------------
+// Global variables ------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+// Macrofunctions --------------------------------------------------------------
+
+#define attachGlcdPlot(object) volatile glcdPlotConfiguration_t object = {\
+	.display = NULL,\
+	.positionX = 0,\
+	.positionY = 0,\
+	.width = 0,\
+	.height = 0,\
+	.counter = 0,\
+	.lastPoint = 0,\
+	.initialized = FALSE}
+
+// -----------------------------------------------------------------------------
+// Public functions declaration ------------------------------------------------
+
+glcdPlotResult_t glcdPlotInit(volatile glcdPlotConfiguration_t * plot, volatile glcdConfiguration_t * display, uint16 x, uint8 y, uint16 width, uint8 height);
+glcdPlotResult_t glcdPlotResetConfiguration(volatile glcdPlotConfiguration_t * plot);
+glcdPlotResult_t glcdPlot(volatile glcdPlotConfiguration_t * plot, uint8 point);
+
+#endif

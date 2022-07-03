@@ -1,0 +1,176 @@
+{
+	"build_systems": [
+		{
+			"name" : "ARM build",
+			"working_dir": "${project_path}",
+			"file_regex": "^(.*):(\\d+):(\\d+):\\s*(.*)$",
+			"variants" : [
+				{
+					"name" : "compile",
+					"cmd" : [
+						"make", "compile"
+					],
+				},
+				{
+					"name" : "program",
+					"cmd" : [
+						"make", "program"
+					],
+				},
+				{
+					"name" : "cleanCompile",
+					"cmd" : [
+						"make", "cleanCompile"
+					],
+				},
+				{
+					"name" : "cleanCompileProgram",
+					"cmd" : [
+						"make", "cleanCompileProgram"
+					],
+				},
+				{
+					"name" : "clean",
+					"cmd" : [
+						"make", "clean"
+					],
+				},
+				{
+					"name" : "compileProgram",
+					"cmd" : [
+						"make", "compileProgram"
+					],
+				},
+				{
+					"name" : "compileCleanProgram",
+					"cmd" : [
+						"make", "compileCleanProgram"
+					],
+				},
+				{
+					"name" : "cleanCompileCleanProgram",
+					"cmd" : [
+						"make", "cleanCompileCleanProgram"
+					],
+				}
+			]
+		}
+	],
+	"folders" : [
+		{
+			"path": ".",
+			"folder_exclude_patterns" : [
+				".git",					// GIT folder
+				"_hide",				// Generic hidden folder
+				"build",				// Target build folder
+				"Debug",				// Target debug folder
+				"doc",					// Generic documentation folder
+				"doxygen",				// Doxygen folder
+				"MDK-ARM",				// Keil project folder
+				"Release"				// Target release folder
+			],
+			"file_exclude_patterns" : [
+				// AStyle
+				"*.cfg",				// AStyle configuration file
+				// Compiled libraries
+				"*.a",
+				"*.lib",
+				// Compilation debris
+				"*.d",					// GCC dependencies
+				"*.lss",				// GCC mixed source and assembly listing
+				"*.lst",				// GCC mixed source and assembly listing
+				"*.map",				// GCC linker map file
+				"*.o",					// GCC compiler object from c source
+				"*.opp",				// GCC compiler object from c++ source
+				// Compilation results
+				"*.bin",				// GCC final binary file
+				"*.elf",				// GCC Executable and Linkable Format
+				"*.hex",				// GCC final hex file
+				// Compressed files
+				"*.7z",					// 7-Zip archive
+				"*.apk",				// Android application
+				"*.bz2",				// Burrows–Wheeler compressed file
+				"*.cab",				// Cabinet file
+				"*.gz",					// GNU Zip
+				"*.rar",				// Roshal Archive file
+				"*.tar",				// Tape Archive (tarball)
+				"*.zip",				// Winzip file
+				"*.zipx",				// Winzip file
+				// Doxygen documentation - General
+				"doxygen_config",		// Doxygen configuration file
+				"*.bat",				// Doxygen Batch file
+				"*.db",					// Doxygen Database
+				// Doxygen documentation - Images
+				"*.bmp",				// Windows Bitmap file
+				"*.eps",				// Encapsulated PostScript file
+				"*.gif",				// Graphics Interchange Format file
+				"*.jpeg",				// Joint Photographic Experts Group file
+				"*.png",				// Portable Network Graphics
+				"*.svg",				// Scalable Vector Graphics file
+				"*.tif",				// Tagged Image File Format
+				"*.tiff",				// Tagged Image File Format
+				// Doxygen documentation - HTML
+				"dox_html_footer",		// Doxygen HTML footer template
+				"dox_html_header",		// Doxygen HTML header template
+				"*.css",				// Cascading Style Sheet
+				"*.js",					// JavaScript source code
+				"*.htm",				// HyperText Markup Language
+				"*.html",				// HyperText Markup Language
+				// Doxygen documentation - LaTeX
+				"*.pdf",				// Portable Document File
+				"*.ps",					// PostScript file
+				"*.sty",				// LaTeX Style definition file
+				"*.tex",				// LaTeX typesetting file
+				// GIT
+				".gitignore",			// GIT ignore file
+				"README.md",			// GIT read me file
+				"LICENSE",				// GIT license file
+				// Makefile
+//				"Makefile",				// Makefile
+				"*.ld",					// Linker Script
+				// Proteus
+				"*.pdsprj",				// Proteus 8 project file
+				"*.pdsbak",				// Proteus 8 project backup file
+				// STM32Cube MX
+				"*.bak",				// STM32CubeMX Backup file
+				"*.icf",				// IAR linker configuration file
+				"*.ioc",				// STM32CubeMX Visual Project File
+				"*.mxproject",			// STM32CubeMX Project
+				"*.scratch",			// STM32CubeMX scratch file
+				// Sublime files
+//				".clang_complete",		// EasyClangComplete file
+				"*.sublime-project",	// Sublime Project file
+				"*.sublime-workspace",	// Sublime Workspace file
+				// Keil
+				"*.axf",				// Keil Absolute executable object file
+				"*.dbgconf",			// Keil Debug Configuration file
+				"*.dep",				// Keil linker dependencies
+				"*.cdb",				// Keil Device Database file
+				"*.cod",				// Keil complete program list file
+				"*.crf",				// Keil Cross-Reference File
+				"*.i",					// Keil preprocessor output file
+				"*.ic",					// Keil Intermediate C source file
+				"*.ini",				// Keil initialization file for debugger
+				"*.lin",				// Keil Linker control file
+				"*.lnp",				// Keil Linker Input file
+				"*.obj",				// Keil relocatable object file
+				"*.opt",				// Keil 3 project options file
+				"*.orc",				// Keil Global Register Coloring file
+				"*.plg",				// Keil Protocol file
+				"*.sbr",				// Keil Source Browser information file
+				"*.sct",				// Keil Scatter-Loading Description file
+				"*.uv2",				// Keil 3 project file
+				"*.uvgui.*",			// Keil 4 project screen layout file
+				"*.uvguix.*",			// Keil 5 project screen layout file
+				"*.uvmpw",				// Keil 4 multi project XML file
+				"*.uvopt",				// Keil 4 project options XML file
+				"*.uvoptx",				// Keil 5 project options XML file
+				"*.uvproj",				// Keil 4 project XML file
+				"*.uvprojx"				// Keil 5 project XML file
+			],
+			"binary_file_patterns": [
+				"*.mmc"					// SD card image file
+			]
+		}
+	]
+}

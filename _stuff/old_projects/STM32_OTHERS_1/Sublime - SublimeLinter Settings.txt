@@ -1,0 +1,10 @@
+{
+	"debug": false,
+	"no_column_highlights_line": true,
+	"statusbar.counters_template": "(W:{}|E:{})",
+	"linters": {
+		"gcc": {
+			"disable": true,
+		}
+	}
+}

@@ -1,0 +1,84 @@
+/* -----------------------------------------------------------------------------
+ * Project:			GPDSE AVR8 Library
+ * File:			crc.c
+ * Module:			Cyclic Redundancy Check functions
+ * Author:			Leandro Schwarz
+ * Version:			1.0
+ * Last edition:	2016-05-13
+ * Purpose:			Cyclic Redundacy Check functions
+ * -------------------------------------------------------------------------- */
+
+// -----------------------------------------------------------------------------
+// Header files ----------------------------------------------------------------
+
+#include "crc.h"
+#if __CRC_H != 10
+	#error Error 101 - Version mismatch on header and source code files (crc).
+#endif
+
+/* -----------------------------------------------------------------------------
+ * Function:	crc8ccitt
+ * Purpose:		Calculates the 8 bits CRC using CCITT pattern
+ * Arguments:	data		Pointer to the data string
+ *				size		Size of the data string
+ *				poly		Reduced size CRC polynom
+ * Returns:		CRC value
+ * -------------------------------------------------------------------------- */
+
+uint8 crc8ccitt(uint8 * data, uint16 size, uint8 poly)
+{
+	uint8 j, aux8;
+	uint16 i, crc;
+
+	crc = 0xff;									// Start overhead
+	for(i = 0;i < size + 1;i++){				// Data looping counting final overhead
+		if(i < size)							// If there still data to process
+			aux8 = data[i];
+		else
+			aux8 = 0x00;						// Adds final overhead
+		for(j = 0;j < 8;j++){
+			crc <<= 1;							// Shifts CRC left 1 bit
+			crc &= 0x1ff;						// Truncates CRC
+			if((aux8 & 128) == 128)				// If aux8 MSB is 1
+				crc = crc + 1;					// Adds bit on CRC
+			aux8 <<= 1;							// Gets next MSB
+			if(crc >= 0x100)					// Fixes poly to include x^8
+				crc ^= (poly + 0x100);			// Calculates new CRC
+		}
+	}
+	return (uint8)crc;
+}
+
+/* -----------------------------------------------------------------------------
+ * Function:	crc16ccitt
+ * Purpose:		Calculates the 16 bits CRC using CCITT pattern
+ * Arguments:	data		Pointer to the data string
+ *				size		Size of the data string
+ *				poly		Reduced size CRC polynom
+ * Returns:		CRC value
+ * -------------------------------------------------------------------------- */
+
+uint16 crc16ccitt(uint8 * data, uint16 size, uint16 poly)
+{
+	uint8 j, aux8;
+	uint16 i;
+	uint32 crc;
+
+	crc = 0xffff;								// Start overhead
+	for(i = 0;i < size + 2;i++){				// Data looping counting final overhead
+		if(i < size)							// If there still data to process
+			aux8 = data[i];
+		else
+			aux8 = 0x00;						// Adds final overhead
+		for(j = 0;j < 8;j++){
+			crc <<= 1;							// Shifts CRC left 1 bit
+			crc &= 0x1ffff;						// Truncates CRC
+			if((aux8 & 128) == 128)				// If aux8 MSB is 1
+				crc = crc + 1;					// Adds bit on CRC
+			aux8 <<= 1;							// Gets next MSB
+			if(crc >= 0x10000)					// Fixes poly to include x^16
+				crc ^= (poly + 0x10000);		// Calculates new CRC
+		}
+	}
+	return (uint16)crc;
+}

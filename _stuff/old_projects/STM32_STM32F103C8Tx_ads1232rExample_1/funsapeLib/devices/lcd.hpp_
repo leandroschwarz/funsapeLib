@@ -1,0 +1,453 @@
+/* =============================================================================
+ * Project:			FunSAPE++ Embedded Library
+ * File name:		lcd.hpp
+ * Module:			HD44780 LCD controller module interface for FunSAPE++
+ * 					Embedded Library project
+ * Authors:			__AUTHORS_TO_REPLACE__
+ * Build:			__BUILD_TO_REPLACE__
+ * Last edition:	__DATE_TO_REPLACE__
+ * ========================================================================== */
+
+// =============================================================================
+// Include guard
+// =============================================================================
+
+#ifndef __LCD_HPP
+#define __LCD_HPP								__BUILD_TO_REPLACE__
+
+// =============================================================================
+// Dependencies
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Global definitions file -----------------------------------------------------
+
+#include "../funsapeLibGlobalDefines.hpp"
+#ifndef __FUNSAPE_LIB_GLOBAL_DEFINES_HPP
+#	error	[lcd.hpp] Error 9 - Global definitions file (funsapeLibGlobalDefines.hpp) is missing or corrupted!
+#elif __FUNSAPE_LIB_GLOBAL_DEFINES_HPP != __BUILD_TO_REPLACE__
+#	error	[lcd.hpp] Error 10 - Build mismatch between (lcd.hpp) and global definitions file (funsapeLibGlobalDefines.hpp)!
+#endif
+
+// -----------------------------------------------------------------------------
+// Header files - FunSAPE Library header files ---------------------------------
+
+#include "../util/funsapeLibDebug.hpp"
+#ifndef __FUNSAPE_LIB_DEBUG_HPP
+#	error	[lcd.hpp] Error 1 - Header file (funsapeLibDebug.hpp) is missing or corrupted!
+#elif __FUNSAPE_LIB_DEBUG_HPP != __BUILD_TO_REPLACE__
+#	error	[lcd.hpp] Error 2 - Build mismatch between (lcd.hpp) and (funsapeLibDebug.hpp) header files!
+#endif
+
+#include "../funsapeLibGpio.hpp"
+#ifndef __FUNSAPE_LIB_GPIO_HPP
+#	error	[lcd.hpp] Error 1 - Header file (funsapeLibGpio.hpp) is missing or corrupted!
+#elif __FUNSAPE_LIB_GPIO_HPP != __BUILD_TO_REPLACE__
+#	error	[lcd.hpp] Error 2 - Build mismatch between (lcd.hpp) and (funsapeLibGpio.hpp) header files!
+#endif
+
+#include <stdint.h>
+#include <stdarg.h>
+
+// =============================================================================
+// Undefining previous definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Constant definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Macro-function definitions
+// *INDENT-OFF*
+// =============================================================================
+
+// NONE
+
+// *INDENT-ON*
+
+// =============================================================================
+// New data types
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Extern global variables
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Lcd - Class declaration
+// =============================================================================
+
+class Lcd
+{
+	// -------------------------------------------------------------------------
+	// New data types
+	// -------------------------------------------------------------------------
+
+public:
+	//     ////////////////////     DISPLAY SIZE     ////////////////////     //
+	enum class DisplaySize : uint8_t {
+		DISPLAY_8X1,
+		DISPLAY_8X2,
+		DISPLAY_10x2,
+		DISPLAY_12X2,
+		DISPLAY_12X4,
+		DISPLAY_16X1,
+		DISPLAY_16X2,
+		DISPLAY_16X4,
+		DISPLAY_20X1,
+		DISPLAY_20X2,
+		DISPLAY_20X4,
+		DISPLAY_24X1,
+		DISPLAY_24X2,
+		DISPLAY_30X2,
+		DISPLAY_32X2,
+		DISPLAY_40X1,
+		DISPLAY_40X2,
+	};
+
+	//     //////////////////////    FONT SIZE     //////////////////////     //
+	enum class FontSize : bool {
+		FONT_5X8,
+		FONT_5X10,
+	};
+
+	//     ///////////////////    CURSOR POSITION     ///////////////////     //
+	enum class CursorPosition : uint8_t {
+		FORWARD,
+		BACKWARD,
+		HOME,
+		NEXT_LINE,
+	};
+
+	//     ////////////////////     CURSOR STATE     ////////////////////     //
+	enum class CursorState : uint8_t {
+		HIDING,
+		SHOWING,
+		BLINKING,
+	};
+
+	enum class EntryMode : uint8_t {
+		RIGHT_OVERWRITE,
+		RIGHT_SHIFT,
+		LEFT_OVERWRITE,
+		LEFT_SHIFT,
+	};
+
+	enum class ShiftDirection : bool {
+		LEFT,
+		RIGHT,
+	};
+
+	/*
+	typedef enum lcdResult_t {
+		LCD_OK = 0,
+		LCD_UNSUPPORTED_FONT_SIZE,
+		LCD_UNSUPPORTED_INTERFACE_MODE,
+		LCD_UNSUPPORTED_DISPLAY_SIZE,
+		LCD_UNSUPPORTED_PARAMETER,
+		LCD_DATA_PORT_NOT_CONFIGURED,
+		LCD_CONTROL_PORT_NOT_CONFIGURED,
+		LCD_NOT_INITIALIZED
+	} lcdResult_t;
+	*/
+
+private:
+	// NONE
+
+protected:
+	// NONE
+
+	// -------------------------------------------------------------------------
+	// Operators overloading
+	// -------------------------------------------------------------------------
+
+public:
+	// NONE
+
+private:
+	// NONE
+
+protected:
+	// NONE
+
+	// -------------------------------------------------------------------------
+	// Constructors
+	// -------------------------------------------------------------------------
+
+public: Lcd(void);
+
+	// -------------------------------------------------------------------------
+	// Methods - Inherited methods
+	// -------------------------------------------------------------------------
+
+public:
+	// NONE
+
+protected:
+	// NONE
+
+	// -------------------------------------------------------------------------
+	// Methods - Class own methods
+	// -------------------------------------------------------------------------
+
+public:
+	//     ////////////////     DEVICE CONFIGURATION     ////////////////     //
+	bool setControlPort(
+			GPIO_TypeDef *gpioPort_p,
+			uint16_t pinE_p,
+			uint16_t pinRs_p,
+			uint16_t pinRw_p = 0x00
+	);
+	bool setDataPort(
+			GPIO_TypeDef *gpioData_p,
+			uint16_t pinFist_p,
+			bool interface4Bits_p
+	);
+	bool init(
+			DisplaySize displaySize_p = DisplaySize::DISPLAY_16X2,
+			FontSize fontSize_p = FontSize::FONT_5X8
+	);
+	bool setEntryMode(
+			EntryMode entryMode_p = EntryMode::RIGHT_OVERWRITE
+	);
+	bool clearScreen(void);
+	bool turnDisplay(
+			State displayState_p
+	);
+	bool turnCursor(
+			CursorState cursorState_p
+	);
+	bool moveCursor(
+			CursorPosition cursorPosition_p
+	);
+	bool moveCursor(
+			uint8_t cursorLine_p,
+			uint8_t cursorColumn_p
+	);
+	bool shiftDisplay(
+			ShiftDirection shiftDirection_p
+	);
+	bool print(
+			const char *strData_p,
+			uint16_t strSize_p
+	);
+	int printf(
+			const char *strData_p,
+			...
+	);
+	void cursorGoTo(
+			uint8_t line_p,
+			uint8_t column_p
+	);
+	Error getLastError(void);
+
+	//     //////////////////////////////////////////////////////////////     //
+	//     ///////////////    --- DEBUG FUNCTIONS ---     ///////////////     //
+	//     //////////////////////////////////////////////////////////////     //
+
+	uint8_t getDisplaySizeLines(void) {
+		return this->_displaySizeLines;
+	}
+
+	uint8_t getDisplaySizeColumns(void) {
+		return this->_displaySizeColumns;
+	}
+
+	uint8_t getCursorLine(void) {
+		return this->_cursorPositionLine;
+	}
+
+	uint8_t getCursorColumn(void) {
+		return this->_cursorPositionColumn;
+	}
+
+private:
+	//     //////////////     CLASS CONTROL AND STATUS     //////////////     //
+	bool _arePortsSet(void);
+	void _clearMembers(void);
+	bool _isInitialized(void);
+
+	//     //////////////////    DATA MANIPULATION     //////////////////     //
+	void _sendCommand(uint8_t command_p, bool onlyHigherNibble_p = false);
+	void _processCharacter(uint8_t character_p);
+	void _sendCharacter(uint8_t character_p);
+
+	//     //////////////////     PRINTF FUNCTIONS     //////////////////     //
+	inline void _my_out_char(
+			char character,
+			void *buffer,
+			size_t idx,
+			size_t maxlen
+	);
+	int _my_vsnprintf(
+			char *buffer,
+			const size_t maxlen,
+			const char *format,
+			va_list va
+	);
+	size_t _my_ntoa_format(
+			char *buffer,
+			size_t idx,
+			size_t maxlen,
+			char *buf,
+			size_t len,
+			bool negative,
+			unsigned int base,
+			unsigned int prec,
+			unsigned int width,
+			unsigned int flags
+	);
+	size_t _my_out_rev(
+			char *buffer,
+			size_t idx,
+			size_t maxlen,
+			const char *buf,
+			size_t len,
+			unsigned int width,
+			unsigned int flags
+	);
+	size_t _my_ntoa_long(
+			char *buffer,
+			size_t idx,
+			size_t maxlen,
+			unsigned long value,
+			bool negative,
+			unsigned long base,
+			unsigned int prec,
+			unsigned int width,
+			unsigned int flags
+	);
+	size_t _my_ntoa_long_long(
+			char *buffer,
+			size_t idx,
+			size_t maxlen,
+			unsigned long long value,
+			bool negative,
+			unsigned long long base,
+			unsigned int prec,
+			unsigned int width,
+			unsigned int flags
+	);
+	size_t _my_ftoa(
+			char *buffer,
+			size_t idx,
+			size_t maxlen,
+			double value,
+			unsigned int prec,
+			unsigned int width,
+			unsigned int flags
+	);
+	size_t _my_etoa(
+			char *buffer,
+			size_t idx,
+			size_t maxlen,
+			double value,
+			unsigned int prec,
+			unsigned int width,
+			unsigned int flags
+	);
+
+protected:
+	// NONE
+
+	// -------------------------------------------------------------------------
+	// Properties
+	// -------------------------------------------------------------------------
+
+public:
+	// NONE
+
+private:
+	//     ////////////////////    PORT HANDLERS     ////////////////////     //
+	bool			_controlPortSet								: 1;
+	bool			_dataPortSet								: 1;
+	bool			_useBusyFlag								: 1;
+
+	uint16_t		_gpioControlPinE;
+	uint16_t		_gpioControlPinRs;
+	uint16_t		_gpioControlPinRw;
+	GPIO_TypeDef	*_gpioControlPort;
+	uint8_t			_gpioDataPinFirstIndex;
+	GPIO_TypeDef	*_gpioDataPort;
+	// Gpio			_controlPinE;
+	// Gpio			_controlPinRs;
+	// Gpio			_controlPinRw;
+	// Gpio			_dataPinFirst;
+	// uint8_t			_dataPinFirstIndex;
+	bool			_dataPortWide4Bits							: 1;
+
+	//     ////////////////////    DEVICE STATUS     ////////////////////     //
+	bool			_initialized								: 1;
+	Error			_lastError;
+	DisplaySize		_displaySize;
+	CursorState		_cursorState;
+	State			_displayState;
+	uint8_t			_cursorPositionColumn						: 7;
+	uint8_t			_cursorPositionLine							: 2;
+	uint8_t			_displaySizeColumns							: 7;
+	uint8_t			_displaySizeLines							: 2;
+	FontSize		_fontSize;
+	EntryMode		_entryMode;
+
+	//     //////////////////    PRINTF PROPERTIES     //////////////////     //
+	bool _makeFunctionNull										: 1;
+
+protected:
+	// NONE
+
+}; // class Lcd
+
+// =============================================================================
+// Lcd - Class overloading operators
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Global variables
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Externally defined global variables -----------------------------------------
+
+// NONE
+
+// -----------------------------------------------------------------------------
+// Internally defined global variables -----------------------------------------
+
+// NONE
+
+// =============================================================================
+// Lcd - Class inline function definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// General public functions declarations
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// General inline functions definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// External default objects
+// =============================================================================
+
+// NONE
+
+#endif // __LCD_HPP

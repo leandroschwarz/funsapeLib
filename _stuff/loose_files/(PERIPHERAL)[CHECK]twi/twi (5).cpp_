@@ -1,0 +1,352 @@
+/* =============================================================================
+ * Project:		GPSDE++ AVR Library
+ * File name:	twi.cpp
+ * Module:		TWI Module Interface for GPDSE++ Library project
+ * Authors:		Leandro Schwarz
+ *				Hazael dos Santos Batista
+ * Build:		1002
+ * Date:		June 14, 2018
+ * ========================================================================== */
+
+// =============================================================================
+// Dependencies
+// =============================================================================
+
+#include "twi.hpp"
+#if __TWI_HPP != 1002
+#	error [twi.cpp] Error 102 - Build mismatch on header and source code files.
+#endif
+
+#include <avr/interrupt.h>
+
+// =============================================================================
+// File exclusive - Constants
+// =============================================================================
+
+/* NONE */
+
+// =============================================================================
+// File exclusive - New data types
+// =============================================================================
+
+typedef enum twiState_e {
+	TWI_START					= 0x08,	// START has been transmitted
+	TWI_REP_START				= 0x10,	// Repeated START has been transmitted
+	TWI_ARB_LOST				= 0x38,	// Arbitration lost
+	TWI_MTX_ADR_ACK				= 0x18,	// SLA+W has been transmitted and ACK received
+	TWI_MTX_ADR_NACK			= 0x20,	// SLA+W has been transmitted and NACK received
+	TWI_MTX_DATA_ACK			= 0x28,	// Data byte has been transmitted and ACK received
+	TWI_MTX_DATA_NACK			= 0x30,	// Data byte has been transmitted and NACK received
+	TWI_MRX_ADR_ACK				= 0x40,	// SLA+R has been transmitted and ACK received
+	TWI_MRX_ADR_NACK			= 0x48,	// SLA+R has been transmitted and NACK received
+	TWI_MRX_DATA_ACK			= 0x50,	// Data byte has been received and ACK transmitted
+	TWI_MRX_DATA_NACK			= 0x58,	// Data byte has been received and NACK transmitted
+	TWI_STX_ADR_ACK				= 0xA8,	// Own SLA+R has been received; ACK has been returned
+	TWI_STX_ADR_ACK_M_ARB_LOST	= 0xB0,	// Arbitration lost in SLA+R/W as Master; own SLA+R has been received; ACK has been returned
+	TWI_STX_DATA_ACK			= 0xB8,	// Data byte in TWDR has been transmitted; ACK has been received
+	TWI_STX_DATA_NACK			= 0xC0,	// Data byte in TWDR has been transmitted; NOT ACK has been received
+	TWI_STX_DATA_ACK_LAST_BYTE	= 0xC8,	// Last data byte in TWDR has been transmitted (TWEA = 0); ACK has been received
+	TWI_SRX_ADR_ACK				= 0x60,	// Own SLA+W has been received ACK has been returned
+	TWI_SRX_ADR_ACK_M_ARB_LOST	= 0x68,	// Arbitration lost in SLA+R/W as Master; own SLA+W has been received; ACK has been returned
+	TWI_SRX_GEN_ACK				= 0x70,	// General call address has been received; ACK has been returned
+	TWI_SRX_GEN_ACK_M_ARB_LOST	= 0x78,	// Arbitration lost in SLA+R/W as Master; General call address has been received; ACK has been returned
+	TWI_SRX_ADR_DATA_ACK		= 0x80,	// Previously addressed with own SLA+W; data has been received; ACK has been returned
+	TWI_SRX_ADR_DATA_NACK		= 0x88,	// Previously addressed with own SLA+W; data has been received; NOT ACK has been returned
+	TWI_SRX_GEN_DATA_ACK		= 0x90,	// Previously addressed with general call; data has been received; ACK has been returned
+	TWI_SRX_GEN_DATA_NACK		= 0x98,	// Previously addressed with general call; data has been received; NOT ACK has been returned
+	TWI_SRX_STOP_RESTART		= 0xA0,	// A STOP condition or repeated START condition has been received while still addressed as Slave
+	TWI_NO_STATE				= 0xF8,	// No relevant state information available; TWINT = 0
+	TWI_BUS_ERROR				= 0x00	// Bus error due to an illegal START or STOP condition
+} twiState_e;
+
+// =============================================================================
+// File exclusive - Macro-functions
+// =============================================================================
+
+/* NONE */
+
+// =============================================================================
+// Global variables
+// =============================================================================
+
+static volatile twiState_e twiState;
+static vuint8_t		*twiBufferData;
+static vuint8_t		twiBufferSize;
+
+// =============================================================================
+// Class constructors
+// =============================================================================
+
+Twi::Twi(uint32_t clockSpeed, bool master, uint8_t bufferSize)
+{
+	uint32_t aux32 = 0;
+	uint8_t aux8 = 0;
+
+	// Reset global variables
+	twiState = TWI_NO_STATE;
+	twiBufferData = NULL;
+	twiBufferSize = 0;
+
+	// Reset data members
+	this->initialized_ = false;
+	this->lastError_ = ERROR_NOT_INITIALIZED;
+	this->lastTransOK_ = false;
+	this->masterMode_ = false;
+	this->maxSize_ = 0;
+	this->speed_ = 0;
+
+	// Setting clock speed
+	aux32 = systemStatus.getCpuClock() / clockSpeed;
+	if (aux32 <= 526) {					// Prescaler 1
+		aux8 = (uint8_t)((aux32 - 16) / 2);
+		clrBit(TWSR, TWPS1);
+		clrBit(TWSR, TWPS0);
+	} else if (aux32 <= 2056) {			// Prescaler 4
+		aux8 = (uint8_t)((aux32 - 16) / 8);
+		clrBit(TWSR, TWPS1);
+		setBit(TWSR, TWPS0);
+	} else if (aux32 <= 8176) {			// Prescaler 16
+		aux8 = (uint8_t)((aux32 - 16) / 32);
+		setBit(TWSR, TWPS1);
+		clrBit(TWSR, TWPS0);
+	} else if (aux32 <= 32656) {		// Prescaler 64
+		aux8 = (uint8_t)((aux32 - 16) / 128);
+		setBit(TWSR, TWPS1);
+		setBit(TWSR, TWPS0);
+	} else {
+		this->lastError_ = ERROR_CLOCK_SPEED_TOO_HIGH;
+		return;
+	}
+	TWBR = aux8;
+
+	// Memory allocation
+	twiBufferData = NULL;
+	twiBufferData = (uint8_t *) calloc(bufferSize, sizeof(uint8_t));
+	if (twiBufferData == NULL) {
+		this->lastError_ = ERROR_MEMORY_ALLOCATION;
+		return;
+	}
+
+	// Initialization
+	TWDR = 0xFF;						// Release SDA
+	TWCR = 1 << TWEN;					// Activate TWI interface
+
+	// Update data members
+	this->maxSize_ = bufferSize;
+	this->speed_ = clockSpeed;
+	this->masterMode_ = master;
+	this->initialized_ = true;
+	this->lastError_ = ERROR_NONE;
+
+	return;
+}
+
+// =============================================================================
+// Class public methods
+// =============================================================================
+
+bool Twi::sendData(uint8_t deviceAddress, twiOperation_e operation, uint8_t *message, uint8_t messageSize)
+{
+	// Error checking
+	if (!this->initialized_) {
+		this->lastError_ = ERROR_NOT_INITIALIZED;
+		return false;
+	}
+	if ((this->maxSize_ - 1) < messageSize) {
+		this->lastError_ = ERROR_BUFFER_SIZE_TOO_SMALL;
+		return false;
+	}
+
+	// Wait until TWI is ready for next transmission.
+	this->waitUntilReady();
+
+	twiBufferSize = 0;
+	twiBufferData[twiBufferSize++] = (deviceAddress << 1);
+
+	// Write data
+	if (operation == TWI_WRITE) {
+		// Transfer data between buffers
+		for (uint8_t i = 0; i < messageSize; i++) {
+			twiBufferData[twiBufferSize++] = message[i];
+		}
+		this->lastTransOK_ = false;
+		twiState = TWI_NO_STATE;
+		TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWINT) | (1 << TWSTA);
+		this->lastError_ = ERROR_NONE;
+		return true;
+	}
+
+	// Set pointer
+	this->lastTransOK_ = false;
+	twiState = TWI_NO_STATE;
+	TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWINT) | (1 << TWSTA);
+
+	// Wait until TWI is ready for next transmission.
+	this->waitUntilReady();
+
+
+	if (readWrite == TWI_READ) {
+		twiMasterReadFromBuffer(message, messageSize);
+	}
+
+	return;
+
+	bool_t	lastTransOK		: 1;
+	bool_t	rxDataInBuf		: 1;
+	bool_t	genAddressCall	: 1;
+	bool_t	initialized		: 1;
+
+
+
+
+
+
+
+	return;
+}
+
+// =============================================================================
+// Class private methods
+// =============================================================================
+
+void Twi::waitUntilReady(void)
+{
+	waitUntilBitIsClear(TWCR, TWIE);
+	return;
+}
+
+// =============================================================================
+// Class protected methods
+// =============================================================================
+
+/* NONE */
+
+// =============================================================================
+// General public functions definitions
+// =============================================================================
+
+/* NONE */
+
+// =============================================================================
+// Public functions definitions
+// =============================================================================
+
+/* NONE */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+static bool_t	twiMasterIsBusy(void);
+static void		twiMasterReadFromBuffer(uint8_t *message, uint8_t messageSize);
+static void		twiMasterResendData(void);
+static uint8_t		twiMasterBufferData[TWI_BUFFER_SIZE];	// Transceiver buffer
+static uint8_t		twiMasterBufferSize;					// Number of bytes to be transmitted
+static twiState_e	twiMasterState = TWI_NO_STATE;			// twiSatet_t is defined in twiMaster.h
+twiMasterStatus_t	twiMasterStatus = {.allFlags = 0};		// twiStatus_t is defined in twiMaster.h
+
+void twiMasterSendData(uint8_t deviceAddress, twiOperation_t readWrite, uint8_t *message, uint8_t messageSize)
+{
+
+}
+
+void twiMasterResendData(void)
+{
+	while (twiMasterIsBusy())
+		;	// Wait until TWI is ready for next transmission
+	twiMasterStatus.allFlags = 0;
+	twiMasterState = TWI_NO_STATE;
+	TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWINT) | (1 << TWSTA);
+
+	return;
+}
+
+twiState_e twiMasterErrorHandler(twiState_e twiErrorCode)
+{
+	if ((twiErrorCode == TWI_MTX_ADR_NACK) || (twiErrorCode == TWI_MRX_ADR_NACK)) {
+		twiMasterResendData();
+	}
+	return twiErrorCode;
+}
+
+
+
+void twiMasterReadFromBuffer(uint8_t *message, uint8_t messageSize)
+{
+	uint8_t i;
+
+	while (twiMasterIsBusy())
+		;	// Wait until TWI is ready for next transmission
+	if (twiMasterStatus.lastTransOK) {			// Last transmission competed successfully
+		for (i = 0; i < messageSize; i++) {	// Copy data from Transceiver buffer
+			message[i] = twiMasterBufferData[i + 1];
+		}
+	}
+
+	return;
+}
+*/
+
+
+
+ISR(TWI_vect)
+{
+	static uint8_t twiBufferPointer;
+
+	switch (TWSR & 0xFC) {
+	case TWI_START:			// START has been transmitted
+	case TWI_REP_START:		// Repeated START has been transmitted
+		twiBufferPointer = 0;	// Set buffer pointer to the TWI Address location
+	case TWI_MTX_ADR_ACK:		// SLA+W has been transmitted and ACK received
+	case TWI_MTX_DATA_ACK:		// Data byte has been transmitted and ACK received
+		if (twiBufferPointer < twiMasterBufferSize) {
+			TWDR = twiMasterBufferData[twiBufferPointer++];
+			TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWINT);
+		} else {			// Send STOP after last byte
+			twiMasterStatus.lastTransOK = TRUE;	// Set status bits to completed successfully
+			TWCR = (1 << TWEN) | (1 << TWINT) | (1 << TWSTO);
+		}
+		break;
+	case TWI_MRX_DATA_ACK:		// Data byte has been received and ACK transmitted
+		twiMasterBufferData[twiBufferPointer++] = TWDR;
+	case TWI_MRX_ADR_ACK:		// SLA+R has been transmitted and ACK received
+		if (twiBufferPointer < (twiMasterBufferSize - 1)) {	// Detect the last byte to NACK it
+			TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWINT) | (1 << TWEA);
+		} else {				// Send NACK after next reception
+			TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWINT);
+		}
+		break;
+	case TWI_MRX_DATA_NACK:		// Data byte has been received and NACK transmitted
+		twiMasterBufferData[twiBufferPointer] = TWDR;
+		twiMasterStatus.lastTransOK = TRUE;	// Set status bits to completed successfully
+		TWCR = (1 << TWEN) | (1 << TWINT) | (1 << TWSTO);
+		break;
+	case TWI_ARB_LOST:			// Arbitration lost
+		TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWINT) | (1 << TWSTA);
+		break;
+	case TWI_MTX_ADR_NACK:		// SLA+W has been transmitted and NACK received
+	case TWI_MRX_ADR_NACK:		// SLA+R has been transmitted and NACK received
+	case TWI_MTX_DATA_NACK:		// Data byte has been transmitted and NACK received
+	case TWI_BUS_ERROR:			// Bus error due to an illegal START or STOP condition
+	default:
+		twiMasterState = (twiState_e)TWSR;		// Store TWSR and automatically sets clears noErrors bit
+		TWCR = (1 << TWEN);		// Reset TWI Interface
+		break;
+	}
+}

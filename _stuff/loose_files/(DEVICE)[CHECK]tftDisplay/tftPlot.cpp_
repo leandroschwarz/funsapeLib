@@ -1,0 +1,188 @@
+
+
+#include "tftPlot.hpp"
+#include <stddef.h>
+#include <stdlib.h>
+
+TftPlot::TftPlot(Tft * tftHdlr, uint32_t bgColor)
+{
+	// Reset data members - Window variables
+	this->borderSize_ = 0;
+	this->borderColor_ = 0;
+	this->windowPosX0_ = 0;
+	this->windowPosX1_ = 0;
+	this->windowPosY0_ = 0;
+	this->windowPosY1_ = 0;
+	// Reset data members - Border variables
+	this->borderSize_ = 0;
+	this->borderColor_ = 0;
+	// Reset data members - Canvas variables
+	this->canvasWidth_ = 0;
+	this->canvasHeight_ = 0;
+	this->canvasPosX_ = 0;
+	this->canvasPosY_ = 0;
+	// Reset data members - Traces variables
+	this->maxTraces_ = 1;
+	this->trace_ = NULL;
+
+	// Configure internal flags
+	this->changesPending_ = true;
+	this->initialized_ = false;
+
+	// Check for errors
+	if (tftHdlr == NULL) {				// Must fail
+		this->lastError_ = ERROR_HANDLER_POINTER_NULL;
+		return;
+	}
+	if (bgColor > 0x00FFFFFF) {			// Must use default value
+		bgColor = 0x00000000;
+	}
+
+	// Get value from arguments
+	this->tftHandler_ = tftHdlr;
+	this->canvasColor_ = bgColor;
+
+	// Return successfully
+	this->lastError_ = ERROR_NONE;
+	return;
+}
+
+TftPlot::~TftPlot()
+{
+	// Must free memory
+	if (this->trace_ != NULL) {
+		for (uint8_t i = 0; i < this->maxTraces_; i++) {
+			delete this->trace_[i];				// Delete each object
+			this->trace_[i] = NULL;				// Nullify each pointer
+		}
+		delete [] this->trace_;					// Delete main object
+		this->trace_ = NULL;					// Nullify main pointer
+	}
+
+	// Return successfully
+	return;
+}
+
+
+bool TftPlot::configBorder(uint8_t bdSize, uint32_t bdColor)
+{
+	// Check for errors
+	if (bdSize > 7) {					// Limit to maximum
+		bdSize = 7;
+	}
+	if (bdColor > 0x00FFFFFF) {			// Must use default value
+		bdColor = 0x00FFFF00;
+	}
+
+	// Get value from arguments
+	this->borderSize_ = bdSize;
+	this->borderColor_ = bdColor;
+
+	// Internal configuration
+	this->changesPending_ = true;
+
+	// Return successfully
+	this->lastError_ = ERROR_NONE;
+	return true;
+}
+
+bool TftPlot::configWindowByPosition(uint16_t top, uint16_t left, uint16_t right, uint16_t bottom)
+{
+	uint16_t xMax = 319;
+	uint16_t yMax = 239;
+
+	// Check for errors
+	if ((top > bottom) || (left > right)) {
+		this->lastError_ = ERROR_ARGUMENTS_MISMATCH;
+		return false;
+	}
+	if ((top > yMax) || (bottom > yMax) || (left > xMax) || (right > xMax)) {
+		this->lastError_ = ERROR_POINT_OUTSIDE_VIEWABLE_AREA;
+		return false;
+	}
+	if (((bottom - top + 1) < 15) || ((right - left + 1) < 15)) {
+		this->lastError_ = ERROR_WINDOW_SIZE_TOO_SMALL;
+		return false;
+	}
+
+	// Get value from arguments
+	this->windowPosX0_ = left;
+	this->windowPosY0_ = top;
+	this->windowPosX1_ = right;
+	this->windowPosY1_ = bottom;
+
+	// Configure internal flags
+	this->changesPending_ = true;
+
+	// Return successfully
+	this->lastError_ = ERROR_NONE;
+	return true;
+}
+
+bool TftPlot::configWindowBySize(uint16_t top, uint16_t left, uint16_t width, uint16_t height)
+{
+	uint16_t xMax = 319;
+	uint16_t yMax = 239;
+
+	// Check for errors
+	if ((width < 15) || (height < 15)) {
+		this->lastError_ = ERROR_WINDOW_SIZE_TOO_SMALL;
+		return false;
+	}
+	if ((top > yMax) || (bottom > yMax) || (left > xMax) || (right > xMax)) {
+		this->lastError_ = ERROR_POINT_OUTSIDE_VIEWABLE_AREA;
+		return false;
+	}
+
+
+	if ((top > bottom) || (left > right)) {
+		this->lastError_ = ERROR_ARGUMENTS_MISMATCH;
+		return false;
+	}
+
+
+
+
+	if (bdSize > 7) {					// Limit to maximum
+		bdSize = 7;
+	}
+	if (bdColor > 0x00FFFFFF) {			// Must use default value
+		bdColor = 0x00FFFF00;
+	}
+
+	this->windowPosX0_ = left;
+	this->windowPosY0_ = top;
+	this->windowPosX1_ = left + width - 1;
+	this->windowPosY1_ = top + height - 1;
+	this->changesPending_ = true;
+	return true;
+}
+
+
+bool TftPlot::setMaxTraces(uint8_t maxTraces)
+{
+
+	return true;
+}
+
+bool TftPlot::configTrace(uint8_t index, uint32_t color)
+{
+	return true;
+}
+
+
+
+bool TftPlot::redrawBorder(void)
+{
+	return true;
+}
+
+bool TftPlot::redrawCanvas(void)
+{
+	return true;
+}
+
+error_e TftPlot::getLastError()
+{
+	return this->lastError_;
+}

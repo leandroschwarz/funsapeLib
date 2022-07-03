@@ -1,0 +1,7 @@
+
+#ifndef __GLOBAL_CONFIGS_HPP
+#define __GLOBAL_CONFIGS_HPP 1000
+
+// EDITABLE DEFINITIONS
+
+#endif

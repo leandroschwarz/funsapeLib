@@ -1,0 +1,387 @@
+/* =============================================================================
+ * Project:			FunSAPE++ Embedded Library
+ * File name:		flTwiBitBang.cpp
+ * Module:			TWI Peripheral Interface for FunSAPE++ Embedded Library
+ *					project
+ * Authors:			__AUTHORS_TO_REPLACE__
+ * Build:			__BUILD_TO_REPLACE__
+ * Last edition:	__DATE_TO_REPLACE__
+ * ========================================================================== */
+
+// =============================================================================
+// System file dependencies
+// =============================================================================
+
+#include "flTwiBitBang.hpp"
+#ifndef __FL_TWI_BIT_BANG_HPP
+#	error	[flTwiBitBang.cpp] Error 1 - Header file (flTwiBitBang.hpp) must be corrupted!
+#elif __FL_TWI_BIT_BANG_HPP != __BUILD_TO_REPLACE__
+#	error	[flTwiBitBang.cpp] Error 9 - Build mismatch between source (flTwiBitBang.cpp) and header (flTwiBitBang.hpp) files!
+#endif
+
+// =============================================================================
+// File exclusive - Constants
+// =============================================================================
+
+#define		TWI_DEFAULT_TIME_OUT				30
+#define		TWI_MIN_BUFFER_SIZE					5
+#define		TWI_MAX_BUFFER_SIZE					200
+
+// =============================================================================
+// File exclusive - New data types
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// File exclusive - Macro-functions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Global variables
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// File exclusive - Static functions declarations
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Class constructors
+// =============================================================================
+
+TwiBitBang::TwiBitBang(void)
+{
+	// Reset data members
+	this->_reset();
+
+	// Return successfully
+	this->_lastError = Error::NONE;
+	return;
+}
+
+TwiBitBang::~TwiBitBang(void)
+{
+	// Reset data members
+	this->_reset();
+
+	// Return successfully
+	return;
+}
+
+// =============================================================================
+// Class inherited methods - public
+// =============================================================================
+
+bool TwiBitBang::read(uint8_t reg_p, uint8_t *dataBuffer_p, uint16_t bytesToRead_p)
+{
+	// Processing request
+	this->_readWrite = true;
+	if(!this->_process(reg_p, dataBuffer_p, bytesToRead_p)) {
+		// Return error
+		return false;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	return true;
+}
+
+bool TwiBitBang::write(uint8_t reg_p, uint8_t *dataBuffer_p, uint16_t bytesToWrite_p)
+{
+	// Processing request
+	this->_readWrite = false;
+	if(!this->_process(reg_p, dataBuffer_p, bytesToWrite_p)) {
+		// Return error
+		return false;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	return true;
+}
+
+Handler::HandlerType TwiBitBang::getHandlerType(void)
+{
+	// Returns handler type
+	return Handler::HandlerType::TWI;
+}
+
+// =============================================================================
+// Class own methods - public
+// =============================================================================
+
+#if defined(_FUNSAPE_PLATFORM_ARM_STM32)
+bool TwiBitBang::init(I2C_HandleTypeDef *twiHandler_p, uint16_t bufSize_p)
+#elif defined(_FUNSAPE_PLATFORM_AVR)
+bool TwiBitBang::init(uint16_t bufSize_p)
+#endif
+{
+	// Deinitialize peripheral
+	if(this->_initialized) {
+		this->_reset();
+	}
+
+	// Check for errors
+#if defined(_FUNSAPE_PLATFORM_ARM_STM32)
+	if(twiHandler_p == nullptr) {
+		// Return error
+		this->_lastError = Error::HANDLER_POINTER_NULL;
+		return false;
+	}
+#elif defined(_FUNSAPE_PLATFORM_AVR)
+	// if(twiInstance_p == TwiBitBangInstance::NONE) {
+	// 	// Return error
+	// 	this->_lastError = Error::UNKNOWN;
+	// 	return false;
+	// }
+#endif
+	if(bufSize_p == 0) {
+		// Return error
+		this->_lastError = Error::BUFFER_SIZE_ZERO;
+		return false;
+	} else if(bufSize_p < TWI_MIN_BUFFER_SIZE) {
+		// Return error
+		this->_lastError = Error::BUFFER_SIZE_TOO_SMALL;
+		return false;
+	} else if(bufSize_p > TWI_MAX_BUFFER_SIZE) {
+		// Return error
+		this->_lastError = Error::BUFFER_SIZE_TOO_LARGE;
+		return false;
+	}
+
+	// Update data members
+#if defined(_FUNSAPE_PLATFORM_ARM_STM32)
+	this->_twiHandler = twiHandler_p;
+#elif defined(_FUNSAPE_PLATFORM_AVR)
+	// this->_twiInstance = twiInstance_p;
+#endif
+	this->_bufferMaxSize = bufSize_p;
+
+	// Initialize
+	if(!this->_initialize()) {
+		// Return error
+		return false;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	return true;
+}
+
+bool TwiBitBang::setTimeOut(uint16_t timeOut_p)
+{
+	// Update data members
+	this->_timeOut = timeOut_p;
+
+	// Return successfully
+	this->_lastError = Error::NONE;
+	return true;
+}
+
+Error TwiBitBang::getLastError(void)
+{
+	// Returns last error
+	return this->_lastError;
+}
+
+// =============================================================================
+// Class own methods - private
+// =============================================================================
+
+bool TwiBitBang::_reset(void)
+{
+	// Reset data members
+#if defined(_FUNSAPE_PLATFORM_ARM_STM32)
+	this->_twiHandler					= nullptr;
+#elif defined(_FUNSAPE_PLATFORM_AVR)
+	// this->_twiInstance					= TwiBitBangInstance::NONE;
+#endif
+	this->_initialized					= false;
+	if(this->_bufferData != nullptr) {
+		free(this->_bufferData);
+		this->_bufferData				= nullptr;
+	}
+	this->_bufferMaxSize				= 0;
+	this->_bufferIndex					= 0;
+	this->_bufferLength					= 0;
+	this->_timeOut						= TWI_DEFAULT_TIME_OUT;
+	this->_isBusy						= false;
+	this->_readWrite					= false;
+	this->_fastStandardSpeed			= false;
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	return true;
+}
+
+bool TwiBitBang::_initialize(void)
+{
+	// Allocate memory
+	this->_bufferData = (uint8_t *)calloc(this->_bufferMaxSize, sizeof(uint8_t));
+	if(this->_bufferData == nullptr) {
+		this->_reset();
+		this->_lastError = Error::MEMORY_ALLOCATION;
+		return false;
+	}
+	this->_bufferIndex = 0;
+	this->_bufferLength = 0;
+
+	// Check peripheral status
+#if defined(_FUNSAPE_PLATFORM_ARM_STM32)
+	do {
+		HAL_TWI_StateTypeDef twiState = HAL_TWI_STATE_RESET;
+		twiState = HAL_TWI_GetState(this->_twiHandler);
+		if(twiState != HAL_TWI_STATE_READY) {
+			// Return error
+			this->_initialized = false;
+			this->_lastError = Error::PERIPHERAL_NOT_READY;
+			return false;
+		}
+	} while(0);
+#elif defined(_FUNSAPE_PLATFORM_AVR)
+	// Nothing to do
+#endif
+
+	// Update data members
+	this->_initialized = true;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	return true;
+}
+
+bool TwiBitBang::_process(uint8_t reg_p, uint8_t *dataBuffer_p, uint16_t bytesToRead_p)
+{
+	// Check for errors
+	if(!this->_initialized) {									// ERROR - peripheral not initialized
+		this->_lastError = Error::NOT_INITIALIZED;
+		return false;
+	}
+	if(dataBuffer_p == nullptr) {								// ERROR - transmission buffer data is null pointer
+		this->_lastError = Error::BUFFER_POINTER_NULL;
+		return false;
+	}
+	if(bytesToRead_p == 0) {									// ERROR - no bytes to send/receive
+		this->_lastError = Error::BUFFER_SIZE_ZERO;
+		return false;
+	}
+	if((bytesToRead_p + 1) > this->_bufferMaxSize) {			// ERROR - message is too large to handle
+		this->_lastError = Error::MESSAGE_TOO_LONG;
+		return false;
+	}
+	if(this->_isBusy) {											// ERROR - peripheral is busy
+		this->_lastError = Error::IS_BUSY;
+		return false;
+	}
+
+	// Transfer data between buffers
+	this->_bufferData[0] = reg_p;
+	if(!this->_readWrite) {				// Write operation selected
+		memcpy(&this->_bufferData[1], dataBuffer_p, bytesToRead_p);
+	}
+	this->_bufferLength = bytesToRead_p + 1;
+	this->_bufferIndex = 0;
+
+	// Send data
+	if(!this->_transmit()) {
+		return false;
+	}
+
+	// Transfer data between buffers
+	if(this->_readWrite) {				// Read operation selected
+		memcpy(dataBuffer_p, &this->_bufferData[1], bytesToRead_p);
+	}
+	this->_bufferLength = bytesToRead_p;
+	this->_bufferIndex = 0;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	return true;
+}
+
+bool TwiBitBang::_transmit(void)
+{
+	/*
+	// Send data by pooling
+	this->_busy = true;							// Mark peripheral as busy
+	this->_activateDefaultDevice();				// Select slave device
+	#if defined(_FUNSAPE_PLATFORM_ARM_STM32)		// Try to transmit (ARM_STM32)
+	HAL_StatusTypeDef halStatus = HAL_TWI_TransmitReceive(
+					this->_spiHandler,
+					this->_txBufferData,
+					this->_bufferData,
+					this->_bufferLength,
+					this->_timeOut
+			);
+	#elif defined(_FUNSAPE_PLATFORM_AVR)			// Try to transmit (AVR)
+	// TODO: AVR implementation
+	#endif
+	this->_deactivateDefaultDevice();			// Deselect slave device
+	#if defined(_FUNSAPE_PLATFORM_ARM_STM32)		// Check transmission status (ARM_STM32)
+	if(halStatus == HAL_TIMEOUT) {
+		this->_lastError = Error::COMMUNICATION_TIME_OUT;
+		// Mark peripheral as not busy before leave
+		this->_busy = false;
+		return false;
+	}
+	if(halStatus == HAL_ERROR) {
+		uint32_t halTwiBitBangError = HAL_TWI_GetError(this->_spiHandler);
+		switch(halTwiBitBangError) {
+		case HAL_TWI_Error::FLAG:
+			this->_lastError = Error::TWI_BUSY_FLAG;
+			break;
+		case HAL_TWI_Error::CRC:
+			this->_lastError = Error::TWI_CRC;
+			break;
+		case HAL_TWI_Error::OVR:
+			this->_lastError = Error::TWI_OVERRUN;
+			break;
+		case HAL_TWI_Error::MODF:
+			this->_lastError = Error::TWI_MODE_FAULT;
+			break;
+		case HAL_TWI_Error::DMA:
+			this->_lastError = Error::TWI_DMA;
+			break;
+		default:
+			// If you arrived here, something really strange happened
+			this->_lastError = Error::UNKNOWN;
+			break;
+		}
+		// Mark peripheral as not busy before leave
+		this->_busy = false;
+		return false;
+	}
+	#elif defined(_FUNSAPE_PLATFORM_AVR)			// Check transmission status (AVR)
+	// TODO: AVR implementation
+	#endif
+	this->_busy = false;						// Mark peripheral as not busy
+
+	*/
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+	return true;
+}
+
+// =============================================================================
+// Class own methods - protected
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// General public functions definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// File exclusive - Static functions definitions
+// =============================================================================
+
+// NONE

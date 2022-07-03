@@ -1,0 +1,60 @@
+\hypertarget{stm32f4xx__cryp__aes_8c}{}\section{\+\_\+hide/\+M\+P\+U/\+S\+T\+M32\+F4/stm32f4xx\+\_\+cryp\+\_\+aes.c File Reference}
+\label{stm32f4xx__cryp__aes_8c}\index{\+\_\+hide/\+M\+P\+U/\+S\+T\+M32\+F4/stm32f4xx\+\_\+cryp\+\_\+aes.\+c@{\+\_\+hide/\+M\+P\+U/\+S\+T\+M32\+F4/stm32f4xx\+\_\+cryp\+\_\+aes.\+c}}
+
+
+This file provides high level functions to encrypt and decrypt an input message using A\+E\+S in E\+C\+B/\+C\+B\+C/\+C\+T\+R modes. It uses the \hyperlink{stm32f4xx__cryp_8c}{stm32f4xx\+\_\+cryp.\+c}/.h drivers to access the S\+T\+M32\+F4xx C\+R\+Y\+P peripheral.  
+
+
+{\ttfamily \#include \char`\"{}stm32f4xx\+\_\+cryp.\+h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___c_r_y_p_ga50631c7b2268fdbd5aaa74195e3ea746}{}\#define {\bfseries A\+E\+S\+B\+U\+S\+Y\+\_\+\+T\+I\+M\+E\+O\+U\+T}~((uint32\+\_\+t) 0x00010000)\label{group___c_r_y_p_ga50631c7b2268fdbd5aaa74195e3ea746}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+Error\+Status \hyperlink{group___c_r_y_p___group6_ga79ff82ece0e9620dc86d6e57abe639e1}{C\+R\+Y\+P\+\_\+\+A\+E\+S\+\_\+\+E\+C\+B} (uint8\+\_\+t Mode, uint8\+\_\+t $\ast$Key, uint16\+\_\+t Keysize, uint8\+\_\+t $\ast$Input, uint32\+\_\+t Ilength, uint8\+\_\+t $\ast$Output)
+\begin{DoxyCompactList}\small\item\em Encrypt and decrypt using A\+E\+S in E\+C\+B Mode. \end{DoxyCompactList}\item 
+Error\+Status \hyperlink{group___c_r_y_p___group6_gaa43eadf707257710f6a53b3295b39d70}{C\+R\+Y\+P\+\_\+\+A\+E\+S\+\_\+\+C\+B\+C} (uint8\+\_\+t Mode, uint8\+\_\+t Init\+Vectors\mbox{[}16\mbox{]}, uint8\+\_\+t $\ast$Key, uint16\+\_\+t Keysize, uint8\+\_\+t $\ast$Input, uint32\+\_\+t Ilength, uint8\+\_\+t $\ast$Output)
+\begin{DoxyCompactList}\small\item\em Encrypt and decrypt using A\+E\+S in C\+B\+C Mode. \end{DoxyCompactList}\item 
+Error\+Status \hyperlink{group___c_r_y_p___group6_ga2f36aea6e94452e5e5e938547fb89d4c}{C\+R\+Y\+P\+\_\+\+A\+E\+S\+\_\+\+C\+T\+R} (uint8\+\_\+t Mode, uint8\+\_\+t Init\+Vectors\mbox{[}16\mbox{]}, uint8\+\_\+t $\ast$Key, uint16\+\_\+t Keysize, uint8\+\_\+t $\ast$Input, uint32\+\_\+t Ilength, uint8\+\_\+t $\ast$Output)
+\begin{DoxyCompactList}\small\item\em Encrypt and decrypt using A\+E\+S in C\+T\+R Mode. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This file provides high level functions to encrypt and decrypt an input message using A\+E\+S in E\+C\+B/\+C\+B\+C/\+C\+T\+R modes. It uses the \hyperlink{stm32f4xx__cryp_8c}{stm32f4xx\+\_\+cryp.\+c}/.h drivers to access the S\+T\+M32\+F4xx C\+R\+Y\+P peripheral. 
+
+\begin{DoxyAuthor}{Author}
+M\+C\+D Application Team 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+V1.\+0.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+30-\/\+September-\/2011 \begin{DoxyVerb}*
+*          ===================================================================
+*                                   How to use this driver
+*          ===================================================================
+*          1. Enable The CRYP controller clock using 
+*            RCC_AHB2PeriphClockCmd(RCC_AHB2Periph_CRYP, ENABLE); function.
+*
+*          2. Encrypt and decrypt using AES in ECB Mode using CRYP_AES_ECB()
+*             function.
+*
+*          3. Encrypt and decrypt using AES in CBC Mode using CRYP_AES_CBC()
+*             function.
+*
+*          4. Encrypt and decrypt using AES in CTR Mode using CRYP_AES_CTR()
+*             function.
+*
+*  \end{DoxyVerb}
+
+\end{DoxyDate}
+\begin{DoxyAttention}{Attention}
+
+\end{DoxyAttention}
+T\+H\+E P\+R\+E\+S\+E\+N\+T F\+I\+R\+M\+W\+A\+R\+E W\+H\+I\+C\+H I\+S F\+O\+R G\+U\+I\+D\+A\+N\+C\+E O\+N\+L\+Y A\+I\+M\+S A\+T P\+R\+O\+V\+I\+D\+I\+N\+G C\+U\+S\+T\+O\+M\+E\+R\+S W\+I\+T\+H C\+O\+D\+I\+N\+G I\+N\+F\+O\+R\+M\+A\+T\+I\+O\+N R\+E\+G\+A\+R\+D\+I\+N\+G T\+H\+E\+I\+R P\+R\+O\+D\+U\+C\+T\+S I\+N O\+R\+D\+E\+R F\+O\+R T\+H\+E\+M T\+O S\+A\+V\+E T\+I\+M\+E. A\+S A R\+E\+S\+U\+L\+T, S\+T\+M\+I\+C\+R\+O\+E\+L\+E\+C\+T\+R\+O\+N\+I\+C\+S S\+H\+A\+L\+L N\+O\+T B\+E H\+E\+L\+D L\+I\+A\+B\+L\+E F\+O\+R A\+N\+Y D\+I\+R\+E\+C\+T, I\+N\+D\+I\+R\+E\+C\+T O\+R C\+O\+N\+S\+E\+Q\+U\+E\+N\+T\+I\+A\+L D\+A\+M\+A\+G\+E\+S W\+I\+T\+H R\+E\+S\+P\+E\+C\+T T\+O A\+N\+Y C\+L\+A\+I\+M\+S A\+R\+I\+S\+I\+N\+G F\+R\+O\+M T\+H\+E C\+O\+N\+T\+E\+N\+T O\+F S\+U\+C\+H F\+I\+R\+M\+W\+A\+R\+E A\+N\+D/\+O\+R T\+H\+E U\+S\+E M\+A\+D\+E B\+Y C\+U\+S\+T\+O\+M\+E\+R\+S O\+F T\+H\+E C\+O\+D\+I\+N\+G I\+N\+F\+O\+R\+M\+A\+T\+I\+O\+N C\+O\+N\+T\+A\+I\+N\+E\+D H\+E\+R\+E\+I\+N I\+N C\+O\+N\+N\+E\+C\+T\+I\+O\+N W\+I\+T\+H T\+H\+E\+I\+R P\+R\+O\+D\+U\+C\+T\+S.
+
+\subsubsection*{\begin{center}\copyright{} C\+O\+P\+Y\+R\+I\+G\+H\+T 2011 S\+T\+Microelectronics\end{center} }

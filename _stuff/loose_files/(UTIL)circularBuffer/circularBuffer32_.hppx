@@ -1,0 +1,132 @@
+
+/* =============================================================================
+ * Project:		GPSDE++ AVR Library
+ * File name:	circularBuffer32.hpp
+ * Module:		32-bits data-wide circular buffer for GPDSE++ Library project
+ * Authors:		Leandro Schwarz
+ *				Hazael dos Santos Batista
+ * Build:		1002
+ * Date:		June 16, 2018
+ * ========================================================================== */
+
+#ifndef __CIRCULAR_BUFFER_32_HPP
+#define __CIRCULAR_BUFFER_32_HPP 1002
+
+// =============================================================================
+// Dependencies
+// =============================================================================
+
+// Global definitions file
+#include "..\globalDefines.hpp"
+#if __GLOBAL_DEFINES_HPP != 1002
+#	error [circularBuffer32.hpp] Error 101 - Global definitions file (globalDefines.hpp) must be build 1002.
+#endif
+
+// Header files
+/* NONE */
+
+// =============================================================================
+// Undefining previous definitions
+// =============================================================================
+
+/* NONE */
+
+// =============================================================================
+// Constants
+// =============================================================================
+
+/* NONE */
+
+// =============================================================================
+// Macro-functions
+// =============================================================================
+
+/* NONE */
+
+// =============================================================================
+// New data types
+// =============================================================================
+
+/* NONE */
+
+// =============================================================================
+// CircularBuffer32 Class
+// =============================================================================
+
+class CircularBuffer32 {
+	// New data types
+public:
+
+	// Constructors
+public:
+	CircularBuffer32(uint16_t bufferSize);
+	~CircularBuffer32();
+
+	// Methods
+public:
+	bool     push(uint32_t data);		// Pushes data into buffer
+	bool     pop(uint32_t *data);		// Pops data from buffer
+	bool     isEmpty(void);				// Check if buffer is empty
+	bool     isFull(void);				// Check if buffer is full
+	uint16_t getOccupation(void);		// Number of occupied elements at the buffer
+	uint16_t getFreeSpace(void);		// Number of free elements at the buffer
+	bool     flush(void);				// Flushes all buffer data
+	void     blockWrite(bool block);	// Controls write access to device
+	void     blockRead(bool block);		// Controls read access to device
+	error_e  getLastError(void);		// Returns error state from last operation
+
+private:
+	bool     isLocked(void);			// Check if buffer is locked
+	bool     isInitialized(void);		// Check if buffer is initialized
+	bool     isWriteProtected(void);	// Check if buffer is write protected
+	bool     isReadProtected(void);		// Check if buffer is read protected
+
+protected:
+
+	// Data members
+public:
+
+private:
+	uint16_t rdIndex_;
+	uint16_t wrIndex_;
+	uint16_t maxSize_;
+	uint16_t occupation_;
+	uint32_t   *data_;
+	// Package status
+	error_e  lastError_;
+	bool     initialized_		: 1;
+	bool     empty_				: 1;
+	bool     full_				: 1;
+	bool     locked_			: 1;
+	bool     rdProtected_       : 1;
+	bool     wrProtected_       : 1;
+
+protected:
+
+};  // class CircularBuffer32
+
+// =============================================================================
+// CircularBuffer32 - Class inline function definitions
+// =============================================================================
+
+/* NONE */
+
+// =============================================================================
+// Extern global variables
+// =============================================================================
+
+/* NONE */
+
+// =============================================================================
+// General public functions declarations
+// =============================================================================
+
+/* NONE */
+
+// =============================================================================
+// General inline functions definitions
+// =============================================================================
+
+/* NONE */
+
+#endif // __CIRCULAR_BUFFER_32_HPP

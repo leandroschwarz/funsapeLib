@@ -1,0 +1,143 @@
+\hypertarget{group___f_l_a_s_h___group4}{}\section{Interrupts and flags management functions}
+\label{group___f_l_a_s_h___group4}\index{Interrupts and flags management functions@{Interrupts and flags management functions}}
+
+
+Interrupts and flags management functions.  
+
+
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{group___f_l_a_s_h___group4_ga94c1e51a9c3bf8d48eb6eb4a4d054861}{F\+L\+A\+S\+H\+\_\+\+I\+T\+Config} (uint32\+\_\+t F\+L\+A\+S\+H\+\_\+\+I\+T, Functional\+State New\+State)
+\begin{DoxyCompactList}\small\item\em Enables or disables the specified F\+L\+A\+S\+H interrupts. \end{DoxyCompactList}\item 
+Flag\+Status \hyperlink{group___f_l_a_s_h___group4_gae3fb545e32f21501ca27d4380e0f2088}{F\+L\+A\+S\+H\+\_\+\+Get\+Flag\+Status} (uint32\+\_\+t F\+L\+A\+S\+H\+\_\+\+F\+L\+A\+G)
+\begin{DoxyCompactList}\small\item\em Checks whether the specified F\+L\+A\+S\+H flag is set or not. \end{DoxyCompactList}\item 
+void \hyperlink{group___f_l_a_s_h___group4_gac4be1d486483fa5cd70ec77d44ca8f87}{F\+L\+A\+S\+H\+\_\+\+Clear\+Flag} (uint32\+\_\+t F\+L\+A\+S\+H\+\_\+\+F\+L\+A\+G)
+\begin{DoxyCompactList}\small\item\em Clears the F\+L\+A\+S\+H's pending flags. \end{DoxyCompactList}\item 
+\hyperlink{group___f_l_a_s_h_gadc63a6f3404ff1f71229a66915e9cdc0}{F\+L\+A\+S\+H\+\_\+\+Status} \hyperlink{group___f_l_a_s_h___group4_gac265b8d1e7ea11e44ceee28797c3debb}{F\+L\+A\+S\+H\+\_\+\+Get\+Status} (void)
+\begin{DoxyCompactList}\small\item\em Returns the F\+L\+A\+S\+H Status. \end{DoxyCompactList}\item 
+\hyperlink{group___f_l_a_s_h_gadc63a6f3404ff1f71229a66915e9cdc0}{F\+L\+A\+S\+H\+\_\+\+Status} \hyperlink{group___f_l_a_s_h___group4_gaaf8ea3b00c9a5f5eca0df9a795b83f22}{F\+L\+A\+S\+H\+\_\+\+Wait\+For\+Last\+Operation} (void)
+\begin{DoxyCompactList}\small\item\em Waits for a F\+L\+A\+S\+H operation to complete. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Interrupts and flags management functions. 
+
+\begin{DoxyVerb} ===============================================================================
+                  Interrupts and flags management functions
+ ===============================================================================  \end{DoxyVerb}
+ 
+
+\subsection{Function Documentation}
+\hypertarget{group___f_l_a_s_h___group4_gac4be1d486483fa5cd70ec77d44ca8f87}{}\index{Interrupts and flags management functions@{Interrupts and flags management functions}!F\+L\+A\+S\+H\+\_\+\+Clear\+Flag@{F\+L\+A\+S\+H\+\_\+\+Clear\+Flag}}
+\index{F\+L\+A\+S\+H\+\_\+\+Clear\+Flag@{F\+L\+A\+S\+H\+\_\+\+Clear\+Flag}!Interrupts and flags management functions@{Interrupts and flags management functions}}
+\subsubsection[{F\+L\+A\+S\+H\+\_\+\+Clear\+Flag}]{\setlength{\rightskip}{0pt plus 5cm}void F\+L\+A\+S\+H\+\_\+\+Clear\+Flag (
+\begin{DoxyParamCaption}
+\item[{uint32\+\_\+t}]{F\+L\+A\+S\+H\+\_\+\+F\+L\+A\+G}
+\end{DoxyParamCaption}
+)}\label{group___f_l_a_s_h___group4_gac4be1d486483fa5cd70ec77d44ca8f87}
+
+
+Clears the F\+L\+A\+S\+H's pending flags. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em F\+L\+A\+S\+H\+\_\+\+F\+L\+A\+G} & specifies the F\+L\+A\+S\+H flags to clear. This parameter can be any combination of the following values\+: \begin{DoxyItemize}
+\item F\+L\+A\+S\+H\+\_\+\+F\+L\+A\+G\+\_\+\+E\+O\+P\+: F\+L\+A\+S\+H End of Operation flag \item F\+L\+A\+S\+H\+\_\+\+F\+L\+A\+G\+\_\+\+O\+P\+E\+R\+R\+: F\+L\+A\+S\+H operation Error flag \item F\+L\+A\+S\+H\+\_\+\+F\+L\+A\+G\+\_\+\+W\+R\+P\+E\+R\+R\+: F\+L\+A\+S\+H Write protected error flag \item F\+L\+A\+S\+H\+\_\+\+F\+L\+A\+G\+\_\+\+P\+G\+A\+E\+R\+R\+: F\+L\+A\+S\+H Programming Alignment error flag \item F\+L\+A\+S\+H\+\_\+\+F\+L\+A\+G\+\_\+\+P\+G\+P\+E\+R\+R\+: F\+L\+A\+S\+H Programming Parallelism error flag \item F\+L\+A\+S\+H\+\_\+\+F\+L\+A\+G\+\_\+\+P\+G\+S\+E\+R\+R\+: F\+L\+A\+S\+H Programming Sequence error flag \end{DoxyItemize}
+\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+\hypertarget{group___f_l_a_s_h___group4_gae3fb545e32f21501ca27d4380e0f2088}{}\index{Interrupts and flags management functions@{Interrupts and flags management functions}!F\+L\+A\+S\+H\+\_\+\+Get\+Flag\+Status@{F\+L\+A\+S\+H\+\_\+\+Get\+Flag\+Status}}
+\index{F\+L\+A\+S\+H\+\_\+\+Get\+Flag\+Status@{F\+L\+A\+S\+H\+\_\+\+Get\+Flag\+Status}!Interrupts and flags management functions@{Interrupts and flags management functions}}
+\subsubsection[{F\+L\+A\+S\+H\+\_\+\+Get\+Flag\+Status}]{\setlength{\rightskip}{0pt plus 5cm}Flag\+Status F\+L\+A\+S\+H\+\_\+\+Get\+Flag\+Status (
+\begin{DoxyParamCaption}
+\item[{uint32\+\_\+t}]{F\+L\+A\+S\+H\+\_\+\+F\+L\+A\+G}
+\end{DoxyParamCaption}
+)}\label{group___f_l_a_s_h___group4_gae3fb545e32f21501ca27d4380e0f2088}
+
+
+Checks whether the specified F\+L\+A\+S\+H flag is set or not. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em F\+L\+A\+S\+H\+\_\+\+F\+L\+A\+G} & specifies the F\+L\+A\+S\+H flag to check. This parameter can be one of the following values\+: \begin{DoxyItemize}
+\item F\+L\+A\+S\+H\+\_\+\+F\+L\+A\+G\+\_\+\+E\+O\+P\+: F\+L\+A\+S\+H End of Operation flag \item F\+L\+A\+S\+H\+\_\+\+F\+L\+A\+G\+\_\+\+O\+P\+E\+R\+R\+: F\+L\+A\+S\+H operation Error flag \item F\+L\+A\+S\+H\+\_\+\+F\+L\+A\+G\+\_\+\+W\+R\+P\+E\+R\+R\+: F\+L\+A\+S\+H Write protected error flag \item F\+L\+A\+S\+H\+\_\+\+F\+L\+A\+G\+\_\+\+P\+G\+A\+E\+R\+R\+: F\+L\+A\+S\+H Programming Alignment error flag \item F\+L\+A\+S\+H\+\_\+\+F\+L\+A\+G\+\_\+\+P\+G\+P\+E\+R\+R\+: F\+L\+A\+S\+H Programming Parallelism error flag \item F\+L\+A\+S\+H\+\_\+\+F\+L\+A\+G\+\_\+\+P\+G\+S\+E\+R\+R\+: F\+L\+A\+S\+H Programming Sequence error flag \item F\+L\+A\+S\+H\+\_\+\+F\+L\+A\+G\+\_\+\+B\+S\+Y\+: F\+L\+A\+S\+H Busy flag \end{DoxyItemize}
+\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em The} & new state of F\+L\+A\+S\+H\+\_\+\+F\+L\+A\+G (S\+E\+T or R\+E\+S\+E\+T). \\
+\hline
+\end{DoxyRetVals}
+\hypertarget{group___f_l_a_s_h___group4_gac265b8d1e7ea11e44ceee28797c3debb}{}\index{Interrupts and flags management functions@{Interrupts and flags management functions}!F\+L\+A\+S\+H\+\_\+\+Get\+Status@{F\+L\+A\+S\+H\+\_\+\+Get\+Status}}
+\index{F\+L\+A\+S\+H\+\_\+\+Get\+Status@{F\+L\+A\+S\+H\+\_\+\+Get\+Status}!Interrupts and flags management functions@{Interrupts and flags management functions}}
+\subsubsection[{F\+L\+A\+S\+H\+\_\+\+Get\+Status}]{\setlength{\rightskip}{0pt plus 5cm}{\bf F\+L\+A\+S\+H\+\_\+\+Status} F\+L\+A\+S\+H\+\_\+\+Get\+Status (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{group___f_l_a_s_h___group4_gac265b8d1e7ea11e44ceee28797c3debb}
+
+
+Returns the F\+L\+A\+S\+H Status. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em None} & \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em F\+L\+A\+S\+H} & Status\+: The returned value can be\+: F\+L\+A\+S\+H\+\_\+\+B\+U\+S\+Y, F\+L\+A\+S\+H\+\_\+\+E\+R\+R\+O\+R\+\_\+\+P\+R\+O\+G\+R\+A\+M, F\+L\+A\+S\+H\+\_\+\+E\+R\+R\+O\+R\+\_\+\+W\+R\+P, F\+L\+A\+S\+H\+\_\+\+E\+R\+R\+O\+R\+\_\+\+O\+P\+E\+R\+A\+T\+I\+O\+N or F\+L\+A\+S\+H\+\_\+\+C\+O\+M\+P\+L\+E\+T\+E. \\
+\hline
+\end{DoxyRetVals}
+\hypertarget{group___f_l_a_s_h___group4_ga94c1e51a9c3bf8d48eb6eb4a4d054861}{}\index{Interrupts and flags management functions@{Interrupts and flags management functions}!F\+L\+A\+S\+H\+\_\+\+I\+T\+Config@{F\+L\+A\+S\+H\+\_\+\+I\+T\+Config}}
+\index{F\+L\+A\+S\+H\+\_\+\+I\+T\+Config@{F\+L\+A\+S\+H\+\_\+\+I\+T\+Config}!Interrupts and flags management functions@{Interrupts and flags management functions}}
+\subsubsection[{F\+L\+A\+S\+H\+\_\+\+I\+T\+Config}]{\setlength{\rightskip}{0pt plus 5cm}void F\+L\+A\+S\+H\+\_\+\+I\+T\+Config (
+\begin{DoxyParamCaption}
+\item[{uint32\+\_\+t}]{F\+L\+A\+S\+H\+\_\+\+I\+T, }
+\item[{Functional\+State}]{New\+State}
+\end{DoxyParamCaption}
+)}\label{group___f_l_a_s_h___group4_ga94c1e51a9c3bf8d48eb6eb4a4d054861}
+
+
+Enables or disables the specified F\+L\+A\+S\+H interrupts. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em F\+L\+A\+S\+H\+\_\+\+I\+T} & specifies the F\+L\+A\+S\+H interrupt sources to be enabled or disabled. This parameter can be any combination of the following values\+: \begin{DoxyItemize}
+\item F\+L\+A\+S\+H\+\_\+\+I\+T\+\_\+\+E\+R\+R\+: F\+L\+A\+S\+H Error Interrupt \item F\+L\+A\+S\+H\+\_\+\+I\+T\+\_\+\+E\+O\+P\+: F\+L\+A\+S\+H end of operation Interrupt \end{DoxyItemize}
+\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+\hypertarget{group___f_l_a_s_h___group4_gaaf8ea3b00c9a5f5eca0df9a795b83f22}{}\index{Interrupts and flags management functions@{Interrupts and flags management functions}!F\+L\+A\+S\+H\+\_\+\+Wait\+For\+Last\+Operation@{F\+L\+A\+S\+H\+\_\+\+Wait\+For\+Last\+Operation}}
+\index{F\+L\+A\+S\+H\+\_\+\+Wait\+For\+Last\+Operation@{F\+L\+A\+S\+H\+\_\+\+Wait\+For\+Last\+Operation}!Interrupts and flags management functions@{Interrupts and flags management functions}}
+\subsubsection[{F\+L\+A\+S\+H\+\_\+\+Wait\+For\+Last\+Operation}]{\setlength{\rightskip}{0pt plus 5cm}{\bf F\+L\+A\+S\+H\+\_\+\+Status} F\+L\+A\+S\+H\+\_\+\+Wait\+For\+Last\+Operation (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{group___f_l_a_s_h___group4_gaaf8ea3b00c9a5f5eca0df9a795b83f22}
+
+
+Waits for a F\+L\+A\+S\+H operation to complete. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em None} & \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em F\+L\+A\+S\+H} & Status\+: The returned value can be\+: F\+L\+A\+S\+H\+\_\+\+B\+U\+S\+Y, F\+L\+A\+S\+H\+\_\+\+E\+R\+R\+O\+R\+\_\+\+P\+R\+O\+G\+R\+A\+M, F\+L\+A\+S\+H\+\_\+\+E\+R\+R\+O\+R\+\_\+\+W\+R\+P, F\+L\+A\+S\+H\+\_\+\+E\+R\+R\+O\+R\+\_\+\+O\+P\+E\+R\+A\+T\+I\+O\+N or F\+L\+A\+S\+H\+\_\+\+C\+O\+M\+P\+L\+E\+T\+E. \\
+\hline
+\end{DoxyRetVals}

@@ -1,0 +1,146 @@
+\hypertarget{group___m_i_s_c___private___functions}{}\section{M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions}
+\label{group___m_i_s_c___private___functions}\index{M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions@{M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions}}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{group___m_i_s_c___private___functions_gadfb1f34f803ce54c976643db8c484442}{N\+V\+I\+C\+\_\+\+Priority\+Group\+Config} (uint32\+\_\+t N\+V\+I\+C\+\_\+\+Priority\+Group)
+\begin{DoxyCompactList}\small\item\em Configures the priority grouping\+: pre-\/emption priority and subpriority. \end{DoxyCompactList}\item 
+void \hyperlink{group___m_i_s_c___private___functions_ga4ab373ed0870c06fca5eb51d639adf41}{N\+V\+I\+C\+\_\+\+Init} (\hyperlink{struct_n_v_i_c___init_type_def}{N\+V\+I\+C\+\_\+\+Init\+Type\+Def} $\ast$N\+V\+I\+C\+\_\+\+Init\+Struct)
+\begin{DoxyCompactList}\small\item\em Initializes the N\+V\+I\+C peripheral according to the specified parameters in the N\+V\+I\+C\+\_\+\+Init\+Struct. \end{DoxyCompactList}\item 
+void \hyperlink{group___m_i_s_c___private___functions_ga1145208ad70edfc2fab19b8b8ef1b1a1}{N\+V\+I\+C\+\_\+\+Set\+Vector\+Table} (uint32\+\_\+t N\+V\+I\+C\+\_\+\+Vect\+Tab, uint32\+\_\+t Offset)
+\begin{DoxyCompactList}\small\item\em Sets the vector table location and Offset. \end{DoxyCompactList}\item 
+void \hyperlink{group___m_i_s_c___private___functions_gae21011c5232f5b8f366acbecd12a1d4a}{N\+V\+I\+C\+\_\+\+System\+L\+P\+Config} (uint8\+\_\+t Low\+Power\+Mode, Functional\+State New\+State)
+\begin{DoxyCompactList}\small\item\em Selects the condition for the system to enter low power mode. \end{DoxyCompactList}\item 
+void \hyperlink{group___m_i_s_c___private___functions_ga2777d255bb06ad62bb6372a9db1ff385}{Sys\+Tick\+\_\+\+C\+L\+K\+Source\+Config} (uint32\+\_\+t Sys\+Tick\+\_\+\+C\+L\+K\+Source)
+\begin{DoxyCompactList}\small\item\em Configures the Sys\+Tick clock source. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Function Documentation}
+\hypertarget{group___m_i_s_c___private___functions_ga4ab373ed0870c06fca5eb51d639adf41}{}\index{M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions@{M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions}!N\+V\+I\+C\+\_\+\+Init@{N\+V\+I\+C\+\_\+\+Init}}
+\index{N\+V\+I\+C\+\_\+\+Init@{N\+V\+I\+C\+\_\+\+Init}!M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions@{M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions}}
+\subsubsection[{N\+V\+I\+C\+\_\+\+Init}]{\setlength{\rightskip}{0pt plus 5cm}void N\+V\+I\+C\+\_\+\+Init (
+\begin{DoxyParamCaption}
+\item[{{\bf N\+V\+I\+C\+\_\+\+Init\+Type\+Def} $\ast$}]{N\+V\+I\+C\+\_\+\+Init\+Struct}
+\end{DoxyParamCaption}
+)}\label{group___m_i_s_c___private___functions_ga4ab373ed0870c06fca5eb51d639adf41}
+
+
+Initializes the N\+V\+I\+C peripheral according to the specified parameters in the N\+V\+I\+C\+\_\+\+Init\+Struct. 
+
+\begin{DoxyNote}{Note}
+To configure interrupts priority correctly, the \hyperlink{group___m_i_s_c___private___functions_gadfb1f34f803ce54c976643db8c484442}{N\+V\+I\+C\+\_\+\+Priority\+Group\+Config()} function should be called before. 
+\end{DoxyNote}
+
+\begin{DoxyParams}{Parameters}
+{\em N\+V\+I\+C\+\_\+\+Init\+Struct} & pointer to a \hyperlink{struct_n_v_i_c___init_type_def}{N\+V\+I\+C\+\_\+\+Init\+Type\+Def} structure that contains the configuration information for the specified N\+V\+I\+C peripheral. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+\hypertarget{group___m_i_s_c___private___functions_gadfb1f34f803ce54c976643db8c484442}{}\index{M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions@{M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions}!N\+V\+I\+C\+\_\+\+Priority\+Group\+Config@{N\+V\+I\+C\+\_\+\+Priority\+Group\+Config}}
+\index{N\+V\+I\+C\+\_\+\+Priority\+Group\+Config@{N\+V\+I\+C\+\_\+\+Priority\+Group\+Config}!M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions@{M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions}}
+\subsubsection[{N\+V\+I\+C\+\_\+\+Priority\+Group\+Config}]{\setlength{\rightskip}{0pt plus 5cm}void N\+V\+I\+C\+\_\+\+Priority\+Group\+Config (
+\begin{DoxyParamCaption}
+\item[{uint32\+\_\+t}]{N\+V\+I\+C\+\_\+\+Priority\+Group}
+\end{DoxyParamCaption}
+)}\label{group___m_i_s_c___private___functions_gadfb1f34f803ce54c976643db8c484442}
+
+
+Configures the priority grouping\+: pre-\/emption priority and subpriority. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em N\+V\+I\+C\+\_\+\+Priority\+Group} & specifies the priority grouping bits length. This parameter can be one of the following values\+: \begin{DoxyItemize}
+\item N\+V\+I\+C\+\_\+\+Priority\+Group\+\_\+0\+: 0 bits for pre-\/emption priority 4 bits for subpriority \item N\+V\+I\+C\+\_\+\+Priority\+Group\+\_\+1\+: 1 bits for pre-\/emption priority 3 bits for subpriority \item N\+V\+I\+C\+\_\+\+Priority\+Group\+\_\+2\+: 2 bits for pre-\/emption priority 2 bits for subpriority \item N\+V\+I\+C\+\_\+\+Priority\+Group\+\_\+3\+: 3 bits for pre-\/emption priority 1 bits for subpriority \item N\+V\+I\+C\+\_\+\+Priority\+Group\+\_\+4\+: 4 bits for pre-\/emption priority 0 bits for subpriority \end{DoxyItemize}
+\\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+When the N\+V\+I\+C\+\_\+\+Priority\+Group\+\_\+0 is selected, I\+R\+Q pre-\/emption is no more possible. The pending I\+R\+Q priority will be managed only by the subpriority. 
+\end{DoxyNote}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+\hypertarget{group___m_i_s_c___private___functions_ga1145208ad70edfc2fab19b8b8ef1b1a1}{}\index{M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions@{M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions}!N\+V\+I\+C\+\_\+\+Set\+Vector\+Table@{N\+V\+I\+C\+\_\+\+Set\+Vector\+Table}}
+\index{N\+V\+I\+C\+\_\+\+Set\+Vector\+Table@{N\+V\+I\+C\+\_\+\+Set\+Vector\+Table}!M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions@{M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions}}
+\subsubsection[{N\+V\+I\+C\+\_\+\+Set\+Vector\+Table}]{\setlength{\rightskip}{0pt plus 5cm}void N\+V\+I\+C\+\_\+\+Set\+Vector\+Table (
+\begin{DoxyParamCaption}
+\item[{uint32\+\_\+t}]{N\+V\+I\+C\+\_\+\+Vect\+Tab, }
+\item[{uint32\+\_\+t}]{Offset}
+\end{DoxyParamCaption}
+)}\label{group___m_i_s_c___private___functions_ga1145208ad70edfc2fab19b8b8ef1b1a1}
+
+
+Sets the vector table location and Offset. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em N\+V\+I\+C\+\_\+\+Vect\+Tab} & specifies if the vector table is in R\+A\+M or F\+L\+A\+S\+H memory. This parameter can be one of the following values\+: \begin{DoxyItemize}
+\item N\+V\+I\+C\+\_\+\+Vect\+Tab\+\_\+\+R\+A\+M\+: Vector Table in internal S\+R\+A\+M. \item N\+V\+I\+C\+\_\+\+Vect\+Tab\+\_\+\+F\+L\+A\+S\+H\+: Vector Table in internal F\+L\+A\+S\+H. \end{DoxyItemize}
+\\
+\hline
+{\em Offset} & Vector Table base offset field. This value must be a multiple of 0x200. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+\hypertarget{group___m_i_s_c___private___functions_gae21011c5232f5b8f366acbecd12a1d4a}{}\index{M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions@{M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions}!N\+V\+I\+C\+\_\+\+System\+L\+P\+Config@{N\+V\+I\+C\+\_\+\+System\+L\+P\+Config}}
+\index{N\+V\+I\+C\+\_\+\+System\+L\+P\+Config@{N\+V\+I\+C\+\_\+\+System\+L\+P\+Config}!M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions@{M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions}}
+\subsubsection[{N\+V\+I\+C\+\_\+\+System\+L\+P\+Config}]{\setlength{\rightskip}{0pt plus 5cm}void N\+V\+I\+C\+\_\+\+System\+L\+P\+Config (
+\begin{DoxyParamCaption}
+\item[{uint8\+\_\+t}]{Low\+Power\+Mode, }
+\item[{Functional\+State}]{New\+State}
+\end{DoxyParamCaption}
+)}\label{group___m_i_s_c___private___functions_gae21011c5232f5b8f366acbecd12a1d4a}
+
+
+Selects the condition for the system to enter low power mode. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Low\+Power\+Mode} & Specifies the new mode for the system to enter low power mode. This parameter can be one of the following values\+: \begin{DoxyItemize}
+\item N\+V\+I\+C\+\_\+\+L\+P\+\_\+\+S\+E\+V\+O\+N\+P\+E\+N\+D\+: Low Power S\+E\+V on Pend. \item N\+V\+I\+C\+\_\+\+L\+P\+\_\+\+S\+L\+E\+E\+P\+D\+E\+E\+P\+: Low Power D\+E\+E\+P\+S\+L\+E\+E\+P request. \item N\+V\+I\+C\+\_\+\+L\+P\+\_\+\+S\+L\+E\+E\+P\+O\+N\+E\+X\+I\+T\+: Low Power Sleep on Exit. \end{DoxyItemize}
+\\
+\hline
+{\em New\+State} & new state of L\+P condition. This parameter can be\+: E\+N\+A\+B\+L\+E or D\+I\+S\+A\+B\+L\+E. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+\hypertarget{group___m_i_s_c___private___functions_ga2777d255bb06ad62bb6372a9db1ff385}{}\index{M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions@{M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions}!Sys\+Tick\+\_\+\+C\+L\+K\+Source\+Config@{Sys\+Tick\+\_\+\+C\+L\+K\+Source\+Config}}
+\index{Sys\+Tick\+\_\+\+C\+L\+K\+Source\+Config@{Sys\+Tick\+\_\+\+C\+L\+K\+Source\+Config}!M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions@{M\+I\+S\+C\+\_\+\+Private\+\_\+\+Functions}}
+\subsubsection[{Sys\+Tick\+\_\+\+C\+L\+K\+Source\+Config}]{\setlength{\rightskip}{0pt plus 5cm}void Sys\+Tick\+\_\+\+C\+L\+K\+Source\+Config (
+\begin{DoxyParamCaption}
+\item[{uint32\+\_\+t}]{Sys\+Tick\+\_\+\+C\+L\+K\+Source}
+\end{DoxyParamCaption}
+)}\label{group___m_i_s_c___private___functions_ga2777d255bb06ad62bb6372a9db1ff385}
+
+
+Configures the Sys\+Tick clock source. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Sys\+Tick\+\_\+\+C\+L\+K\+Source} & specifies the Sys\+Tick clock source. This parameter can be one of the following values\+: \begin{DoxyItemize}
+\item Sys\+Tick\+\_\+\+C\+L\+K\+Source\+\_\+\+H\+C\+L\+K\+\_\+\+Div8\+: A\+H\+B clock divided by 8 selected as Sys\+Tick clock source. \item Sys\+Tick\+\_\+\+C\+L\+K\+Source\+\_\+\+H\+C\+L\+K\+: A\+H\+B clock selected as Sys\+Tick clock source. \end{DoxyItemize}
+\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}

@@ -1,0 +1,91 @@
+
+/* =============================================================================
+ * NOTES
+ * =============================================================================
+ * Voltage calculation of CR2032 Battery.
+ *
+ * ADC reference 4096 c.u. = 3300 mV
+ *
+ * 3300 ----------- 4096
+ * Vadc(mV) -------- ADC
+ * 0 ----------------- 0
+ *
+ * Vadc(mV) / 3300 = ADC / 4096
+ * Vadc(mV) = 3300 * ADC / 4096
+ * Vadc(mV) = (825 * ADC) / 1024
+ ** =============================================================================
+ * Voltage calculation of 18650 Battery.
+ *
+ * ADC reference 4096 c.u. = 3300 mV
+ * Vadc(mV) = (825 * ADC) / 1024
+ *
+ * Voltage is divided by two resistor in voltage divider configuration.
+ *
+ * Top Resistor (R1)		= 12k
+ * Bottom Resistor (R2)		= 33k
+ *
+ * Vadc(mV) = Vbat(mV) * R2 / (R1 + R2)
+ * Vadc(mV) * (R1 + R2) = Vbat(mV) * R2
+ * Vbat(mV) * = Vadc(mV) * (R1 + R2) / R2
+ *
+ * Mixing both equations, resuts in
+ *
+ * Vbat(mV) * = Vadc(mV) * (R1 + R2) / R2
+ * Vbat(mV) * = ((825 * ADC) / 1024) * (R1 + R2) / R2
+ * Vbat(mV) * = 825 * ADC * (R1 + R2) / (R2 * 1024)
+ * =============================================================================
+ * Voltage calculation of STEP UP converter.
+ *
+ * ADC reference 4096 c.u. = 3300 mV
+ * Vadc(mV) = (825 * ADC) / 1024
+ *
+ * Voltage is divided by two resistor in voltage divider configuration.
+ *
+ * Top Resistor (R3)		= 18k
+ * Bottom Resistor (R4)		= 15k
+ *
+ * Vbat(mV) * = 825 * ADC * (R3 + R4) / (R4 * 1024)
+ * =============================================================================
+ * SD card data package format (must have 512 bytes in length)
+ *
+ * 	Byte 0			Start delimiter 1 (0x22)	(1 byte)
+ * 	Byte 1			Start delimiter 2 (0x03)	(1 byte)
+ * 	Byte 2			Start delimiter 3 (0x19)	(1 byte)
+ * 	Byte 3			Start delimiter 4 (0x82)	(1 byte)
+ * 	Byte 4-11		Sample information			(8 bytes)
+ * 	Byte 12-13		Sample time index			(2 bytes)
+ * 		-> 13 Sequential samples, each sample is composed of:
+ * 				ECG1 (2 bytes)
+ * 				ECG2 (2 bytes)
+ * 				ECG3 (2 bytes)
+ * 				MPU1_X (2 bytes)
+ * 				MPU1_Y (2 bytes)
+ * 				MPU1_Z (2 bytes)
+ * 				MPU2_X (2 bytes)
+ * 				MPU2_Y (2 bytes)
+ * 				MPU2_Z (2 bytes)
+ * 				MPU3_X (2 bytes)
+ * 				MPU3_Y (2 bytes)
+ * 				MPU3_Z (2 bytes)
+ * 				MPU4_X (2 bytes)
+ * 				MPU4_Y (2 bytes)
+ * 				MPU4_Z (2 bytes)
+ * 				PPG1_IR (2 bytes)
+ * 				PPG1_RED (2 bytes)
+ * 				PPG2_IR (2 bytes)
+ * 				PPG2_RED (2 bytes)
+ * 				Total 13 x 38 bytes = 494 bytes
+ * 	Bytes 508-510	Blank (0x00)		(3 bytes)
+ * 	Byte 511			Checksum			(1 byte)
+ * =============================================================================
+ * Tempo de comunicação para a leitura de 6 bytes de todos os MPU por SPI
+ *
+ * 4 MPUs em 400 Hz, prescaler = 128			=> 200ms a cada segundo
+ *
+ * Verificar se funciona com prescreler = 64, f = 1.125 MHz (MPU suporta 1 MHz
+ * segundo o datasheet)
+ * ============================================================================
+ * Tempo de comunicação para a leitura de 6 bytes do MAX por I2C
+ *
+ * 1 MAX em 100 Hz, com fscl = 400 kHz			=> 22ms a cada segundo
+ * ========================================================================== */

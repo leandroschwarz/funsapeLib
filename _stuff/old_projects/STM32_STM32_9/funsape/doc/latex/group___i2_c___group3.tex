@@ -1,0 +1,127 @@
+\hypertarget{group___i2_c___group3}{}\section{P\+E\+C management functions}
+\label{group___i2_c___group3}\index{P\+E\+C management functions@{P\+E\+C management functions}}
+
+
+P\+E\+C management functions.  
+
+
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{group___i2_c___group3_gaa27d1440290fe601e730b6980999afe3}{I2\+C\+\_\+\+Transmit\+P\+E\+C} (\hyperlink{struct_i2_c___type_def}{I2\+C\+\_\+\+Type\+Def} $\ast$I2\+Cx, Functional\+State New\+State)
+\begin{DoxyCompactList}\small\item\em Enables or disables the specified I2\+C P\+E\+C transfer. \end{DoxyCompactList}\item 
+void \hyperlink{group___i2_c___group3_ga5d0f939bdd45542502827bf408f24161}{I2\+C\+\_\+\+P\+E\+C\+Position\+Config} (\hyperlink{struct_i2_c___type_def}{I2\+C\+\_\+\+Type\+Def} $\ast$I2\+Cx, uint16\+\_\+t I2\+C\+\_\+\+P\+E\+C\+Position)
+\begin{DoxyCompactList}\small\item\em Selects the specified I2\+C P\+E\+C position. \end{DoxyCompactList}\item 
+void \hyperlink{group___i2_c___group3_gae86801251359226c35745e0a258388b0}{I2\+C\+\_\+\+Calculate\+P\+E\+C} (\hyperlink{struct_i2_c___type_def}{I2\+C\+\_\+\+Type\+Def} $\ast$I2\+Cx, Functional\+State New\+State)
+\begin{DoxyCompactList}\small\item\em Enables or disables the P\+E\+C value calculation of the transferred bytes. \end{DoxyCompactList}\item 
+uint8\+\_\+t \hyperlink{group___i2_c___group3_ga7bf75e7c27c0e1d73e70fc0e1c7cd1dd}{I2\+C\+\_\+\+Get\+P\+E\+C} (\hyperlink{struct_i2_c___type_def}{I2\+C\+\_\+\+Type\+Def} $\ast$I2\+Cx)
+\begin{DoxyCompactList}\small\item\em Returns the P\+E\+C value for the specified I2\+C. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+P\+E\+C management functions. 
+
+\begin{DoxyVerb} ===============================================================================
+                         PEC management functions
+ ===============================================================================  \end{DoxyVerb}
+ 
+
+\subsection{Function Documentation}
+\hypertarget{group___i2_c___group3_gae86801251359226c35745e0a258388b0}{}\index{P\+E\+C management functions@{P\+E\+C management functions}!I2\+C\+\_\+\+Calculate\+P\+E\+C@{I2\+C\+\_\+\+Calculate\+P\+E\+C}}
+\index{I2\+C\+\_\+\+Calculate\+P\+E\+C@{I2\+C\+\_\+\+Calculate\+P\+E\+C}!P\+E\+C management functions@{P\+E\+C management functions}}
+\subsubsection[{I2\+C\+\_\+\+Calculate\+P\+E\+C}]{\setlength{\rightskip}{0pt plus 5cm}void I2\+C\+\_\+\+Calculate\+P\+E\+C (
+\begin{DoxyParamCaption}
+\item[{{\bf I2\+C\+\_\+\+Type\+Def} $\ast$}]{I2\+Cx, }
+\item[{Functional\+State}]{New\+State}
+\end{DoxyParamCaption}
+)}\label{group___i2_c___group3_gae86801251359226c35745e0a258388b0}
+
+
+Enables or disables the P\+E\+C value calculation of the transferred bytes. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em I2\+Cx} & where x can be 1, 2 or 3 to select the I2\+C peripheral. \\
+\hline
+{\em New\+State} & new state of the I2\+Cx P\+E\+C value calculation. This parameter can be\+: E\+N\+A\+B\+L\+E or D\+I\+S\+A\+B\+L\+E. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+\hypertarget{group___i2_c___group3_ga7bf75e7c27c0e1d73e70fc0e1c7cd1dd}{}\index{P\+E\+C management functions@{P\+E\+C management functions}!I2\+C\+\_\+\+Get\+P\+E\+C@{I2\+C\+\_\+\+Get\+P\+E\+C}}
+\index{I2\+C\+\_\+\+Get\+P\+E\+C@{I2\+C\+\_\+\+Get\+P\+E\+C}!P\+E\+C management functions@{P\+E\+C management functions}}
+\subsubsection[{I2\+C\+\_\+\+Get\+P\+E\+C}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t I2\+C\+\_\+\+Get\+P\+E\+C (
+\begin{DoxyParamCaption}
+\item[{{\bf I2\+C\+\_\+\+Type\+Def} $\ast$}]{I2\+Cx}
+\end{DoxyParamCaption}
+)}\label{group___i2_c___group3_ga7bf75e7c27c0e1d73e70fc0e1c7cd1dd}
+
+
+Returns the P\+E\+C value for the specified I2\+C. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em I2\+Cx} & where x can be 1, 2 or 3 to select the I2\+C peripheral. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em The} & P\+E\+C value. \\
+\hline
+\end{DoxyRetVals}
+\hypertarget{group___i2_c___group3_ga5d0f939bdd45542502827bf408f24161}{}\index{P\+E\+C management functions@{P\+E\+C management functions}!I2\+C\+\_\+\+P\+E\+C\+Position\+Config@{I2\+C\+\_\+\+P\+E\+C\+Position\+Config}}
+\index{I2\+C\+\_\+\+P\+E\+C\+Position\+Config@{I2\+C\+\_\+\+P\+E\+C\+Position\+Config}!P\+E\+C management functions@{P\+E\+C management functions}}
+\subsubsection[{I2\+C\+\_\+\+P\+E\+C\+Position\+Config}]{\setlength{\rightskip}{0pt plus 5cm}void I2\+C\+\_\+\+P\+E\+C\+Position\+Config (
+\begin{DoxyParamCaption}
+\item[{{\bf I2\+C\+\_\+\+Type\+Def} $\ast$}]{I2\+Cx, }
+\item[{uint16\+\_\+t}]{I2\+C\+\_\+\+P\+E\+C\+Position}
+\end{DoxyParamCaption}
+)}\label{group___i2_c___group3_ga5d0f939bdd45542502827bf408f24161}
+
+
+Selects the specified I2\+C P\+E\+C position. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em I2\+Cx} & where x can be 1, 2 or 3 to select the I2\+C peripheral. \\
+\hline
+{\em I2\+C\+\_\+\+P\+E\+C\+Position} & specifies the P\+E\+C position. This parameter can be one of the following values\+: \begin{DoxyItemize}
+\item I2\+C\+\_\+\+P\+E\+C\+Position\+\_\+\+Next\+: indicates that the next byte is P\+E\+C \item I2\+C\+\_\+\+P\+E\+C\+Position\+\_\+\+Current\+: indicates that current byte is P\+E\+C\end{DoxyItemize}
+\\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+This function configures the same bit (P\+O\+S) as \hyperlink{group___i2_c___group1_gad08ebffc3a234d84e6405ec115bd74f1}{I2\+C\+\_\+\+N\+A\+C\+K\+Position\+Config()} but is intended to be used in S\+M\+B\+U\+S mode while \hyperlink{group___i2_c___group1_gad08ebffc3a234d84e6405ec115bd74f1}{I2\+C\+\_\+\+N\+A\+C\+K\+Position\+Config()} is intended to used in I2\+C mode.
+\end{DoxyNote}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+\hypertarget{group___i2_c___group3_gaa27d1440290fe601e730b6980999afe3}{}\index{P\+E\+C management functions@{P\+E\+C management functions}!I2\+C\+\_\+\+Transmit\+P\+E\+C@{I2\+C\+\_\+\+Transmit\+P\+E\+C}}
+\index{I2\+C\+\_\+\+Transmit\+P\+E\+C@{I2\+C\+\_\+\+Transmit\+P\+E\+C}!P\+E\+C management functions@{P\+E\+C management functions}}
+\subsubsection[{I2\+C\+\_\+\+Transmit\+P\+E\+C}]{\setlength{\rightskip}{0pt plus 5cm}void I2\+C\+\_\+\+Transmit\+P\+E\+C (
+\begin{DoxyParamCaption}
+\item[{{\bf I2\+C\+\_\+\+Type\+Def} $\ast$}]{I2\+Cx, }
+\item[{Functional\+State}]{New\+State}
+\end{DoxyParamCaption}
+)}\label{group___i2_c___group3_gaa27d1440290fe601e730b6980999afe3}
+
+
+Enables or disables the specified I2\+C P\+E\+C transfer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em I2\+Cx} & where x can be 1, 2 or 3 to select the I2\+C peripheral. \\
+\hline
+{\em New\+State} & new state of the I2\+C P\+E\+C transmission. This parameter can be\+: E\+N\+A\+B\+L\+E or D\+I\+S\+A\+B\+L\+E. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}

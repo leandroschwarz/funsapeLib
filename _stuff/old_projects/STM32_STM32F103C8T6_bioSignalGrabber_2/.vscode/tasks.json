@@ -1,0 +1,237 @@
+{
+	// See https://go.microsoft.com/fwlink/?LinkId=733558
+	// for the documentation about the tasks.json format
+	"version": "2.0.0",
+	"options": {
+		"env": {
+			"BUILD_DIR": "build",
+			"BUILD_NAME": "bioSignalGrabber",
+			"COMPILER_DEBUG": "1",
+			"COMPILER_OPT": "-Og",
+			"COMPILER_PATH": "",
+			"COMPILER_PREFIX": "arm-none-eabi-",
+			"COMPILER_STD": "c++11",
+			"DEFINES_ASM": "",
+			"DEFINES_CXX": "USE_HAL_DRIVER STM32F103xB",
+			"FILES_LDSCRIPT": "STM32F103C8Tx_FLASH.ld",
+			"MCU_CORE_FLOAT_ABI": "",
+			"MCU_CORE_FPU": "",
+			"MCU_CORE_ID": "cortex-m3",
+			"PATH_EXCLUDE": "",
+			"PATH_GPDSE": "",
+			"PROGRAMMER_BAUDRATE": "57600",
+			"PROGRAMMER_CONFIG_FILE": "C:\\Program Files (x86)\\avrdudess\\avrdude.conf",
+			"PROGRAMMER_PORT": "COM5",
+			"PROGRAMMER_TYPE": "arduino"
+		}
+	},
+	"tasks": [
+		{
+			"label": "STM32 complile",
+			"type": "shell",
+			"group": "build",
+			"command": "make",
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"focus": true,
+				"echo": true,
+				"showReuseMessage": false,
+				"clear": true
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"args": [
+				{
+					"quoting": "weak",
+					"value": "compile"
+				}
+			]
+		},
+		{
+			"label": "STM32 clean",
+			"type": "shell",
+			"group": "build",
+			"command": "make",
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"focus": true,
+				"echo": true,
+				"showReuseMessage": false,
+				"clear": true
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"args": [
+				{
+					"quoting": "weak",
+					"value": "clean"
+				}
+			]
+		},
+		{
+			"label": "STM32 clean/compile",
+			"type": "shell",
+			"group": "build",
+			"command": "make",
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"focus": true,
+				"echo": true,
+				"showReuseMessage": false,
+				"clear": true
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"args": [
+				{
+					"quoting": "weak",
+					"value": "cleanCompile"
+				}
+			]
+		},
+		{
+			"label": "STM32 program",
+			"type": "shell",
+			"group": "build",
+			"command": "make",
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"focus": true,
+				"echo": true,
+				"showReuseMessage": false,
+				"clear": true
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"args": [
+				{
+					"quoting": "weak",
+					"value": "program"
+				}
+			]
+		},
+		{
+			"label": "STM32 compile/program",
+			"type": "shell",
+			"group": "build",
+			"command": "make",
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"focus": true,
+				"echo": true,
+				"showReuseMessage": false,
+				"clear": true
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"args": [
+				{
+					"quoting": "weak",
+					"value": "compileProgram"
+				}
+			]
+		},
+		{
+			"label": "STM32 clean/compile/program",
+			"type": "shell",
+			"group": "build",
+			"command": "make",
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"focus": true,
+				"echo": true,
+				"showReuseMessage": false,
+				"clear": true
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"args": [
+				{
+					"quoting": "weak",
+					"value": "cleanCompileProgram"
+				}
+			]
+		},
+		{
+			"label": "STM32 compile/clean/program",
+			"type": "shell",
+			"group": "build",
+			"command": "make",
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"focus": true,
+				"echo": true,
+				"showReuseMessage": false,
+				"clear": true
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"args": [
+				{
+					"quoting": "weak",
+					"value": "compileCleanProgram"
+				}
+			]
+		},
+		{
+			"label": "STM32 clean/compile/clean/program",
+			"type": "shell",
+			"group": "build",
+			"command": "make",
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"focus": true,
+				"echo": true,
+				"showReuseMessage": false,
+				"clear": true
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"args": [
+				{
+					"quoting": "weak",
+					"value": "cleanCompileCleanProgram"
+				}
+			]
+		},
+		{
+			"label": "STM32 do nothing",
+			"type": "shell",
+			"group": "build",
+			"command": "make",
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"focus": true,
+				"echo": true,
+				"showReuseMessage": false,
+				"clear": true
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"args": [
+				{
+					"quoting": "weak",
+					"value": "doNothing"
+				}
+			]
+		}
+	]
+}

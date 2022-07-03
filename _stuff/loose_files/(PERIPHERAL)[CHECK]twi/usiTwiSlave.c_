@@ -1,0 +1,265 @@
+/* -----------------------------------------------------------------------------
+ * Project:			GPDSE AVR8 Library
+ * File:			usiTwiSlave.c
+ * Module:			USI TWI Slave Controller
+ * Author:			Fabio Cabral Pacheco
+ *					Hazael dos Santos Batista
+ *					Leandro Schwarz
+ * Version:			1.0
+ * Last edition:	2016-03-02
+ * Purpose:			USI (TWI) slave bus controller using the dedicated
+ *					peripheral (interrupt-driven)
+ * Notes:			This code is heavily based on the Atmel Application Note
+ *					AVR312. Unfortunately, the original authorship of the code
+ *					is referred as jtyssoe. Please refer him as the main author
+ * -------------------------------------------------------------------------- */
+
+#include "usiTwiSlave.h"
+
+static volatile unsigned char usiTwiSlaveAddress;
+static volatile unsigned char usiTwiState;
+
+static volatile unsigned char usiTwiBuffer[USI_TWI_BUFFER_SIZE];
+static volatile unsigned char usiTwiIndex = 0;
+
+static volatile unsigned char usiTwiIntAddrByte = 0;
+
+volatile uint16 usiTwiSlaveFlagList = 0;
+volatile uint16 usiTwiSlaveExecutionList = 0;
+volatile uint8 usiTwiSlaveExecutionLocked = 0;
+
+struct usiTwiSlaveExecutionListInternalData{
+	void (*funct)(volatile unsigned char* buffer);
+	uint16 mask;
+} usiTwiSlaveExecutionListInternalData[10];
+uint8 usiTwiSlaveExecutionListIndex = 0;
+
+void usiTwiSlaveAddFunctionToExecutionList(void (*funct)(volatile unsigned char*), uint16 address)
+{
+	if(usiTwiSlaveExecutionListIndex < 10) {
+		setBit(usiTwiSlaveExecutionListInternalData[usiTwiSlaveExecutionListIndex].mask, (address - 16));
+		usiTwiSlaveExecutionListInternalData[usiTwiSlaveExecutionListIndex].funct = funct;
+		usiTwiSlaveExecutionListIndex++;
+	}
+}
+
+void usiTwiSlaveRunExecutionList()
+{
+	if(usiTwiSlaveExecutionLocked) return;
+	
+	uint8 aux = 0;
+	
+	for(aux = 0; aux < 10; aux++){
+		if(usiTwiSlaveExecutionListInternalData[usiTwiSlaveExecutionListIndex].mask & usiTwiSlaveFlagList) {
+			usiTwiSlaveExecutionListInternalData[usiTwiSlaveExecutionListIndex].funct(usiTwiBuffer);
+		}
+	}
+	
+	usiTwiSlaveFlagList = 0;
+}
+
+// -----------------------------------------------------------------------------
+// Inline functions ------------------------------------------------------------
+
+static inline void usiTwiSetToSendAck()
+{
+	USIDR = 0;
+    DDR_USI_TWI |= (1 << PORT_USI_TWI_SDA);
+    USISR = (0 << USISIF) | (1 << USIOIF) | (1 << USIPF) | (1 << USIDC) |
+			(0x0E << USICNT0);
+}
+
+static inline void usiTwiSetToReadAck()
+{
+	DDR_USI_TWI &= ~(1 << PORT_USI_TWI_SDA);
+	USIDR = 0;
+    USISR = (0 << USISIF) | (1 << USIOIF) | (1 << USIPF) | (1 << USIDC) |
+			(0x0E << USICNT0);
+}
+
+static inline void usiTwiSetToReceiveStart()
+{
+	USICR =	(1 << USISIE) | (0 << USIOIE) |
+			(1 << USIWM1) | (0 << USIWM0) |
+			(1 << USICS1) | (0 << USICS0) | (0 << USICLK) |
+			(0 << USITC);
+    USISR = (0 << USISIF) | (1 << USIOIF) | (1 << USIPF) | (1 << USIDC) |
+			(0x0 << USICNT0);
+}
+
+static inline void usiTwiSetToSendData()
+{
+	DDR_USI_TWI |= (1<<PORT_USI_TWI_SDA);
+	USISR = (0 << USISIF) | (1 << USIOIF) | (1 << USIPF) | (1 << USIDC) |
+			(0x0 << USICNT0);
+}
+
+static inline void usiTwiSetToReadData()
+{
+	DDR_USI_TWI &= ~(1<<PORT_USI_TWI_SDA);
+	USISR = (0 << USISIF) | (1 << USIOIF) | (1 << USIPF) | (1 << USIDC) |
+			(0x0 << USICNT0);
+}
+
+/* -----------------------------------------------------------------------------
+ * Initializes the USI TWI Slave on the device
+ * -------------------------------------------------------------------------- */
+
+void usiTwiSlaveInit(unsigned char usiTwiOwnAddress)
+{
+	usiTwiSlaveAddress = usiTwiOwnAddress;
+
+	setBit(PORT_USI_TWI, PORT_USI_TWI_SCL);
+	setBit(PORT_USI_TWI, PORT_USI_TWI_SDA);
+	setBit(DDR_USI_TWI, PORT_USI_TWI_SCL);
+	clrBit(DDR_USI_TWI, PORT_USI_TWI_SDA);
+
+	USICR =	(1 << USISIE) | (0 << USIOIE) |
+			(1 << USIWM1) | (0 << USIWM0) |
+			(1 << USICS1) | (0 << USICS0) | (0 << USICLK) |
+			(0 << USITC);
+
+	USISR = 0xF0;		// Clear flags and counter
+
+	return;
+}
+
+/* -----------------------------------------------------------------------------
+ * Returns a pointer to the USI TWI buffer
+ * -------------------------------------------------------------------------- */
+
+usiTwiBuffer_t* usiTwiGetBuffer()
+{
+	return usiTwiBuffer;
+}
+
+/* -----------------------------------------------------------------------------
+ * Processes the Start Condition on the TWI bus
+ * -------------------------------------------------------------------------- */
+
+ISR(USI_START_vect)
+{
+	clrBit(DDR_USI_TWI, PORT_USI_TWI_SDA);
+	while(isBitSet(PIN_USI_TWI, PIN_USI_TWI_SCL) && isBitClr(PIN_USI_TWI, PIN_USI_TWI_SDA))
+		;	// Wait until SCL goes low after Start condition
+
+	if(isBitClr(PIN_USI_TWI, PIN_USI_TWI_SDA)){
+		usiTwiState = USI_TWI_SLAVE_CHECK_ADDRESS;
+		USICR =	(1 << USISIE) | (1 << USIOIE) |
+				(1 << USIWM1) | (1 << USIWM0) |
+				(1 << USICS1) | (0 << USICS0) | (0 << USICLK) |
+				(0 << USITC);
+		usiTwiSlaveExecutionLocked = 1;
+	}else{
+		usiTwiState = USI_TWI_SLAVE_STOP_DETECTED;
+		USICR =	(1 << USISIE) | (0 << USIOIE) |
+				(1 << USIWM1) | (1 << USIWM0) |
+				(1 << USICS1) | (0 << USICS0) | (0 << USICLK) |
+				(0 << USITC);
+	}
+	USISR = 0xF0;		// Clear flags and counter
+}
+
+/* -----------------------------------------------------------------------------
+ * Processes the Overflow Condition of the TWI bus
+ * -------------------------------------------------------------------------- */
+
+ISR(USI_OVF_vect)
+{
+	switch(usiTwiState){
+	case USI_TWI_SLAVE_CHECK_ADDRESS:
+		if((USIDR == USI_TWI_SLAVE_GENERAL_CALL_ADDRESS) || ((USIDR >> 1) == usiTwiSlaveAddress)){
+			if(USIDR & 0x01){	// Slave send data to master
+				usiTwiState = USI_TWI_SLAVE_SEND_DATA;
+			}else{				// Master send data to slave
+				usiTwiState = USI_TWI_SLAVE_REQUEST_DATA;
+				usiTwiIntAddrByte = 1;	// Precisa sobrescrever o apontador
+			}
+			usiTwiSetToSendAck();
+		}else{
+			usiTwiSetToReceiveStart();
+		}
+		break;
+
+	case USI_TWI_SLAVE_CHECK_REPLY_FROM_SEND_DATA:
+		if(USIDR){
+			usiTwiSetToReceiveStart();
+			usiTwiState = USI_TWI_SLAVE_STOP_DETECTED;
+			break;
+		}
+		USIDR = usiTwiBuffer[usiTwiIndex++];
+		usiTwiIndex &= USI_TWI_BUFFER_MASK;
+		usiTwiState = USI_TWI_SLAVE_REQUEST_REPLY_FROM_SEND_DATA;
+		usiTwiSetToSendData();
+		break;
+
+	case USI_TWI_SLAVE_SEND_DATA:			
+		USIDR = usiTwiBuffer[usiTwiIndex++];
+		usiTwiIndex &= USI_TWI_BUFFER_MASK;
+		usiTwiState = USI_TWI_SLAVE_REQUEST_REPLY_FROM_SEND_DATA;
+		usiTwiSetToSendData();
+		break;
+
+	case USI_TWI_SLAVE_REQUEST_REPLY_FROM_SEND_DATA:
+		usiTwiState = USI_TWI_SLAVE_CHECK_REPLY_FROM_SEND_DATA;
+		usiTwiSetToReadAck();
+		break;
+
+	case USI_TWI_SLAVE_REQUEST_DATA:
+		usiTwiState = USI_TWI_SLAVE_GET_DATA_AND_SEND_ACK;
+		usiTwiSetToReadData();
+		waitUntilBitIsSet(PIN_USI_TWI, PIN_USI_TWI_SCL);
+		while(1){
+			if(isBitClr(PIN_USI_TWI, PIN_USI_TWI_SCL)){
+				break;
+			}else if(isBitSet(PIN_USI_TWI, PIN_USI_TWI_SDA)){
+				usiTwiState = USI_TWI_SLAVE_STOP_DETECTED;
+				break;
+			}
+		}
+		break;
+
+	case USI_TWI_SLAVE_GET_DATA_AND_SEND_ACK:
+		if(usiTwiIntAddrByte == 1){
+			usiTwiIntAddrByte = 0;
+			usiTwiIndex = USIDR;
+			usiTwiIndex &= USI_TWI_BUFFER_MASK;
+		}else{
+			if(usiTwiIndex > 15){
+				usiTwiBuffer[usiTwiIndex] = USIDR;
+				setBit(usiTwiSlaveFlagList, (usiTwiIndex - 16));
+			}
+			usiTwiIndex++;
+			usiTwiIndex &= USI_TWI_BUFFER_MASK;
+		}
+		usiTwiState = USI_TWI_SLAVE_REQUEST_DATA;
+		usiTwiSetToSendAck();
+		break;
+	}
+
+	if(usiTwiState == USI_TWI_SLAVE_STOP_DETECTED){
+		usiTwiSlaveExecutionLocked = 0;
+	}
+}
+
+/******************************************************************************
+uint8 usiTwiSlaveAddBufferAddressToWatchList(uint8 bufferAddress)
+{
+	if(bufferAddress < 64)
+		return 1;
+	bufferAddress -= 64;
+	setBit(usiTwiSlaveWatchList, bufferAddress);
+
+	return 0;
+}
+
+uint8 usiTwiSlaveRemoveBufferAddressFromWatchList(uint8 bufferAddress)
+{
+	if(bufferAddress < 64)
+		return 1;
+	bufferAddress -= 64;
+	clrBit(usiTwiSlaveWatchList, bufferAddress);
+
+	return 0;
+}
+******************************************************************************/

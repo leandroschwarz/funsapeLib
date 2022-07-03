@@ -1,0 +1,1616 @@
+/* -----------------------------------------------------------------------------
+ * Project:		GPSDE++ AVR Library
+ * File name:	mpu9250.cpp
+ * Module:		MPU9250 Driver for GPDSE++ AVR Library project
+ * Authors:		Leandro Schwarz
+ *				Hazael dos Santos Batista
+ * Build:		1001
+ * Date:		May 26, 2018
+ * -------------------------------------------------------------------------- */
+
+
+// -----------------------------------------------------------------------------
+// Header files ----------------------------------------------------------------
+
+#include "..\globalConfigs.hpp"
+#ifndef __GLOBAL_CONFIGS_HPP
+#	error	[mpu9250.cpp] Error 100 - System configuration file (globalConfigs.hpp) is missing
+#else
+#	if __GLOBAL_CONFIGS_HPP != 1001
+#		error 	[mpu9250.cpp] Error 101 - Build mismatch (globalConfigs.hpp and mpu9250.hpp)
+#	endif		// __GLOBAL_CONFIGS_HPP != 1001
+#endif		// __GLOBAL_CONFIGS_HPP
+
+#if __USE_OWN_DEFINITIONS_FILE == 1
+#	include "..\userDefines.hpp"
+#else
+#	include "..\globalDefines.hpp"
+#	if __GLOBAL_DEFINES_HPP != 1001
+#		error 	[mpu9250.cpp] Error 102 - Build mismatch (globalDefines.hpp and mpu9250.hpp)
+#	endif		// __GLOBAL_CONFIGS_HPP != 1001
+#endif		// __USE_OWN_DEFINITIONS_FILE == 1
+
+#include "mpu9250.hpp"
+#if __MPU9250_HPP != 1001
+#	error [mpu9250.cpp] Error 103 - Build mismatch on header and source code files.
+#endif
+
+// -----------------------------------------------------------------------------
+// File exclusive - Constant definitions ---------------------------------------
+
+#define SLAVE_ADDRESS_NORMAL				0x68
+#define SLAVE_ADDRESS_ALTERNATE				0x69
+#define SLAVE_ADDRESS_MAGNETOMETER			0X0C
+#define WHO_AM_I							0x71
+#define MAGNETOMETER_WHO_AM_I				0x48
+#define MAGNETOMETER_OFFSET					0
+#define MAGNETOMETER_SENSIBIITY				321
+#define MAGNETOMETER_Q_MULTIPIER			Q9_MULTIPLIER
+#define ACCELEROMETER_Q_MULTIPIER			Q9_MULTIPLIER
+#define GYROSCOPE_Q_MULTIPIER				Q9_MULTIPLIER
+
+#define Q1_MULTIPLIER						(1 << 1)
+#define Q2_MULTIPLIER						(1 << 2)
+#define Q3_MULTIPLIER						(1 << 3)
+#define Q4_MULTIPLIER						(1 << 4)
+#define Q5_MULTIPLIER						(1 << 5)
+#define Q6_MULTIPLIER						(1 << 6)
+#define Q7_MULTIPLIER						(1 << 7)
+#define Q8_MULTIPLIER						(1 << 8)
+#define Q9_MULTIPLIER						(1 << 9)
+#define Q10_MULTIPLIER						(1 << 10)
+#define Q11_MULTIPLIER						(1 << 11)
+#define Q12_MULTIPLIER						(1 << 12)
+#define Q13_MULTIPLIER						(1 << 13)
+#define Q14_MULTIPLIER						(1 << 14)
+#define Q15_MULTIPLIER						(1 << 15)
+#define Q16_MULTIPLIER						(1 << 16)
+
+#define REG_SELF_TEST_X_GYRO				0x00
+#define REG_SELF_TEST_Y_GYRO				0x01
+#define REG_SELF_TEST_Z_GYRO				0x02
+#define REG_SELF_TEST_X_ACCEL				0x0D
+#define REG_SELF_TEST_Y_ACCEL				0x0E
+#define REG_SELF_TEST_Z_ACCEL				0x0F
+#define REG_XG_OFFSET_H						0x13
+#define REG_XG_OFFSET_L						0x14
+#define REG_YG_OFFSET_H						0x15
+#define REG_YG_OFFSET_L						0x16
+#define REG_ZG_OFFSET_H						0x17
+#define REG_ZG_OFFSET_L						0x18
+#define REG_SMPLRT_DIV						0x19
+#define REG_CONFIG							0x1A
+#define REG_GYRO_CONFIG						0x1B
+#define REG_ACCEL_CONFIG					0x1C
+#define REG_ACCEL_CONFIG2					0x1D
+#define REG_LP_ACCEL_ODR					0x1E
+#define REG_WOM_THR							0x1F
+#define REG_FIFO_EN							0x23
+#define REG_I2C_MST_CTRL					0x24
+#define REG_I2C_SLV0_ADDR					0x25
+#define REG_I2C_SLV0_REG					0x26
+#define REG_I2C_SLV0_CTRL					0x27
+#define REG_I2C_SLV1_ADDR					0x28
+#define REG_I2C_SLV1_REG					0x29
+#define REG_I2C_SLV1_CTRL					0x2A
+#define REG_I2C_SLV2_ADDR					0x2B
+#define REG_I2C_SLV2_REG					0x2C
+#define REG_I2C_SLV2_CTRL					0x2D
+#define REG_I2C_SLV3_ADDR					0x2E
+#define REG_I2C_SLV3_REG					0x2F
+#define REG_I2C_SLV3_CTRL					0x30
+#define REG_I2C_SLV4_ADDR					0x31
+#define REG_I2C_SLV4_REG					0x32
+#define REG_I2C_SLV4_DO						0x33
+#define REG_I2C_SLV4_CTRL					0x34
+#define REG_I2C_SLV4_DI						0x35
+#define REG_I2C_MST_STATUS					0x36
+#define REG_INT_PIN_CFG						0x37
+#define REG_INT_ENABLE						0x38
+#define REG_INT_STATUS						0x3A
+#define REG_ACCEL_XOUT_H					0x3B
+#define REG_ACCEL_XOUT_L					0x3C
+#define REG_ACCEL_YOUT_H					0x3D
+#define REG_ACCEL_YOUT_L					0x3E
+#define REG_ACCEL_ZOUT_H					0x3F
+#define REG_ACCEL_ZOUT_L					0x40
+#define REG_TEMP_OUT_H						0x41
+#define REG_TEMP_OUT_L						0x42
+#define REG_GYRO_XOUT_H						0x43
+#define REG_GYRO_XOUT_L						0x44
+#define REG_GYRO_YOUT_H						0x45
+#define REG_GYRO_YOUT_L						0x46
+#define REG_GYRO_ZOUT_H						0x47
+#define REG_GYRO_ZOUT_L						0x48
+#define REG_EXT_SENS_DATA_00				0x49
+#define REG_EXT_SENS_DATA_01				0x4A
+#define REG_EXT_SENS_DATA_02				0x4B
+#define REG_EXT_SENS_DATA_03				0x4C
+#define REG_EXT_SENS_DATA_04				0x4D
+#define REG_EXT_SENS_DATA_05				0x4E
+#define REG_EXT_SENS_DATA_06				0x4F
+#define REG_EXT_SENS_DATA_07				0x50
+#define REG_EXT_SENS_DATA_08				0x51
+#define REG_EXT_SENS_DATA_09				0x52
+#define REG_EXT_SENS_DATA_10				0x53
+#define REG_EXT_SENS_DATA_11				0x54
+#define REG_EXT_SENS_DATA_12				0x55
+#define REG_EXT_SENS_DATA_13				0x56
+#define REG_EXT_SENS_DATA_14				0x57
+#define REG_EXT_SENS_DATA_15				0x58
+#define REG_EXT_SENS_DATA_16				0x59
+#define REG_EXT_SENS_DATA_17				0x5A
+#define REG_EXT_SENS_DATA_18				0x5B
+#define REG_EXT_SENS_DATA_19				0x5C
+#define REG_EXT_SENS_DATA_20				0x5D
+#define REG_EXT_SENS_DATA_21				0x5E
+#define REG_EXT_SENS_DATA_22				0x5F
+#define REG_EXT_SENS_DATA_23				0x60
+#define REG_I2C_SLV0_DO						0x63
+#define REG_I2C_SLV1_DO						0x64
+#define REG_I2C_SLV2_DO						0x65
+#define REG_I2C_SLV3_DO						0x66
+#define REG_I2C_MST_DELAY_CTRL				0x67
+#define REG_SIGNAL_PATH_RESET				0x68
+#define REG_MOT_DETECT_CTRL					0x69
+#define REG_USER_CTRL						0x6A
+#define REG_PWR_MGMT_1						0x6B
+#define REG_PWR_MGMT_2						0x6C
+#define REG_FIFO_COUNT_H					0x72
+#define REG_FIFO_COUNT_L					0x73
+#define REG_FIFO_R_W						0x74
+#define REG_WHO_AM_I						0x75
+#define REG_XA_OFFSET_H						0x77
+#define REG_XA_OFFSET_L						0x78
+#define REG_YA_OFFSET_H						0x7A
+#define REG_YA_OFFSET_L						0x7B
+#define REG_ZA_OFFSET_H						0x7D
+#define REG_ZA_OFFSET_L						0x7E
+
+#define BIT_ACCEL_CONFIG_Z_ST_EN			7
+#define BIT_ACCEL_CONFIG_Y_ST_EN			6
+#define BIT_ACCEL_CONFIG_X_ST_EN			5
+#define BIT_ACCEL_CONFIG_FS_SEL0			2
+
+#define BIT_ACCEL_CONFIG2_FCHOICE_B			3
+#define BIT_ACCEL_CONFIG2_DLPCFG			0
+
+#define BIT_CONFIG_FIFO_MODE_BIT			6
+#define BIT_CONFIG_EXT_SYNC_SET0			3
+#define BIT_CONFIG_DLPF_CFG0				0
+
+#define BIT_FIFO_EN_TEMP_BIT				7
+#define BIT_FIFO_EN_GYRO_XOUT_BIT			6
+#define BIT_FIFO_EN_GYRO_YOUT_BIT			5
+#define BIT_FIFO_EN_GYRO_ZOUT_BIT			4
+#define BIT_FIFO_EN_ACCEL_BIT				3
+#define BIT_FIFO_EN_SLV2_BIT				2
+#define BIT_FIFO_EN_SLV1_BIT				1
+#define BIT_FIFO_EN_SLV0_BIT				0
+
+#define BIT_GYRO_CONFIG_Z_ST_EN				7
+#define BIT_GYRO_CONFIG_Y_ST_EN				6
+#define BIT_GYRO_CONFIG_X_ST_EN				5
+#define BIT_GYRO_CONFIG_FS_SEL0				2
+#define BIT_GYRO_CONFIG_FCHOICE_B0			0
+
+#define BIT_I2C_MST_CTRL_MULT_MST_EN		7
+#define BIT_I2C_MST_CTRL_WAIT_FOR_ES		6
+#define BIT_I2C_MST_CTRL_SLV_3_FIFO_EN		5
+#define BIT_I2C_MST_CTRL_P_NSR				4
+#define BIT_I2C_MST_CTRL_CLK				0
+
+#define BIT_I2C_SLV0_ADDR_RNW				7
+#define BIT_I2C_SLV0_ADDR_ID0				0
+
+#define BIT_I2C_SLV0_CTRL_EN				7
+#define BIT_I2C_SLV0_CTRL_BYTE_SW			6
+#define BIT_I2C_SLV0_CTRL_REG_DIS			5
+#define BIT_I2C_SLV0_CTRL_GRP				4
+#define BIT_I2C_SLV0_CTRL_LENG0				0
+
+#define BIT_I2C_SLV1_ADDR_RNW				7
+#define BIT_I2C_SLV1_ADDR_ID0				0
+
+#define BIT_I2C_SLV1_CTRL_EN				7
+#define BIT_I2C_SLV1_CTRL_BYTE_SW			6
+#define BIT_I2C_SLV1_CTRL_REG_DIS			5
+#define BIT_I2C_SLV1_CTRL_GRP				4
+#define BIT_I2C_SLV1_CTRL_LENG0				0
+
+#define BIT_I2C_SLV2_ADDR_RNW				7
+#define BIT_I2C_SLV2_ADDR_ID0				0
+
+#define BIT_I2C_SLV2_CTRL_EN				7
+#define BIT_I2C_SLV2_CTRL_BYTE_SW			6
+#define BIT_I2C_SLV2_CTRL_REG_DIS			5
+#define BIT_I2C_SLV2_CTRL_GRP				4
+#define BIT_I2C_SLV2_CTRL_LENG0				0
+
+#define BIT_I2C_SLV3_ADDR_RNW				7
+#define BIT_I2C_SLV3_ADDR_ID0				0
+
+#define BIT_I2C_SLV3_CTRL_EN				7
+#define BIT_I2C_SLV3_CTRL_BYTE_SW			6
+#define BIT_I2C_SLV3_CTRL_REG_DIS			5
+#define BIT_I2C_SLV3_CTRL_GRP				4
+#define BIT_I2C_SLV3_CTRL_LENG0				0
+
+#define BIT_I2C_SLV4_ADDR_RNW				7
+#define BIT_I2C_SLV4_ADDR_ID0				0
+
+#define BIT_I2C_SLV4_CTRL_EN				7
+#define BIT_I2C_SLV4_CTRL_DONE_INT_EN		6
+#define BIT_I2C_SLV4_CTRL_REG_DIS			5
+#define BIT_I2C_SLV4_CTRL_MST_DLY0			0
+
+#define BIT_I2C_MST_DELAY_CTRL_ES_SHADOW	7
+#define BIT_I2C_MST_DELAY_CTRL_SLV4_DLY_EN	4
+#define BIT_I2C_MST_DELAY_CTRL_SLV3_DLY_EN	3
+#define BIT_I2C_MST_DELAY_CTRL_SLV2_DLY_EN	2
+#define BIT_I2C_MST_DELAY_CTRL_SLV1_DLY_EN	1
+#define BIT_I2C_MST_DELAY_CTRL_SLV0_DLY_EN	0
+
+#define BIT_INT_PIN_CFG_ACTL_BIT				7
+#define BIT_INT_PIN_CFG_OPEN_BIT				6
+#define BIT_INT_PIN_CFG_LATCH_INT_EN_BIT		5
+#define BIT_INT_PIN_CFG_INT_ANYRD_CLEAR_BIT		4
+#define BIT_INT_PIN_CFG_FSYNC_BIT				3
+#define BIT_INT_PIN_CFG_FSYNC_INT_MODE_EN_BIT	2
+#define BIT_INT_PIN_CFG_BYPASS_EN_BIT			1
+
+#define BIT_INT_STATUS_WOM				6
+#define BIT_INT_STATUS_FIFO_OVERFLOW	4
+#define BIT_INT_STATUS_FSYNC			3
+#define BIT_INT_STATUS_RAW_DATA_RDY		0
+
+#define BIT_PWR_MGMT_1_H_RESET			7
+#define BIT_PWR_MGMT_1_SLEEP			6
+#define BIT_PWR_MGMT_1_CYCLE			5
+#define BIT_PWR_MGMT_1_GYRO_STANDBY		4
+#define BIT_PWR_MGMT_1_PD_PTAT			3
+#define BIT_PWR_MGMT_1_CLKSEL0			0
+
+#define BIT_PWR_MGMT_2_DISABLE_XA		5
+#define BIT_PWR_MGMT_2_DISABLE_YA		4
+#define BIT_PWR_MGMT_2_DISABLE_ZA		3
+#define BIT_PWR_MGMT_2_DISABLE_XG		2
+#define BIT_PWR_MGMT_2_DISABLE_YG		1
+#define BIT_PWR_MGMT_2_DISABLE_ZG		0
+
+#define BIT_USER_CTRL_FIFO_EN_BIT		6
+#define BIT_USER_CTRL_I2C_MST_EN_BIT	5
+#define BIT_USER_CTRL_I2C_IF_DIS_BIT	4
+#define BIT_USER_CTRL_FIFO_RST_BIT		2
+#define BIT_USER_CTRL_I2C_MST_RST_BIT	1
+#define BIT_USER_CTRL_SIG_COND_RST_BIT	0
+
+#define REG_MAG_WHO_AM_I				0x00
+#define REG_MAG_INFO					0x01
+#define REG_MAG_ST1						0x02
+#define REG_MAG_HXL						0x03
+#define REG_MAG_HXH						0x04
+#define REG_MAG_HYL						0x05
+#define REG_MAG_HYH						0x06
+#define REG_MAG_HZL						0x07
+#define REG_MAG_HZH						0x08
+#define REG_MAG_ST2						0x09
+#define REG_MAG_CNTL1					0x0A
+#define REG_MAG_CNTL2					0x0B
+#define REG_MAG_ASTC					0x0C
+#define REG_MAG_TS1						0x0D
+#define REG_MAG_TS2						0x0E
+#define REG_MAG_I2CDIS					0x0F
+#define REG_MAG_ASAX					0x10
+#define REG_MAG_ASAY					0x11
+#define REG_MAG_ASAZ					0x12
+
+// -----------------------------------------------------------------------------
+// File exclusive - New data types ---------------------------------------------
+
+typedef enum magOperationMode_e {
+	MAG_OPERATION_MODE_POWER_DOWN					= 0,
+	MAG_OPERATION_MODE_SINGLE_MEASUREMENT			= 1,
+	MAG_OPERATION_MODE_CONTINUOUS_MEASUREMENT_1		= 2,
+	MAG_OPERATION_MODE_CONTINUOUS_MEASUREMENT_2		= 6,
+	MAG_OPERATION_MODE_EXTERNAL_TRIGGER				= 4,
+	MAG_OPERATION_MODE_SELF_TEST					= 8,
+	MAG_OPERATION_MODE_FUSE_ROM_ACCESS				= 15,
+} magOperationMode_e;
+
+// -----------------------------------------------------------------------------
+// File exclusive - Macro-functions definitions --------------------------------
+
+/* NONE */
+
+// -----------------------------------------------------------------------------
+// Global variables ------------------------------------------------------------
+
+/* NONE */
+
+// -----------------------------------------------------------------------------
+// Mpu9250 class - Constructors definitions ------------------------------------
+
+Mpu9250::Mpu9250(TWI_HANDLER_CLASS * i2cHand, bool_t alternateAddress)
+{
+	uint8_t i = 0;
+
+	if(alternateAddress) {
+		this->i2cMyAddress_ = SLAVE_ADDRESS_ALTERNATE;
+	} else {
+		this->i2cMyAddress_ = SLAVE_ADDRESS_NORMAL;
+	}
+	this->i2cHandler_ = i2cHand;
+
+	this->initialized_ = FALSE;
+	this->clockSelection_ = CLOCK_AUTO_SELECT_BEST;
+	this->powerMode_ = POWER_MODE_NORMAL;
+	this->powerDownMode_ = FALSE;
+
+	// Array
+	for(i = 0; i < 3; i++) {
+		this->gyroFactorySelfTest_[i] = 0;
+		this->accelFactorySelfTest_[i] = 0;
+		this->gyroOffset_[i] = 0;
+		this->accelData_[i] = 0;
+		this->gyroData_[i] = 0;
+		this->accelOffset_[i] = 0;
+		this->extSensData_[i] = 0;
+	}
+	for(; i < 24; i++) {
+		this->extSensData_[i] = 0;
+	}
+
+	this->accelFullScale_ = AFS_2G;
+	this->accelSamplingConfig_ =  ACCEL_SAMP_4_KHZ_FILTER_1046_HZ;
+	this->accelSamplingLowPower_ = ACCEL_SAMP_LOW_POWER_0P24_HZ;
+	this->accelSignalPathReset_ = FALSE;
+	this->accelWakeUpMotionThreshold_ = 0;
+	this->accelXDisable_ = FALSE;
+	this->accelXSelfTestEnabled_ = FALSE;
+	this->accelYDisable_ = FALSE;
+	this->accelYSelfTestEnabled_ = FALSE;
+	this->accelZDisable_ = FALSE;
+	this->accelZSelfTestEnabled_ = FALSE;
+	this->clockSelection_ = CLOCK_20_MHZ_OSCILLATOR;
+	this->externalSync_ = EXT_SYNC_DISABLED;
+	this->fifoAccelXYXRecordEnabled_ = FALSE;
+	this->fifoCount_ = 0;
+	this->fifoData_ = 0;
+	this->fifoEnabled_ = FALSE;
+	this->fifoGyroXRecordEnabled_ = FALSE;
+	this->fifoGyroYRecordEnabled_ = FALSE;
+	this->fifoGyroZRecordEnabled_ = FALSE;
+	this->fifoResetStrobe_ = FALSE;
+	this->fifoSlave0RecordEnabled_ = FALSE;
+	this->fifoSlave1RecordEnabled_ = FALSE;
+	this->fifoSlave2RecordEnabled_ = FALSE;
+	this->fifoSlave3RecordEnabled_ = FALSE;
+	this->fifoStopWhenFull_ = FALSE;
+	this->fifoTempRecordEnabled_ = FALSE;
+	this->fsyncPinActivationLevel_ = LOW;
+	this->fsyncPinTriggerInterrupt_ = FALSE;
+	this->gyroFullScale_ = GFS_250DPS;
+	this->gyroSamplingConfig_ = GYRO_SAMP_8_KHZ_FILTER_250_HZ;
+	this->gyroSignalPathReset_ = FALSE;
+	this->gyroXDisable_ = FALSE;
+	this->gyroXSelfTestEnabled_ = FALSE;
+	this->gyroYDisable_ = FALSE;
+	this->gyroYSelfTestEnabled_ = FALSE;
+	this->gyroZDisable_ = FALSE;
+	this->gyroZSelfTestEnabled_ = FALSE;
+	this->i2cBypassModeEnabled_ = FALSE;
+	this->i2cDataReadyIntWaitExternalSensors_ = FALSE;
+	this->i2cExtDataShadowingEnabled_ = FALSE;
+	this->i2cMasterClock_ = I2C_MST_CLK_348_KHz;
+	this->i2cMasterEnabled_ = FALSE;
+	this->i2cMasterResetStrobe_ = FALSE;
+	this->i2cMultiMasterEnabled_ = FALSE;
+	this->i2cSendStopBetweenSlaves_ = FALSE;
+	this->i2cSlave0Address_ = 0;
+	this->i2cSlave0DataLenght_ = 0;
+	this->i2cSlave0DataOut_ = 0;
+	this->i2cSlave0DelayEnabled_ = FALSE;
+	this->i2cSlave0DoNotSendRegister_ = FALSE;
+	this->i2cSlave0Enabled_ = FALSE;
+	this->i2cSlave0GroupEndingEven_ = FALSE;
+	this->i2cSlave0ReadMode_ = FALSE;
+	this->i2cSlave0Register_ = 0;
+	this->i2cSlave0WordBytesSwap_ = FALSE;
+	this->i2cSlave1Address_ = 0;
+	this->i2cSlave1DataLenght_ = 0;
+	this->i2cSlave1DataOut_ = 0;
+	this->i2cSlave1DelayEnabled_ = FALSE;
+	this->i2cSlave1DoNotSendRegister_ = FALSE;
+	this->i2cSlave1Enabled_ = FALSE;
+	this->i2cSlave1GroupEndingEven_ = FALSE;
+	this->i2cSlave1ReadMode_ = FALSE;
+	this->i2cSlave1Register_ = 0;
+	this->i2cSlave1WordBytesSwap_ = FALSE;
+	this->i2cSlave2Address_ = 0;
+	this->i2cSlave2DataLenght_ = 0;
+	this->i2cSlave2DataOut_ = 0;
+	this->i2cSlave2DelayEnabled_ = FALSE;
+	this->i2cSlave2DoNotSendRegister_ = FALSE;
+	this->i2cSlave2Enabled_ = FALSE;
+	this->i2cSlave2GroupEndingEven_ = FALSE;
+	this->i2cSlave2ReadMode_ = FALSE;
+	this->i2cSlave2Register_ = 0;
+	this->i2cSlave2WordBytesSwap_ = FALSE;
+	this->i2cSlave3Address_ = 0;
+	this->i2cSlave3DataLenght_ = 0;
+	this->i2cSlave3DataOut_ = 0;
+	this->i2cSlave3DelayEnabled_ = FALSE;
+	this->i2cSlave3DoNotSendRegister_ = FALSE;
+	this->i2cSlave3Enabled_ = FALSE;
+	this->i2cSlave3GroupEndingEven_ = FALSE;
+	this->i2cSlave3ReadMode_ = FALSE;
+	this->i2cSlave3Register_ = 0;
+	this->i2cSlave3WordBytesSwap_ = FALSE;
+	this->i2cSlave4Address_ = 0;
+	this->i2cSlave4DataIn_ = 0;
+	this->i2cSlave4DataOut_ = 0;
+	this->i2cSlave4DelayEnabled_ = FALSE;
+	this->i2cSlave4DoNotSendRegister_ = FALSE;
+	this->i2cSlave4IntTransferReadyEnabled_ = FALSE;
+	this->i2cSlave4MasterDelay_ = 0;
+	this->i2cSlave4ReadMode_ = FALSE;
+	this->i2cSlave4Register_ = 0;
+	this->i2cSlave4SingleTransferEnable_ = FALSE;
+	this->i2cStatusArbitrationLost_ = FALSE;
+	this->i2cStatusPassThroughFlag_ = FALSE;
+	this->i2cStatusSlave0NackReceivedFlag_ = FALSE;
+	this->i2cStatusSlave1NackReceivedFlag_ = FALSE;
+	this->i2cStatusSlave2NackReceivedFlag_ = FALSE;
+	this->i2cStatusSlave3NackReceivedFlag_ = FALSE;
+	this->i2cStatusSlave4NackReceivedFlag_ = FALSE;
+	this->i2cStatusSlave4TransferDoneFlag_ = FALSE;
+	this->intFifoOverflowEnabled_ = FALSE;
+	this->intFifoOverflowFlag_ = FALSE;
+	this->intFsyncEnabled_ = FALSE;
+	this->intFsyncFlag_ = FALSE;
+	this->intI2cDataReadyEnabled_ = FALSE;
+	this->intI2cDataReadyFlag_ = FALSE;
+	this->intPinActivationLevel_ = LOW;
+	this->intPinClearWhenRead_ = FALSE;
+	this->intPinLatched_ = FALSE;
+	this->intPinOutputDriver_ = PUSH_PULL;
+	this->intWakeOnMotionEnabled_ = FALSE;
+	this->intWakeOnMotionFlag_ = FALSE;
+	this->powerDownMode_ = FALSE;	// PD_PTAT
+	this->powerMode_ = POWER_MODE_NORMAL;
+	this->resetDevice_ = FALSE;
+	this->sampleRateDivider_ = 0;
+	this->signalPathResetStrobe_ = FALSE;
+	this->tempData_ = 0;
+	this->tempSignalPathReset_ = FALSE;
+	this->useSpiInterface_ = FALSE;
+
+	// MAGNETOMETER
+	this->magI2cBypass_ = FALSE;
+	for(i = 0; i < 3; i++) {
+		this->magSensibility_[i] = 0;
+	}
+
+	return;
+}
+
+// -----------------------------------------------------------------------------
+// Mpu9250 class - Public methods definitions ----------------------------------
+
+mpu9250Error_e Mpu9250::initialize(void)
+{
+	// Checks Who Am I
+	if(!checkWhoAmI()) {
+		return MPU9250_ERROR_WRONG_WHO_AM_I;
+	}
+
+	// Reset device
+	this->resetDevice_ = TRUE;
+	this->powerMode_ = POWER_MODE_NORMAL;
+	this->powerDownMode_ = FALSE;
+	this->clockSelection_ = CLOCK_DISABLED;
+	this->updatePowerManagementControl1();
+	_delay_ms(100);
+
+	// Wake up device
+	this->clockSelection_ = CLOCK_AUTO_SELECT_BEST;
+	this->updatePowerManagementControl1();
+
+	// Accelerometer and Gyroscope configuration
+	this->gyroXSelfTestEnabled_ = FALSE;
+	this->gyroYSelfTestEnabled_ = FALSE;
+	this->gyroZSelfTestEnabled_ = FALSE;
+	this->gyroFullScale_ = GFS_250DPS;
+	this->gyroSamplingConfig_ = GYRO_SAMP_1_KHZ_FILTER_184_HZ;
+	this->accelXSelfTestEnabled_ = FALSE;
+	this->accelYSelfTestEnabled_ = FALSE;
+	this->accelZSelfTestEnabled_ = FALSE;
+	this->accelFullScale_ = AFS_2G;
+	this->accelSamplingConfig_ = ACCEL_SAMP_1_KHZ_FILTER_420_HZ;
+	this->updateAccelConfig();
+	this->updateAccelConfig2();
+	this->updateConfig();
+	this->updateGyroConfig();
+
+	// FIFO configuration
+	this->fifoStopWhenFull_ = FALSE;
+	this->fifoTempRecordEnabled_ = FALSE;
+	this->fifoGyroXRecordEnabled_ = FALSE;
+	this->fifoGyroYRecordEnabled_ = FALSE;
+	this->fifoGyroZRecordEnabled_ = FALSE;
+	this->fifoAccelXYXRecordEnabled_ = FALSE;
+	this->fifoSlave2RecordEnabled_ = FALSE;
+	this->fifoSlave1RecordEnabled_ = FALSE;
+	this->fifoSlave0RecordEnabled_ = FALSE;
+	this->updateFifoEnable();
+
+	// Magnetometer configuration
+	this->initializeMagnetometer();
+	this->setMagnetometerSampleRate();			// SET TO 10
+
+	// Turn on all axis
+	this->accelXDisable_ = FALSE;
+	this->accelYDisable_ = FALSE;
+	this->accelZDisable_ = FALSE;
+	this->gyroXDisable_ = FALSE;
+	this->gyroYDisable_ = FALSE;
+	this->gyroZDisable_ = FALSE;
+	this->updatePowerManagementControl2();
+
+	this->initialized_ = TRUE;
+
+	return MPU9250_ERROR_NONE;
+}
+
+void Mpu9250::setI2cMasterBusBypass(bool_t bypass)
+{
+	if(this->magI2cBypass_ == bypass) {
+		return;
+	}
+
+	this->magI2cBypass_ = bypass;
+	if(bypass) {		// Turns on i2c bypass
+		// Disables I2C master module
+		this->i2cMasterEnabled_ = FALSE;
+		this->updateUserControl();
+		_delay_ms(3);
+		// Enables i2c bypass
+		this->i2cBypassModeEnabled_ = TRUE;
+		this->updateIntPinConfig();
+	} else {			// Turns off i2c bypass
+		// Enables i2c master module
+		this->i2cMasterEnabled_ = TRUE;
+		this->updateUserControl();
+		_delay_ms(3);
+		// Disables i2c bypass
+		this->i2cBypassModeEnabled_ = FALSE;
+		this->updateIntPinConfig();
+	}
+
+	return;
+}
+
+void Mpu9250::initializeMagnetometer(void)
+{
+	uint8_t buffer[3];
+
+	// Bypass I2C master bus to access device directly
+	this->setI2cMasterBusBypass(TRUE);
+
+	// Look for magnetometer
+	buffer[0] = REG_MAG_WHO_AM_I;
+	this->i2cHandler_->sendData(SLAVE_ADDRESS_MAGNETOMETER, TWI_WRITE, buffer, 1);
+	this->i2cHandler_->sendData(SLAVE_ADDRESS_MAGNETOMETER, TWI_READ, buffer, 1);
+	if(buffer[0] != MAGNETOMETER_WHO_AM_I) {
+		return;
+	}
+
+	// Powers down magnetometer
+	buffer[0] = REG_MAG_CNTL1;
+	buffer[1] = MAG_OPERATION_MODE_POWER_DOWN;
+	this->i2cHandler_->sendData(SLAVE_ADDRESS_MAGNETOMETER, TWI_WRITE, buffer, 2);
+	_delay_ms(1);
+
+	// Activates FUSE ROM access mode
+	buffer[0] = REG_MAG_CNTL1;
+	buffer[1] = MAG_OPERATION_MODE_FUSE_ROM_ACCESS;
+	this->i2cHandler_->sendData(SLAVE_ADDRESS_MAGNETOMETER, TWI_WRITE, buffer, 2);
+	_delay_ms(1);
+
+	// Gets magnetometer adjustment coefficients
+	buffer[0] = REG_MAG_ASAX;
+	this->i2cHandler_->sendData(SLAVE_ADDRESS_MAGNETOMETER, TWI_WRITE, buffer, 1);
+	this->i2cHandler_->sendData(SLAVE_ADDRESS_MAGNETOMETER, TWI_READ, buffer, 3);
+	this->magSensibility_[0] = (int16_t)buffer[0] + 128;
+	this->magSensibility_[1] = (int16_t)buffer[1] + 128;
+	this->magSensibility_[2] = (int16_t)buffer[2] + 128;
+
+	// Powers down magnetometer again
+	buffer[0] = REG_MAG_CNTL1;
+	buffer[1] = MAG_OPERATION_MODE_POWER_DOWN;
+	this->i2cHandler_->sendData(SLAVE_ADDRESS_MAGNETOMETER, TWI_WRITE, buffer, 2);
+	_delay_ms(1);
+
+	// Returns control of the I2C master bus to device
+	this->setI2cMasterBusBypass(FALSE);
+
+	// Configures interrupts to wait for devices
+	this->i2cMultiMasterEnabled_ = FALSE;
+	this->i2cDataReadyIntWaitExternalSensors_ = TRUE;
+	this->updateI2cMasterControl();
+
+	// Configures Slave 0 - Data values
+	this->i2cSlave0ReadMode_ = TRUE;
+	this->i2cSlave0Address_ = SLAVE_ADDRESS_MAGNETOMETER;
+	this->i2cSlave0Register_ = REG_MAG_ST1;
+	this->i2cSlave0Enabled_ = TRUE;
+	this->i2cSlave0DataLenght_ = 8;
+	this->updateI2cSlave0Address();
+	this->updateI2cSlave0Register();
+	this->updateI2cSlave0Control();
+
+	// Configures Slave 1 - Changes measurement mode
+	this->i2cSlave1ReadMode_ = FALSE;
+	this->i2cSlave1Address_ = SLAVE_ADDRESS_MAGNETOMETER;
+	this->i2cSlave1Register_ = REG_MAG_CNTL1;
+	this->i2cSlave1Enabled_ = TRUE;
+	this->i2cSlave1DataLenght_ = 1;
+	this->i2cSlave1DataOut_ = MAG_OPERATION_MODE_SINGLE_MEASUREMENT;
+	this->updateI2cSlave1Address();
+	this->updateI2cSlave1Register();
+	this->updateI2cSlave1Control();
+
+	// Setup proper delays between acquisitions
+	this->i2cSlave0DelayEnabled_ = TRUE;
+	this->i2cSlave1DelayEnabled_ = TRUE;
+	this->updateI2cMasterDelayControl();
+
+	return;
+}
+
+void Mpu9250::setMagnetometerSampleRate(void)
+{
+	/*
+		unsigned char div;
+		if(!rate || rate > st.chip_cfg.sample_rate || rate > MAX_COMPASS_SAMPLE_RATE) {
+			return -1;
+		}
+
+		div = st.chip_cfg.sample_rate / rate - 1;
+		if(i2c_write(st.hw->addr, st.reg->s4_ctrl, 1, &div)) {
+			return -1;
+		}
+		st.chip_cfg.compass_sample_rate = st.chip_cfg.sample_rate / (div + 1);
+		return 0;
+	*/
+}
+
+mpu9250Error_e Mpu9250::getAccelRaw(int16_t * accelRawBuff, axis_t axis)
+{
+	uint8_t i = 0;
+
+	if(!this->initialized_) {
+		return MPU9250_ERROR_NOT_INITIALIZED;
+	}
+
+	if(axis == AXIS_NONE) {
+		return MPU9250_INVALID_AXIS;
+	}
+
+	this->readAccelData();
+
+	if(isBitSet(axis, 0)) {
+		accelRawBuff[i++] = this->accelData_[0];
+	}
+	if(isBitSet(axis, 1)) {
+		accelRawBuff[i++] = this->accelData_[1];
+	}
+	if(isBitSet(axis, 2)) {
+		accelRawBuff[i++] = this->accelData_[2];
+	}
+
+	return MPU9250_ERROR_NONE;
+}
+
+mpu9250Error_e Mpu9250::getGyroRaw(int16_t * gyroRawBuff, axis_t axis)
+{
+	uint8_t i = 0;
+
+	if(!this->initialized_) {
+		return MPU9250_ERROR_NOT_INITIALIZED;
+	}
+
+	if(axis == AXIS_NONE) {
+		return MPU9250_INVALID_AXIS;
+	}
+
+	this->readGyroData();
+
+	if(isBitSet(axis, 0)) {
+		gyroRawBuff[i++] = this->gyroData_[0];
+	}
+	if(isBitSet(axis, 1)) {
+		gyroRawBuff[i++] = this->gyroData_[1];
+	}
+	if(isBitSet(axis, 2)) {
+		gyroRawBuff[i++] = this->gyroData_[2];
+	}
+
+	return MPU9250_ERROR_NONE;
+}
+
+mpu9250Error_e Mpu9250::getTemp(uint32_t * tempUQ12)
+{
+	int32_t aux32 = 0;
+
+	if(!this->initialized_) {
+		return MPU9250_ERROR_NOT_INITIALIZED;
+	}
+
+	this->readTempData();
+	aux32 = this->tempData_ - MAGNETOMETER_OFFSET;
+	aux32 *= MAGNETOMETER_Q_MULTIPIER;
+	aux32 /= MAGNETOMETER_SENSIBIITY;
+	aux32 += (int32_t)35 * (int32_t)MAGNETOMETER_Q_MULTIPIER;
+	*tempUQ12 = (uint32_t)aux32;
+
+	return MPU9250_ERROR_NONE;
+}
+
+mpu9250Error_e Mpu9250::getAccel(int32_t * accelQ9Buff, axis_t axis, int16_t * accelRawBuff)
+{
+	uint8_t i = 0;
+	int32_t aux32;
+	int32_t scale;
+
+	if(!this->initialized_) {
+		return MPU9250_ERROR_NOT_INITIALIZED;
+	}
+
+	if(axis == AXIS_NONE) {
+		return MPU9250_INVALID_AXIS;
+	}
+	this->readAccelData();
+
+	switch(this->accelFullScale_) {
+	case AFS_2G:
+		scale = 2;
+		break;
+	case AFS_4G:
+		scale = 4;
+		break;
+	case AFS_8G:
+		scale = 8;
+		break;
+	case AFS_16G:
+		scale = 16;
+		break;
+	}
+
+	if(isBitSet(axis, 0)) {
+		accelRawBuff[i] = this->accelData_[0];
+		aux32 = this->accelData_[0];
+		aux32 *= scale;
+		aux32 /= 64;			// 64 = (1 << 15) / Q9_MULTIPLIER
+		accelQ9Buff[i++] = aux32;
+	}
+	if(isBitSet(axis, 1)) {
+		accelRawBuff[i] = this->accelData_[1];
+		aux32 = this->accelData_[1];
+		aux32 *= scale;
+		aux32 /= 64;			// 64 = (1 << 15) / Q9_MULTIPLIER
+		accelQ9Buff[i++] = aux32;
+	}
+	if(isBitSet(axis, 2)) {
+		accelRawBuff[i] = this->accelData_[2];
+		aux32 = this->accelData_[2];
+		aux32 *= scale;
+		aux32 /= 64;			// 64 = (1 << 15) / Q9_MULTIPLIER
+		accelQ9Buff[i++] = aux32;
+	}
+
+	return MPU9250_ERROR_NONE;
+}
+
+mpu9250Error_e Mpu9250::getGyro(int32_t * gyroQ9Buff, axis_t axis, int16_t * gyroRawBuff)
+{
+	uint8_t i = 0;
+	int32_t aux32;
+	int32_t scale = 0;
+
+	if(!this->initialized_) {
+		return MPU9250_ERROR_NOT_INITIALIZED;
+	}
+
+	if(axis == AXIS_NONE) {
+		return MPU9250_INVALID_AXIS;
+	}
+	this->readAccelData();
+
+	switch(this->gyroFullScale_) {
+	case GFS_250DPS:
+		scale = 250;
+		break;
+	case GFS_500DPS:
+		scale = 500;
+		break;
+	case GFS_1000DPS:
+		scale = 1000;
+		break;
+	case GFS_2000DPS:
+		scale = 2000;
+		break;
+	}
+
+	if(isBitSet(axis, 0)) {
+		gyroRawBuff[i] = this->gyroData_[0];
+		aux32 = this->gyroData_[0];
+		aux32 *= scale;
+		aux32 /= 64;			// 64 = (1 << 15) / Q9_MULTIPLIER
+		gyroQ9Buff[i++] = aux32;
+	}
+	if(isBitSet(axis, 1)) {
+		gyroRawBuff[i] = this->gyroData_[1];
+		aux32 = this->gyroData_[1];
+		aux32 *= scale;
+		aux32 /= 64;			// 64 = (1 << 15) / Q9_MULTIPLIER
+		gyroQ9Buff[i++] = aux32;
+	}
+	if(isBitSet(axis, 2)) {
+		gyroRawBuff[i] = this->gyroData_[2];
+		aux32 = this->gyroData_[2];
+		aux32 *= scale;
+		aux32 /= 64;			// 64 = (1 << 15) / Q9_MULTIPLIER
+		gyroQ9Buff[i++] = aux32;
+	}
+
+	return MPU9250_ERROR_NONE;
+}
+
+
+
+
+
+mpu9250Error_e Mpu9250::setGyroScale(gyroFullScale_e scale)
+{
+	if(!this->initialized_) {
+		return MPU9250_ERROR_NOT_INITIALIZED;
+	}
+
+	this->gyroFullScale_ = scale;
+	this->updateGyroConfig();
+
+	return MPU9250_ERROR_NONE;
+}
+
+mpu9250Error_e Mpu9250::setAccelScale(accelFullScale_e scale)
+{
+	if(!this->initialized_) {
+		return MPU9250_ERROR_NOT_INITIALIZED;
+	}
+
+	this->accelFullScale_ = scale;
+	this->updateAccelConfig();
+
+	return MPU9250_ERROR_NONE;
+}
+
+mpu9250Error_e Mpu9250::getAccelOffset(int16_t * accelOffsetBuff, axis_t axis)
+{
+	uint8_t i = 0;
+
+	if(!this->initialized_) {
+		return MPU9250_ERROR_NOT_INITIALIZED;
+	}
+
+	if(axis == AXIS_NONE) {
+		return MPU9250_INVALID_AXIS;
+	}
+
+	this->readAccelOffset();
+
+	if(isBitSet(axis, 0)) {
+		accelOffsetBuff[i++] = this->accelOffset_[0];
+	}
+	if(isBitSet(axis, 1)) {
+		accelOffsetBuff[i++] = this->accelOffset_[1];
+	}
+	if(isBitSet(axis, 2)) {
+		accelOffsetBuff[i++] = this->accelOffset_[2];
+	}
+
+	return MPU9250_ERROR_NONE;
+}
+
+mpu9250Error_e Mpu9250::getGyroOffset(int16_t * gyroOffsetBuff, axis_t axis)
+{
+	uint8_t i = 0;
+
+	if(!this->initialized_) {
+		return MPU9250_ERROR_NOT_INITIALIZED;
+	}
+
+	if(axis == AXIS_NONE) {
+		return MPU9250_INVALID_AXIS;
+	}
+
+	this->readGyroOffset();
+
+	if(isBitSet(axis, 0)) {
+		gyroOffsetBuff[i++] = this->gyroOffset_[0];
+	}
+	if(isBitSet(axis, 1)) {
+		gyroOffsetBuff[i++] = this->gyroOffset_[1];
+	}
+	if(isBitSet(axis, 2)) {
+		gyroOffsetBuff[i++] = this->gyroOffset_[2];
+	}
+
+	return MPU9250_ERROR_NONE;
+}
+
+mpu9250Error_e Mpu9250::setAccelOffset(int16_t * accelOffsetBuff, axis_t axis)
+{
+	uint8_t i = 0;
+
+	if(!this->initialized_) {
+		return MPU9250_ERROR_NOT_INITIALIZED;
+	}
+
+	if(axis == AXIS_NONE) {
+		return MPU9250_INVALID_AXIS;
+	}
+
+	if(isBitSet(axis, 0)) {
+		this->accelOffset_[0] = accelOffsetBuff[i++];
+	}
+	if(isBitSet(axis, 1)) {
+		this->accelOffset_[1] = accelOffsetBuff[i++];
+	}
+	if(isBitSet(axis, 2)) {
+		this->accelOffset_[2] = accelOffsetBuff[i++];
+	}
+	this->updateAccelOffset();
+
+	return MPU9250_ERROR_NONE;
+}
+
+mpu9250Error_e Mpu9250::setGyroOffset(int16_t * gyroOffsetBuff, axis_t axis)
+{
+	uint8_t i = 0;
+
+	if(!this->initialized_) {
+		return MPU9250_ERROR_NOT_INITIALIZED;
+	}
+
+	if(axis == AXIS_NONE) {
+		return MPU9250_INVALID_AXIS;
+	}
+
+	if(isBitSet(axis, 0)) {
+		this->gyroOffset_[0] = gyroOffsetBuff[i++];
+	}
+	if(isBitSet(axis, 1)) {
+		this->gyroOffset_[1] = gyroOffsetBuff[i++];
+	}
+	if(isBitSet(axis, 2)) {
+		this->gyroOffset_[2] = gyroOffsetBuff[i++];
+	}
+	this->updateGyroOffset();
+
+	return MPU9250_ERROR_NONE;
+}
+
+
+
+// -----------------------------------------------------------------------------
+// Mpu9250 class - Private methods definitions ---------------------------------
+
+void Mpu9250::updateAccelConfig(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_ACCEL_CONFIG;
+	buffer[1] = 0x00;
+	buffer[1] |= (this->accelXSelfTestEnabled_ << BIT_ACCEL_CONFIG_X_ST_EN);
+	buffer[1] |= (this->accelYSelfTestEnabled_ << BIT_ACCEL_CONFIG_Y_ST_EN);
+	buffer[1] |= (this->accelZSelfTestEnabled_ << BIT_ACCEL_CONFIG_Z_ST_EN);
+	buffer[1] |= (this->accelFullScale_ << BIT_ACCEL_CONFIG_FS_SEL0);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateAccelConfig2(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_ACCEL_CONFIG2;
+	buffer[1] = 0x00;
+	buffer[1] |= ((this->accelSamplingConfig_ >> 3) << BIT_ACCEL_CONFIG2_FCHOICE_B);
+	buffer[1] |= ((this->accelSamplingConfig_ & 0x07) << BIT_ACCEL_CONFIG2_DLPCFG);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateConfig(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_CONFIG;
+	buffer[1] = 0x00;
+	buffer[1] |= (this->fifoStopWhenFull_ << BIT_CONFIG_FIFO_MODE_BIT);
+	buffer[1] |= (this->externalSync_ << BIT_CONFIG_EXT_SYNC_SET0);
+	buffer[1] |= ((this->gyroSamplingConfig_ & 0x07) << BIT_CONFIG_DLPF_CFG0);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateFifoEnable(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_FIFO_EN;
+	buffer[1] = 0x00;
+	buffer[1] |= (this->fifoTempRecordEnabled_ << BIT_FIFO_EN_TEMP_BIT);
+	buffer[1] |= (this->fifoGyroXRecordEnabled_ << BIT_FIFO_EN_GYRO_XOUT_BIT);
+	buffer[1] |= (this->fifoGyroYRecordEnabled_ << BIT_FIFO_EN_GYRO_YOUT_BIT);
+	buffer[1] |= (this->fifoGyroZRecordEnabled_ << BIT_FIFO_EN_GYRO_ZOUT_BIT);
+	buffer[1] |= (this->fifoAccelXYXRecordEnabled_ << BIT_FIFO_EN_ACCEL_BIT);
+	buffer[1] |= (this->fifoSlave2RecordEnabled_ << BIT_FIFO_EN_SLV2_BIT);
+	buffer[1] |= (this->fifoSlave1RecordEnabled_ << BIT_FIFO_EN_SLV1_BIT);
+	buffer[1] |= (this->fifoSlave0RecordEnabled_ << BIT_FIFO_EN_SLV0_BIT);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateGyroConfig(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_GYRO_CONFIG;
+	buffer[1] = 0x00;
+	buffer[1] |= (this->gyroXSelfTestEnabled_ << BIT_GYRO_CONFIG_X_ST_EN);
+	buffer[1] |= (this->gyroYSelfTestEnabled_ << BIT_GYRO_CONFIG_Y_ST_EN);
+	buffer[1] |= (this->gyroZSelfTestEnabled_ << BIT_GYRO_CONFIG_Z_ST_EN);
+	buffer[1] |= (this->gyroFullScale_ << BIT_GYRO_CONFIG_FS_SEL0);
+	buffer[1] |= ((this->gyroSamplingConfig_ >> 3) << BIT_GYRO_CONFIG_FCHOICE_B0);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateI2cMasterControl(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_MST_CTRL;
+	buffer[1] = 0x00;
+	buffer[1] |= (this->i2cMultiMasterEnabled_ << BIT_I2C_MST_CTRL_MULT_MST_EN);
+	buffer[1] |= (this->i2cDataReadyIntWaitExternalSensors_ << BIT_I2C_MST_CTRL_WAIT_FOR_ES);
+	buffer[1] |= (this->fifoSlave3RecordEnabled_ << BIT_I2C_MST_CTRL_SLV_3_FIFO_EN);
+	buffer[1] |= (this->i2cSendStopBetweenSlaves_ << BIT_I2C_MST_CTRL_P_NSR);
+	buffer[1] |= (this->i2cMasterClock_ << BIT_I2C_MST_CTRL_CLK);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateI2cMasterDelayControl(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_MST_DELAY_CTRL;
+	buffer[1] = 0x00;
+	buffer[1] |= (this->i2cExtDataShadowingEnabled_ << BIT_I2C_MST_DELAY_CTRL_ES_SHADOW);
+	buffer[1] |= (this->i2cSlave4DelayEnabled_ << BIT_I2C_MST_DELAY_CTRL_SLV4_DLY_EN);
+	buffer[1] |= (this->i2cSlave3DelayEnabled_ << BIT_I2C_MST_DELAY_CTRL_SLV3_DLY_EN);
+	buffer[1] |= (this->i2cSlave2DelayEnabled_ << BIT_I2C_MST_DELAY_CTRL_SLV2_DLY_EN);
+	buffer[1] |= (this->i2cSlave1DelayEnabled_ << BIT_I2C_MST_DELAY_CTRL_SLV1_DLY_EN);
+	buffer[1] |= (this->i2cSlave0DelayEnabled_ << BIT_I2C_MST_DELAY_CTRL_SLV0_DLY_EN);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateI2cSlave0Address(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_SLV0_ADDR;
+	buffer[1] = 0x00;
+	buffer[1] |= (this->i2cSlave0ReadMode_ << BIT_I2C_SLV0_ADDR_RNW);
+	buffer[1] |= (this->i2cSlave0Address_ << BIT_I2C_SLV0_ADDR_ID0);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateI2cSlave0Control(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_SLV0_CTRL;
+	buffer[1] = 0x00;
+	buffer[1] |= (this->i2cSlave0Enabled_ << BIT_I2C_SLV0_CTRL_EN);
+	buffer[1] |= (this->i2cSlave0WordBytesSwap_ << BIT_I2C_SLV0_CTRL_BYTE_SW);
+	buffer[1] |= (this->i2cSlave0DoNotSendRegister_ << BIT_I2C_SLV0_CTRL_REG_DIS);
+	buffer[1] |= (this->i2cSlave0GroupEndingEven_ << BIT_I2C_SLV0_CTRL_GRP);
+	buffer[1] |= (this->i2cSlave0DataLenght_ << BIT_I2C_SLV0_CTRL_LENG0);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateI2cSlave0DataOut(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_SLV0_DO;
+	buffer[1] = this->i2cSlave0DataOut_;
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateI2cSlave0Register(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_SLV0_REG;
+	buffer[1] = this->i2cSlave0Register_;
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateI2cSlave1Address(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_SLV1_ADDR;
+	buffer[1] = 0x00;
+	buffer[1] |= (this->i2cSlave1ReadMode_ << BIT_I2C_SLV1_ADDR_RNW);
+	buffer[1] |= (this->i2cSlave1Address_ << BIT_I2C_SLV1_ADDR_ID0);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateI2cSlave1Control(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_SLV1_CTRL;
+	buffer[1] = 0x00;
+	buffer[1] |= (this->i2cSlave1Enabled_ << BIT_I2C_SLV1_CTRL_EN);
+	buffer[1] |= (this->i2cSlave1WordBytesSwap_ << BIT_I2C_SLV1_CTRL_BYTE_SW);
+	buffer[1] |= (this->i2cSlave1DoNotSendRegister_ << BIT_I2C_SLV1_CTRL_REG_DIS);
+	buffer[1] |= (this->i2cSlave1GroupEndingEven_ << BIT_I2C_SLV1_CTRL_GRP);
+	buffer[1] |= (this->i2cSlave1DataLenght_ << BIT_I2C_SLV1_CTRL_LENG0);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateI2cSlave1DataOut(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_SLV1_DO;
+	buffer[1] = this->i2cSlave1DataOut_;
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateI2cSlave1Register(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_SLV1_REG;
+	buffer[1] = this->i2cSlave1Register_;
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateI2cSlave2Address(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_SLV2_ADDR;
+	buffer[1] = 0x00;
+	buffer[1] |= (this->i2cSlave2ReadMode_ << BIT_I2C_SLV2_ADDR_RNW);
+	buffer[1] |= (this->i2cSlave2Address_ << BIT_I2C_SLV2_ADDR_ID0);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateI2cSlave2Control(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_SLV2_CTRL;
+	buffer[1] = 0x00;
+	buffer[1] |= (this->i2cSlave2Enabled_ << BIT_I2C_SLV2_CTRL_EN);
+	buffer[1] |= (this->i2cSlave2WordBytesSwap_ << BIT_I2C_SLV2_CTRL_BYTE_SW);
+	buffer[1] |= (this->i2cSlave2DoNotSendRegister_ << BIT_I2C_SLV2_CTRL_REG_DIS);
+	buffer[1] |= (this->i2cSlave2GroupEndingEven_ << BIT_I2C_SLV2_CTRL_GRP);
+	buffer[1] |= (this->i2cSlave2DataLenght_ << BIT_I2C_SLV2_CTRL_LENG0);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateI2cSlave2DataOut(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_SLV2_DO;
+	buffer[1] = this->i2cSlave2DataOut_;
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateI2cSlave2Register(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_SLV2_REG;
+	buffer[1] = this->i2cSlave2Register_;
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateI2cSlave3Address(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_SLV3_ADDR;
+	buffer[1] = 0x00;
+	buffer[1] |= (this->i2cSlave3ReadMode_ << BIT_I2C_SLV3_ADDR_RNW);
+	buffer[1] |= (this->i2cSlave3Address_ << BIT_I2C_SLV3_ADDR_ID0);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateI2cSlave3Control(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_SLV3_CTRL;
+	buffer[1] = 0x00;
+	buffer[1] |= (this->i2cSlave3Enabled_ << BIT_I2C_SLV3_CTRL_EN);
+	buffer[1] |= (this->i2cSlave3WordBytesSwap_ << BIT_I2C_SLV3_CTRL_BYTE_SW);
+	buffer[1] |= (this->i2cSlave3DoNotSendRegister_ << BIT_I2C_SLV3_CTRL_REG_DIS);
+	buffer[1] |= (this->i2cSlave3GroupEndingEven_ << BIT_I2C_SLV3_CTRL_GRP);
+	buffer[1] |= (this->i2cSlave3DataLenght_ << BIT_I2C_SLV3_CTRL_LENG0);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateI2cSlave3DataOut(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_SLV3_DO;
+	buffer[1] = this->i2cSlave3DataOut_;
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateI2cSlave3Register(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_SLV3_REG;
+	buffer[1] = this->i2cSlave3Register_;
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateI2cSlave4Address(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_SLV4_ADDR;
+	buffer[1] = 0x00;
+	buffer[1] |= (this->i2cSlave4ReadMode_ << BIT_I2C_SLV4_ADDR_RNW);
+	buffer[1] |= (this->i2cSlave4Address_ << BIT_I2C_SLV4_ADDR_ID0);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateI2cSlave4Control(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_SLV4_CTRL;
+	buffer[1] = 0x00;
+	buffer[1] |= (this->i2cSlave4SingleTransferEnable_ << BIT_I2C_SLV4_CTRL_EN);
+	buffer[1] |= (this->i2cSlave4IntTransferReadyEnabled_ << BIT_I2C_SLV4_CTRL_DONE_INT_EN);
+	buffer[1] |= (this->i2cSlave4DoNotSendRegister_ << BIT_I2C_SLV4_CTRL_REG_DIS);
+	buffer[1] |= (this->i2cSlave4MasterDelay_ << BIT_I2C_SLV4_CTRL_MST_DLY0);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::readI2cSlave4DataIn(void)
+{
+	uint8_t buffer;
+
+	buffer = REG_I2C_SLV4_DI;
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, &buffer, 1);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_READ, &buffer, 1);
+
+	this->i2cSlave4DataIn_ = buffer;
+
+	return;
+}
+
+void Mpu9250::updateI2cSlave4DataOut(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_SLV4_DO;
+	buffer[1] = this->i2cSlave4DataOut_;
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateI2cSlave4Register(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_I2C_SLV4_REG;
+	buffer[1] = this->i2cSlave4Register_;
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateIntPinConfig(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_INT_PIN_CFG;
+	buffer[1] = 0x00;
+	buffer[1] |= (this->intPinActivationLevel_ << BIT_INT_PIN_CFG_ACTL_BIT);
+	buffer[1] |= (this->intPinOutputDriver_ << BIT_INT_PIN_CFG_OPEN_BIT);
+	buffer[1] |= (this->intPinLatched_ << BIT_INT_PIN_CFG_LATCH_INT_EN_BIT);
+	buffer[1] |= (this->intPinClearWhenRead_ << BIT_INT_PIN_CFG_INT_ANYRD_CLEAR_BIT);
+	buffer[1] |= (this->fsyncPinActivationLevel_ << BIT_INT_PIN_CFG_FSYNC_BIT);
+	buffer[1] |= (this->fsyncPinTriggerInterrupt_ << BIT_INT_PIN_CFG_FSYNC_INT_MODE_EN_BIT);
+	buffer[1] |= (this->i2cBypassModeEnabled_ << BIT_INT_PIN_CFG_BYPASS_EN_BIT);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updatePowerManagementControl1(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_PWR_MGMT_1;
+	buffer[1] = 0x00;
+	buffer[1] |= (this->resetDevice_ << BIT_PWR_MGMT_1_H_RESET);
+	buffer[1] |= (this->powerMode_ << BIT_PWR_MGMT_1_GYRO_STANDBY);
+	buffer[1] |= (this->powerDownMode_ << BIT_PWR_MGMT_1_PD_PTAT);
+	buffer[1] |= (this->clockSelection_ << BIT_PWR_MGMT_1_CLKSEL0);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	// Auto clear reset
+	this->resetDevice_ = FALSE;
+
+	return;
+}
+
+void Mpu9250::updatePowerManagementControl2(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_PWR_MGMT_2;
+	buffer[1] = 0x00;
+	buffer[1] |= (this->accelXDisable_ << BIT_PWR_MGMT_2_DISABLE_XA);
+	buffer[1] |= (this->accelYDisable_ << BIT_PWR_MGMT_2_DISABLE_YA);
+	buffer[1] |= (this->accelZDisable_ << BIT_PWR_MGMT_2_DISABLE_ZA);
+	buffer[1] |= (this->gyroXDisable_ << BIT_PWR_MGMT_2_DISABLE_XG);
+	buffer[1] |= (this->gyroYDisable_ << BIT_PWR_MGMT_2_DISABLE_YG);
+	buffer[1] |= (this->gyroZDisable_ << BIT_PWR_MGMT_2_DISABLE_ZG);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+void Mpu9250::updateUserControl(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_USER_CTRL;
+	buffer[1] = 0x00;
+	buffer[1] |= (this->fifoEnabled_ << BIT_USER_CTRL_FIFO_EN_BIT);
+	buffer[1] |= (this->i2cMasterEnabled_ << BIT_USER_CTRL_I2C_MST_EN_BIT);
+	buffer[1] |= (this->useSpiInterface_ << BIT_USER_CTRL_I2C_IF_DIS_BIT);
+	buffer[1] |= (this->fifoResetStrobe_ << BIT_USER_CTRL_FIFO_RST_BIT);
+	buffer[1] |= (this->i2cMasterResetStrobe_ << BIT_USER_CTRL_I2C_MST_RST_BIT);
+	buffer[1] |= (this->signalPathResetStrobe_ << BIT_USER_CTRL_SIG_COND_RST_BIT);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 2);
+
+	return;
+}
+
+
+
+bool_t Mpu9250::checkWhoAmI(void)
+{
+	uint8_t buffer;
+
+	buffer = REG_WHO_AM_I;
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, &buffer, 1);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_READ, &buffer, 1);
+
+	if(buffer != WHO_AM_I) {
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+void Mpu9250::readAccelData(void)
+{
+	uint8_t buffer[6];
+
+	buffer[0] = REG_ACCEL_XOUT_H;
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 1);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_READ, buffer, 6);
+	this->accelData_[0] = (int16_t)(((int16_t)buffer[0] << 8) | buffer[1]);
+	this->accelData_[1] = (int16_t)(((int16_t)buffer[2] << 8) | buffer[3]);
+	this->accelData_[2] = (int16_t)(((int16_t)buffer[4] << 8) | buffer[5]);
+
+	return;
+}
+
+void Mpu9250::readGyroData(void)
+{
+	uint8_t buffer[6];
+
+	buffer[0] = REG_GYRO_XOUT_H;
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 1);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_READ, buffer, 6);
+	this->gyroData_[0] = (int16_t)(((int16_t)buffer[0] << 8) | buffer[1]);
+	this->gyroData_[1] = (int16_t)(((int16_t)buffer[2] << 8) | buffer[3]);
+	this->gyroData_[2] = (int16_t)(((int16_t)buffer[4] << 8) | buffer[5]);
+
+	return;
+}
+
+void Mpu9250::readTempData(void)
+{
+	uint8_t buffer[2];
+
+	buffer[0] = REG_TEMP_OUT_H;
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 1);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_READ, buffer, 2);
+	this->tempData_ = (int16_t)(((int16_t)buffer[0] << 8) | (int16_t)buffer[1]);
+
+	return;
+}
+
+void Mpu9250::readAccelOffset(void)
+{
+	uint8_t buffer[6];
+
+	buffer[0] = REG_XA_OFFSET_H;
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 1);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_READ, buffer, 6);
+	this->accelOffset_[0] = (int16_t)(((int16_t)buffer[0] << 8) | buffer[1]) >> 1;
+	this->accelOffset_[1] = (int16_t)(((int16_t)buffer[2] << 8) | buffer[3]) >> 1;
+	this->accelOffset_[2] = (int16_t)(((int16_t)buffer[4] << 8) | buffer[5]) >> 1;
+
+	return;
+}
+
+void Mpu9250::readGyroOffset(void)
+{
+	uint8_t buffer[6];
+
+	buffer[0] = REG_XG_OFFSET_H;
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 1);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_READ, buffer, 6);
+	this->gyroOffset_[0] = (int16_t)(((int16_t)buffer[0] << 8) | buffer[1]);
+	this->gyroOffset_[1] = (int16_t)(((int16_t)buffer[2] << 8) | buffer[3]);
+	this->gyroOffset_[2] = (int16_t)(((int16_t)buffer[4] << 8) | buffer[5]);
+
+	return;
+}
+
+void Mpu9250::updateAccelOffset(void)
+{
+	int16_t aux16;
+	uint8_t buffer[7];
+
+	buffer[0] = REG_XA_OFFSET_H;
+	aux16 = this->accelOffset_[0] << 1;
+	buffer[1] = (uint8_t)(aux16 >> 8);
+	buffer[2] = (uint8_t)(aux16 & 0xFF);
+	aux16 = this->accelOffset_[1] << 1;
+	buffer[3] = (uint8_t)(aux16 >> 8);
+	buffer[4] = (uint8_t)(aux16 & 0xFF);
+	aux16 = this->accelOffset_[2] << 1;
+	buffer[5] = (uint8_t)(aux16 >> 8);
+	buffer[6] = (uint8_t)(aux16 & 0xFF);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 7);
+
+	return;
+}
+
+void Mpu9250::updateGyroOffset(void)
+{
+	uint8_t buffer[7];
+
+	buffer[0] = REG_XG_OFFSET_H;
+	buffer[1] = (uint8_t)(this->gyroOffset_[0] >> 8);
+	buffer[2] = (uint8_t)(this->gyroOffset_[0] & 0xFF);
+	buffer[3] = (uint8_t)(this->gyroOffset_[1] >> 8);
+	buffer[4] = (uint8_t)(this->gyroOffset_[1] & 0xFF);
+	buffer[5] = (uint8_t)(this->gyroOffset_[2] >> 8);
+	buffer[6] = (uint8_t)(this->gyroOffset_[2] & 0xFF);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 7);
+
+	return;
+}
+
+void Mpu9250::readAccelFactorySelfTest(void)
+{
+	uint8_t buffer[3];
+
+	buffer[0] = REG_SELF_TEST_X_ACCEL;
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 1);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_READ, buffer, 3);
+	this->accelFactorySelfTest_[0] = buffer[0];
+	this->accelFactorySelfTest_[1] = buffer[1];
+	this->accelFactorySelfTest_[2] = buffer[2];
+
+	return;
+}
+
+void Mpu9250::readGyroFactorySelfTest(void)
+{
+	uint8_t buffer[3];
+
+	buffer[0] = REG_SELF_TEST_X_GYRO;
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_WRITE, buffer, 1);
+	this->i2cHandler_->sendData(this->i2cMyAddress_, TWI_READ, buffer, 3);
+	this->gyroFactorySelfTest_[0] = buffer[0];
+	this->gyroFactorySelfTest_[1] = buffer[1];
+	this->gyroFactorySelfTest_[2] = buffer[2];
+
+	return;
+}
+
+
+
+// -----------------------------------------------------------------------------
+// Mpu9250 class - Protected methods definitions -------------------------------
+
+/* NONE */
+
+// -----------------------------------------------------------------------------
+// General public functions definitions ----------------------------------------
+
+/* NONE */

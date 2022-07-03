@@ -1,0 +1,185 @@
+
+#include "mpu9250.hpp"
+#ifndef __MPU9250_HPP
+#	error Header file is corrupted or missing!
+#else
+#	if __MPU9250_HPP != __BUILD_TO_REPLACE__
+#		error Build mismatch between source and header files!
+#	endif
+#endif
+
+// Constructor
+
+Mpu9250::Mpu9250(SPI_HandleTypeDef *spiHanler_p)
+{
+	this->_spiHandler = spiHanler_p;
+
+	// Return successfully
+	this->_lastError = ERROR_NONEX;
+	return;
+}
+
+// Mpu9250::Mpu9250(void)
+// {
+// 	this->_spiHandler = nullptr;
+
+// 	// Return successfully
+// 	this->_lastError = ERROR_NONEX;
+// 	return;
+// }
+
+// Methods
+
+bool Mpu9250::init(SPI_HandleTypeDef *spiHanler_p)
+{
+	// Local variables
+	uint8_t txBuffer[2];
+	uint8_t rxBuffer[2];
+
+	if (spiHanler_p != nullptr) {
+		this->_spiHandler = spiHanler_p;
+	}
+
+	// Read Who Am I
+	if (!this->_identifyChip()) {
+		this->_lastError = ERROR_WRONG_CHIP;
+		return false;
+	}
+
+	// Standard configuration
+	// REG_SMPLRT_DIV => 0
+	// REG_CONFIG => 0
+
+	txBuffer[0] = REG_GYRO_CONFIG | SPI_OPERATION_WRITE;
+	txBuffer[1] =
+		(0 << BIT_GYRO_CONFIG_X_ST_EN)	|
+		(0 << BIT_GYRO_CONFIG_Y_ST_EN)	|
+		(0 << BIT_GYRO_CONFIG_Z_ST_EN)	|
+		(0 << BIT_GYRO_CONFIG_FS_SEL)	|
+		(2 << BIT_GYRO_CONFIG_FCHOICE_B);
+	if (!sendData(this->_spiHandler, txBuffer, rxBuffer, 2)) {
+		this->_lastError = ERROR_SPI_COMMUNICATION_FAILED;
+		return false;
+	}
+
+	// REG_ACCEL_CONFIG => 0
+	txBuffer[0] = REG_ACCEL_CONFIG2 | SPI_OPERATION_WRITE;
+	txBuffer[1] =
+		(1 << BIT_ACCEL_CONFIG2_FCHOICE_B) |
+		(0 << BIT_ACCEL_CONFIG2_DLPF_CFG);
+	if (!sendData(this->_spiHandler, txBuffer, rxBuffer, 2)) {
+		this->_lastError = ERROR_SPI_COMMUNICATION_FAILED;
+		return false;
+	}
+
+	// REG_ACCEL_LOW_POWER_ODR => 0
+
+	this->_lastError = ERROR_NONEX;
+	return true;
+}
+
+bool Mpu9250::getAccelData(uint16_t *accelData_p, bool updateRawData_p)
+{
+	if (updateRawData_p) {
+		this->_updateData();
+	}
+
+	for (uint8_t i = 0; i < 3; i++) {
+		accelData_p[i] = this->_accelData[i];
+	}
+
+	// Return successfully
+	this->_lastError = ERROR_NONEX;
+	return true;
+}
+
+bool Mpu9250::getGyroData(uint16_t *gyroData_p, bool updateRawData_p)
+{
+	if (updateRawData_p) {
+		this->_updateData();
+	}
+
+	for (uint8_t i = 0; i < 3; i++) {
+		gyroData_p[i] = this->_gyroData[i];
+	}
+
+	// Return successfully
+	this->_lastError = ERROR_NONEX;
+	return true;
+}
+
+bool Mpu9250::getTempData(uint16_t *tempData_p, bool updateRawData_p)
+{
+	if (updateRawData_p) {
+		this->_updateData();
+	}
+
+	*tempData_p = (this->_tempData);
+
+	// Return successfully
+	this->_lastError = ERROR_NONEX;
+	return true;
+}
+
+error_ex Mpu9250::getLastError(void)
+{
+	return this->_lastError;
+}
+
+
+bool Mpu9250::_identifyChip(void)
+{
+	uint8_t txBuffer[2];
+	uint8_t rxBuffer[2];
+
+	// Select register
+	txBuffer[0] = REG_WHO_AM_I | SPI_OPERATION_READ;
+
+	// Read data
+	if (!sendData(this->_spiHandler, txBuffer, rxBuffer, 2)) {
+		this->_lastError = ERROR_SPI_COMMUNICATION_FAILED;
+		return false;
+	}
+	if (rxBuffer[1] != MPU9250_WHO_AM_I) {
+		this->_lastError = ERROR_DEVICE_ID_MISMATCH;
+		return false;
+	}
+
+	if (!sendData(this->_spiHandler, txBuffer, rxBuffer, 2)) {
+		this->_lastError = ERROR_SPI_COMMUNICATION_FAILED;
+		return false;
+	}
+
+	this->_lastError = ERROR_NONEX;
+	return true;
+}
+
+// External functions
+
+bool sendData(SPI_HandleTypeDef *spiHandler_p, uint8_t *txBuffData_p, uint8_t *rxBuffData_p, uint16_t buffSize_p)
+{
+	HAL_StatusTypeDef halStatus = HAL_OK;
+
+	HAL_GPIO_WritePin(NLED_GPIO_Port, NLED_Pin, GPIO_PIN_RESET);
+
+	// while (1) {
+	// 	if (txBuffData_p[0] == 245) {
+	// 		HAL_GPIO_WritePin(NLED_GPIO_Port, NLED_Pin, GPIO_PIN_SET);
+	// 	}
+	// }
+
+	halStatus = HAL_SPI_TransmitReceive(spiHandler_p, txBuffData_p, rxBuffData_p, buffSize_p, SPI_DEFAULT_TIMEOUT);
+	//HAL_SPI_Transmit_IT
+
+	if (!halStatus) {
+		// while (1) {
+		// 	HAL_GPIO_WritePin(NLED_GPIO_Port, NLED_Pin, GPIO_PIN_SET);
+		// }
+
+		return false;
+	}
+
+
+
+	return true;
+}

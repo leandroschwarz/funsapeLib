@@ -1,0 +1,92 @@
+/*
+ * gpdseDevelopment.c
+ *
+ * Created: 06/09/2017 14:39:44
+ *  Author: Schwarz
+ */
+
+#define F_CPU 16000000UL
+
+#include "globalDefines.h"
+#include "ATmega328.h"
+#include "spiMaster.h"
+#include "twiMaster.h"
+#include "owiMaster.h"
+// #include "lcd4d.h"
+// #include "lcd8d.h"
+// #include "lcd4f.h"
+// #include "lcd8f.h"
+#include "usart.h"
+
+int main(void)
+{
+	// Variable declations
+	uint16 adcRawData = 0;
+	uint8 buffer[5];
+	int16 temperature = 0;
+	uint8 aux = 0;
+
+	// USART configuration
+	usartInit(USART_MODE_ASYNCHRONOUS, USART_BAUD_9600, USART_DATA_BITS_8, USART_PARITY_NONE, USART_STOP_BIT_SINGLE);
+	usartEnableReceiver();
+	usartEnableTransmitter();
+	usartStdio();
+	printf("Teste da USART\r\r");
+
+	// SPI configuration
+	spiMasterInit(SPI_PRESCALER_4, SPI_MODE_0, SPI_MSB_FIRST);
+	setBit(SPI_DDR, SPI_SS);
+
+	// Enables Global Interrupts
+	sei();
+
+	// TWI configuration
+	twiMasterInit(10000);
+
+	// OWI configuration
+    owi_t ow;
+    owiDevice_t owDevice[2];
+    owiSetPort(&ow, &DDRB, &PORTB, &PINB, PB0);
+    if(!owiDetectPresence(&ow)) {
+	    owiSearchRom(&ow, &owDevice[0]);
+    }
+    if(!owiDetectPresence(&ow)) {
+	    owiSearchRom(&ow, &owDevice[1]);
+    }
+
+	// Main loop
+	while(1) {
+		clrBit(SPI_PORT, SPI_SS);
+		adcRawData = (uint16)spiMasterSendReceiveData(0x00);
+		adcRawData &= 0x001F;
+		adcRawData <<= 8;
+		adcRawData |= (uint16)spiMasterSendReceiveData(0x00);
+		adcRawData >>= 1;
+		setBit(SPI_PORT, SPI_SS);
+		buffer[0] = 0;
+
+//		if(owiDetectPresence(&ow)) {
+//			continue;
+//		}
+		aux= !aux;
+		owiMatchRom(&ow, &owDevice[aux]);
+		owiSendByte(&ow, 0x44);
+		owiSendByte(&ow, 0x44);
+		while(!owiReadBit(&ow));
+//		if(owiDetectPresence(&ow)) {
+//			continue;
+//		}
+		owiMatchRom(&ow, &owDevice[aux]);
+		owiSendByte(&ow, 0xBE);
+		temperature = owiReceiveByte(&ow);
+		temperature |= (owiReceiveByte(&ow) << 8);
+		twiMasterSendData(0x68, TWI_MASTER_WRITE, buffer, 1);
+		twiMasterSendData(0x68, TWI_MASTER_READ, buffer, 1);
+		printf("adc = %d\r", adcRawData);
+		printf("sec = %02x\r", buffer[0]);
+		printf("temp = %d\r\r", (temperature >> 4));
+		_delay_ms(1000);
+	}
+
+	return 0;
+}

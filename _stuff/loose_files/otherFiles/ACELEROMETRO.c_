@@ -1,0 +1,33 @@
+// -----------------------------------------------------------------------------
+// Arquivo:			ACELEROMETRO.c
+// Modulo:			Acelerômetro
+// Autores:			Leandro Schwarz
+//					Mayara de Sousa
+// Versão:			1.5
+// Modificado em:	15/02/2012
+// Observações:		Para utilizar, é necessário alterar os valor das constantes
+//					ACEL_S0, ACEL_S1, ACEL_SLEEP, ACEL_CONTROLE	PORTx, definidas 
+//					no arquivo ACELEROMETRO.h
+// -----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+// Arquivos necessários --------------------------------------------------------
+
+#include <avr/io.h>
+#include "ACELEROMETRO.h"
+
+
+
+
+				
+// -----------------------------------------------------------------------------
+// Função:		ACEL_inicia
+// Argumentos:	Nenhum
+// Retono:		Nenhum
+// Objetivo:	Começa a ler os eixos do acelerômetro
+// -----------------------------------------------------------------------------
+
+void ACEL_inicia()
+{
+	
+}

@@ -1,0 +1,864 @@
+/* =============================================================================
+ * Project:		GPSDE++ AVR Library
+ * File name:	packageApi.cpp
+ * Module:		API package parser for GPDSE++ AVR Library project
+ * Author:		Leandro Schwarz
+ * Build:		__BUILD_MACRO_TO_BE_CHANGED__
+ * Date:		__DATE_MACRO_TO_BE_CHANGED__
+ * ========================================================================== */
+
+// =============================================================================
+// System file dependencies
+// =============================================================================
+
+#include <packageApi.hpp>
+#if __PACKAGE_API_HPP != __BUILD_MACRO_TO_BE_CHANGED__
+#	error [packageApi.cpp] Build mismatch on header and source code files.
+#endif
+
+// =============================================================================
+// File exclusive - Constants
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// File exclusive - New data types
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// File exclusive - Macro-functions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Global variables
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Static functions declarations
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Class constructors
+// =============================================================================
+
+PackageApi::PackageApi(uint8_t payloadMaxSize, bool useEscapeChar)
+{
+	// Reset data members - General information
+	this->_initialized = false;
+	this->_lastError = ERROR_NOT_INITIALIZED;
+	this->_payloadMaxSize = 0;
+	this->_rawMaxSize = 0;
+	// Reset data members - Start delimiter and escape options
+	this->_configEscapeCharacter = 0x7D;
+	this->_configEscapeCharData = NULL;
+	this->_configEscapeCharSize = 0;
+	this->_configEscapeEnabled = false;
+	this->_configEscapeXorDecoded = 0x20;
+	this->_configStartDelimiter = 0x7E;
+	// Reset data members - Ingoing package data
+	this->_rxRawChecksum = 0xFF;
+	this->_rxRawData = NULL;
+	this->_rxRawEscape = false;
+	this->_rxRawIndex = 0;
+	this->_rxRawReady = false;
+	this->_rxRawSize = 0;
+	this->_rxRawState = STATE_START_DELIMITER;
+	this->_rxDecodedAuxData = 0;
+	this->_rxDecodedDestAddress = 0;
+	this->_rxDecodedId = 0;
+	this->_txDecodedIdAutoIncrement = false;
+	this->_rxDecodedPayloadData = NULL;
+	this->_rxDecodedPayloadIndex = 0;
+	this->_rxDecodedPayloadSize = 0;
+	this->_rxDecodedSourAddress = 0;
+	// Reset data members - Outgoing package data
+	this->_txRawData = NULL;
+	this->_txRawIndex = 0;
+	this->_txRawSize = 0;
+	this->_txDecodedDestAddress = 0;
+	this->_txDecodedId = 0;
+	this->_txDecodedPayloadData = NULL;
+	this->_txDecodedPayloadIndex = 0;
+	this->_txDecodedPayloadSize = 0;
+	this->_txDecodedSourAddress = 0;
+
+	// Check for errors
+	if (payloadMaxSize == 0) {
+		this->_lastError = ERROR_BUFFER_SIZE_ZERO;
+		return;
+	}
+	if (payloadMaxSize < 2) {
+		this->_lastError = ERROR_BUFFER_SIZE_TOO_SMALL;
+		return;
+	}
+
+	// Update data members
+	this->_configEscapeEnabled = useEscapeChar;
+	this->_payloadMaxSize = payloadMaxSize;
+	this->_rawMaxSize = 5 + (uint16_t)this->_payloadMaxSize;	// (ID+DA+SA+SZ+CH)+PL
+	if (useEscapeChar) {
+		this->_rawMaxSize *= 2;									// Double for escapes
+	}
+	this->_rawMaxSize++;										// Add START
+
+	// Memory allocation
+	// Raw Rx Data
+	this->_rxRawData = (uint8_t *)calloc(this->_rawMaxSize, sizeof(uint8_t));
+	if (this->_rxRawData == NULL) {					// ERROR
+		this->_lastError = ERROR_MEMORY_ALLOCATION;
+		return;
+	}
+	// Raw Tx Data
+	this->_txRawData = (uint8_t *)calloc(this->_rawMaxSize, sizeof(uint8_t));
+	if (this->_txRawData == NULL) {					// ERROR
+		free(this->_rxRawData);
+		this->_lastError = ERROR_MEMORY_ALLOCATION;
+		return;
+	}
+	// Decoded Rx Data
+	this->_rxDecodedPayloadData = (uint8_t *)calloc(this->_payloadMaxSize, sizeof(uint8_t));
+	if (this->_rxDecodedPayloadData == NULL) {		// ERROR
+		free(this->_rxRawData);
+		free(this->_txRawData);
+		this->_lastError = ERROR_MEMORY_ALLOCATION;
+		return;
+	}
+	// Decoded Tx Data
+	this->_txDecodedPayloadData = (uint8_t *)calloc(this->_payloadMaxSize, sizeof(uint8_t));
+	if (this->_txDecodedPayloadData == NULL) {		// ERROR
+		free(this->_rxRawData);
+		free(this->_txRawData);
+		free(this->_rxDecodedPayloadData);
+		this->_lastError = ERROR_MEMORY_ALLOCATION;
+		return;
+	}
+	this->_initialized = true;
+
+	this->_lastError = ERROR_NONE;
+	return;
+}
+
+// =============================================================================
+// Class public methods
+// =============================================================================
+
+//////////////////////////////////   CONFIG   //////////////////////////////////
+
+bool PackageApi::configCharSet(uint8_t startDelimiter)
+{
+	// Check for errors
+	if (!this->_checkInitialized()) {
+		return false;
+	}
+	if (this->_configEscapeEnabled) {
+		this->_lastError = ERROR_ARGUMENTS_WRONG_NUMBER;
+		return false;
+	}
+
+	// Free _configEscapeCharData memory
+	if (this->_configEscapeCharData != NULL) {
+		free(this->_configEscapeCharData);
+		this->_configEscapeCharData = NULL;
+	}
+
+	// Update data members
+	this->_configEscapeCharacter = 0x00;
+	this->_configEscapeXorDecoded = 0;
+	this->_configEscapeCharSize = 0;
+	this->_configStartDelimiter = startDelimiter;
+
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+bool PackageApi::configCharSet(uint8_t startDelimiter, uint8_t escapeChar, uint8_t escapeXor)
+{
+	// Check for errors
+	if (!this->_checkInitialized()) {
+		return false;
+	}
+	if (!this->_configEscapeEnabled) {
+		this->_lastError = ERROR_ARGUMENTS_WRONG_NUMBER;
+		return false;
+	}
+
+	// Free _configEscapeCharData memory
+	if (this->_configEscapeCharData != NULL) {
+		free(this->_configEscapeCharData);
+		this->_configEscapeCharData = NULL;
+	}
+	this->_configEscapeCharSize = 0;
+
+	// Memory allocation
+	this->_configEscapeCharData = (uint8_t *)calloc(2, sizeof(uint8_t));
+	if (this->_configEscapeCharData == NULL) {
+		this->_lastError = ERROR_MEMORY_ALLOCATION;
+		return false;
+	}
+	this->_configEscapeCharData[0] = startDelimiter;
+	this->_configEscapeCharData[1] = escapeChar;
+
+	// Update data members
+	this->_configEscapeCharSize = 2;
+	this->_configEscapeXorDecoded = escapeXor;
+	this->_configEscapeCharacter = escapeChar;
+	this->_configStartDelimiter = startDelimiter;
+
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+bool PackageApi::configCharSet(uint8_t startDelimiter, uint8_t escapeChar, uint8_t escapeXor, uint8_t *othersChars,
+							   uint8_t othersSize)
+{
+	// Check for errors
+	if (!this->_checkInitialized()) {
+		return false;
+	}
+	if (!this->_configEscapeEnabled) {
+		this->_lastError = ERROR_ARGUMENTS_WRONG_NUMBER;
+		return false;
+	}
+	if (othersChars == NULL) {
+		this->_lastError = ERROR_BUFFER_POINTER_NULL;
+		return false;
+	}
+	if (othersSize == 0) {
+		this->_lastError = ERROR_BUFFER_SIZE_ZERO;
+		return false;
+	}
+	if (othersSize > 30) {
+		this->_lastError = ERROR_BUFFER_SIZE_TOO_LARGE;
+		return false;
+	}
+
+	// Free _configEscapeCharData memory
+	if (this->_configEscapeCharData != NULL) {
+		free(this->_configEscapeCharData);
+		this->_configEscapeCharData = NULL;
+	}
+	this->_configEscapeCharSize = 0;
+
+	// Memory allocation
+	this->_configEscapeCharData = (uint8_t *)calloc((othersSize + 2), sizeof(uint8_t));
+	if (this->_configEscapeCharData == NULL) {
+		this->_lastError = ERROR_MEMORY_ALLOCATION;
+		return false;
+	}
+	this->_configEscapeCharData[0] = startDelimiter;
+	this->_configEscapeCharData[1] = escapeChar;
+	for (uint8_t i = 0; i < othersSize; i++) {
+		this->_configEscapeCharData[i + 2] = othersChars[i];
+	}
+
+	// Update data members
+	this->_configEscapeCharSize = (othersSize + 2);
+	this->_configEscapeXorDecoded = escapeXor;
+	this->_configEscapeCharacter = escapeChar;
+	this->_configStartDelimiter = startDelimiter;
+
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+error_e PackageApi::getLastError(void)
+{
+	return this->_lastError;
+}
+
+////////////////////////////////////   RX   ////////////////////////////////////
+
+bool PackageApi::rxAddData(uint8_t data)
+{
+	// Check for errors
+	if (!this->_checkInitialized()) {
+		return false;
+	}
+	if (this->_rxRawReady) {
+		this->_lastError = ERROR_PACKAGE_AWAITING;
+		return false;
+	}
+	if (this->_rxRawState == STATE_READY) {
+		this->_lastError = ERROR_PACKAGE_AWAITING;
+		return false;
+	}
+
+	// Update auxData
+	this->_rxDecodedAuxData = data;
+
+	// Process escape character
+	if (!this->_rxProcessEscapeCharacter()) {		// Could be an error, checking...
+		if (this->_lastError == ERROR_NONE) {		// Not an error, return successful
+			return true;
+		} else {									// It is a really an error
+			return false;
+		}
+	} // No error detected, continuing process
+
+	// Check frame format
+	if (!this->_rxProcessFrameFormat()) {					// Frame error
+		return false;
+	}
+
+	// Put data in raw package
+	if (!this->_rxProcessRawAddData()) {
+		return false;
+	}
+
+	// Evaluates states machine next state
+	return this->_rxProcessNextState();
+}
+
+void PackageApi::rxFreePackage(void)
+{
+	this->_rxRawReady = false;
+	this->_rxResetPackage();
+}
+
+bool PackageApi::rxGetDestinationAddress(uint8_t *destAddress)
+{
+	// Check for errors
+	if (!this->_checkInitialized()) {
+		return false;
+	}
+	if (destAddress == NULL) {
+		this->_lastError = ERROR_BUFFER_POINTER_NULL;
+		return false;
+	}
+
+	*destAddress = this->_rxDecodedDestAddress;
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+bool PackageApi::rxGetId(uint8_t *id)
+{
+	// Check for errors
+	if (!this->_checkInitialized()) {
+		return false;
+	}
+	if (id == NULL) {
+		this->_lastError = ERROR_BUFFER_POINTER_NULL;
+		return false;
+	}
+
+	*id = this->_rxDecodedId;
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+bool PackageApi::rxGetPayload(uint8_t *payloadData, uint8_t *payloadSize, uint8_t maxChars)
+{
+	// Check for errors
+	if (!this->_checkInitialized()) {
+		return false;
+	}
+	if ((payloadData == NULL) || (payloadSize == NULL)) {
+		this->_lastError = ERROR_BUFFER_POINTER_NULL;
+		return false;
+	}
+
+	// Retrieve payload size
+	*payloadSize = this->_rxDecodedPayloadSize;
+
+	// Retrieve payload data
+	for (uint8_t i = 0; i < this->_rxDecodedPayloadSize; i++) {
+		if (i == maxChars) {
+			this->_lastError = ERROR_BUFFER_FULL;
+			return false;
+		}
+		payloadData[i] = this->_rxDecodedPayloadData[i];
+	}
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+bool PackageApi::rxGetSourceAddress(uint8_t *sourAddress)
+{
+	// Check for errors
+	if (!this->_checkInitialized()) {
+		return false;
+	}
+	if (sourAddress == NULL) {
+		this->_lastError = ERROR_BUFFER_POINTER_NULL;
+		return false;
+	}
+
+	*sourAddress = this->_rxDecodedSourAddress;
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+bool PackageApi::rxIsReady(void)
+{
+	return this->_rxRawReady;
+}
+
+////////////////////////////////////   TX   ////////////////////////////////////
+
+bool PackageApi::txCreatePackage(uint8_t *packageData, uint16_t *packageSize, uint16_t maxChars)
+{
+#if (GPDSE_DEBUG_MODULE_ALL == 1) || (GPDSE_DEBUG_MODULE_PACKAGE_API == 1)
+	uint8_t debBuf[30];
+	debModule_e debModule = DEB_MOD_PACKAGE_API;
+	debFunctionId_e debFunctionId = DEB_FUN_PACKAGE_API_TX_CREATE_PACKAGE;
+	debugPackageApi(1);
+#endif
+
+	// Check for errors
+	if (!this->_checkInitialized()) {
+#if (GPDSE_DEBUG_MODULE_ALL == 1) || (GPDSE_DEBUG_MODULE_PACKAGE_API == 1)
+		debugPackageApi(2);
+#endif
+		return false;
+	}
+	if ((packageData == NULL) || (packageSize == NULL)) {
+		this->_lastError = ERROR_BUFFER_POINTER_NULL;
+#if (GPDSE_DEBUG_MODULE_ALL == 1) || (GPDSE_DEBUG_MODULE_PACKAGE_API == 1)
+		debugPackageApi(3);
+#endif
+		return false;
+	}
+
+	// Reset Raw Tx data members
+	this->_txRawIndex = 0;
+	this->_txRawSize = 0;
+
+	// Encode raw package
+	if (!this->_txEncodePackage()) {
+#if (GPDSE_DEBUG_MODULE_ALL == 1) || (GPDSE_DEBUG_MODULE_PACKAGE_API == 1)
+		debugPackageApi(4);
+#endif
+		return false;
+	}
+
+
+	// Transfer data
+	for (uint16_t i = 0; i < this->_txRawSize; i++) {
+
+		if (i == maxChars) {
+			this->_lastError = ERROR_BUFFER_FULL;
+#if (GPDSE_DEBUG_MODULE_ALL == 1) || (GPDSE_DEBUG_MODULE_PACKAGE_API == 1)
+			debugPackageApi(5);
+#endif
+			return false;
+		}
+		packageData[i] = this->_txRawData[i];
+	}
+	*packageSize = this->_txRawSize;
+
+	this->_lastError = ERROR_NONE;
+#if (GPDSE_DEBUG_MODULE_ALL == 1) || (GPDSE_DEBUG_MODULE_PACKAGE_API == 1)
+	debugPackageApi(6);
+#endif
+	return true;
+}
+
+bool PackageApi::txSetDestinationAddress(uint8_t destAddress)
+{
+	// Check for errors
+	if (!this->_checkInitialized()) {
+		return false;
+	}
+
+	this->_txDecodedDestAddress = destAddress;
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+bool PackageApi::txSetId(uint8_t id, bool autoIncrement)
+{
+	// Check for errors
+	if (!this->_checkInitialized()) {
+		return false;
+	}
+
+	this->_txDecodedId = id;
+	this->_txDecodedIdAutoIncrement = autoIncrement;
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+bool PackageApi::txSetPayload(uint8_t *payload, uint8_t size)
+{
+	// Check for errors
+	if (!this->_checkInitialized()) {
+		return false;
+	}
+	if (size == 0) {
+		this->_lastError = ERROR_BUFFER_SIZE_ZERO;
+		return false;
+	}
+	if (size < 6) {
+		this->_lastError = ERROR_BUFFER_SIZE_TOO_SMALL;
+		return false;
+	}
+	if (size > this->_payloadMaxSize) {
+		this->_lastError = ERROR_BUFFER_SIZE_TOO_LARGE;
+		return false;
+	}
+	if (payload == NULL) {
+		this->_lastError = ERROR_BUFFER_POINTER_NULL;
+		return false;
+	}
+
+	this->_txDecodedPayloadSize = size;
+	for (uint8_t i = 0; i < size; i++) {
+		this->_txDecodedPayloadData[i] = payload[i];
+	}
+
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+bool PackageApi::txSetSourceAddress(uint8_t sourAddress)
+{
+	// Check for errors
+	if (!this->_checkInitialized()) {
+		return false;
+	}
+
+	this->_txDecodedSourAddress = sourAddress;
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+// =============================================================================
+// Class private methods
+// =============================================================================
+
+bool PackageApi::_checkInitialized(void)
+{
+	if (!this->_initialized) {
+		this->_lastError = ERROR_NOT_INITIALIZED;
+		return false;
+	}
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+bool PackageApi::_rxProcessEscapeCharacter(void)
+{
+	// Escape character is not in use!
+	if (!this->_configEscapeEnabled) {
+		this->_lastError = ERROR_NONE;
+		return true;
+	}
+
+	// Escape character found!
+	if (this->_rxDecodedAuxData == this->_configEscapeCharacter) {
+		// Check for error
+		if (this->_rxRawEscape) {
+			// Last character was an escape!
+			this->_lastError = ERROR_FRAME_ERROR;
+			this->_rxResetPackage();
+			return false;
+		} else {
+			// Mark as escape character
+			this->_rxRawEscape = true;
+			this->_rxProcessRawAddData();
+			// Procedure was successful but, must indicate that the
+			// function should end, because no next state must be
+			// evaluated and no further data must be added to buffers
+			// So, ERROR_NONE and false must be checked at caller function
+			this->_lastError = ERROR_NONE;
+			return false;
+		}
+	}
+
+	// Checks for misplaced start delimiter
+	if (this->_rxDecodedAuxData == this->_configStartDelimiter) {
+		if (this->_rxRawState != STATE_START_DELIMITER) {
+			// Start delimiter must not happen outside STATE_START_DELIMITER
+			this->_lastError = ERROR_FRAME_ERROR;
+			this->_rxResetPackage();
+			return false;
+		}
+	}
+
+	// Normal character found!
+	if (this->_rxRawEscape) {			// It must be escaped?
+		this->_rxDecodedAuxData ^= this->_configEscapeXorDecoded;
+		this->_rxRawEscape = false;
+	}
+
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+bool PackageApi::_rxProcessFrameFormat(void)
+{
+	switch (this->_rxRawState) {
+	case STATE_START_DELIMITER:
+		if (this->_rxDecodedAuxData != this->_configStartDelimiter) {
+			this->_lastError = ERROR_FRAME_ERROR;
+			this->_rxResetPackage();
+			return false;
+		}
+		break;
+	case STATE_PAYLOAD_SIZE:
+		if (this->_rxDecodedAuxData == 0) {
+			this->_lastError = ERROR_FRAME_ERROR;
+			this->_rxResetPackage();
+			return false;
+		}
+		break;
+	case STATE_PAYLOAD_DATA:
+		if ((this->_rxDecodedPayloadIndex + 1) == this->_payloadMaxSize) {
+			this->_rxResetPackage();
+			this->_lastError = ERROR_BUFFER_FULL;
+			return false;
+		}
+		break;
+	case STATE_CHECKSUM:
+		if (this->_rxDecodedAuxData != this->_rxRawChecksum) {	// Checksum error
+			this->_rxResetPackage();
+			this->_lastError = ERROR_CHECKSUM_ERROR;
+			return false;
+		}
+	default:
+		break;
+	}
+
+	// Everything OK
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+bool PackageApi::_rxProcessNextState(void)
+{
+	if (this->_rxRawEscape) {
+		return true;
+	}
+
+	switch (this->_rxRawState) {
+	case STATE_START_DELIMITER:
+		this->_rxRawChecksum = 0xFF;
+		this->_rxRawState++;
+		break;
+	case STATE_ID:
+		this->_rxDecodedId = this->_rxDecodedAuxData;
+		this->_rxRawChecksum -= this->_rxDecodedAuxData;
+		this->_rxRawState++;
+		break;
+	case STATE_DESTINATION_ADDRESS:
+		this->_rxDecodedDestAddress = this->_rxDecodedAuxData;
+		this->_rxRawChecksum -= this->_rxDecodedAuxData;
+		this->_rxRawState++;
+		break;
+	case STATE_SOURCE_ADDRESS:
+		this->_rxDecodedSourAddress = this->_rxDecodedAuxData;
+		this->_rxRawChecksum -= this->_rxDecodedAuxData;
+		this->_rxRawState++;
+		break;
+	case STATE_PAYLOAD_SIZE:
+		this->_rxDecodedPayloadIndex = 0;
+		this->_rxDecodedPayloadSize = this->_rxDecodedAuxData;
+		this->_rxRawChecksum -= this->_rxDecodedAuxData;
+		this->_rxRawState++;
+		break;
+	case STATE_PAYLOAD_DATA:
+		this->_rxDecodedPayloadData[this->_rxDecodedPayloadIndex++] = this->_rxDecodedAuxData;
+		this->_rxRawChecksum -= this->_rxDecodedAuxData;
+		if (this->_rxDecodedPayloadIndex == this->_rxDecodedPayloadSize) {
+			this->_rxRawState++;
+		}
+		break;
+	case STATE_CHECKSUM:
+		this->_rxRawReady = true;
+		this->_rxRawSize = this->_rxRawIndex;
+		this->_rxRawState = STATE_READY;
+		break;
+	default:
+		// Unreachable code area
+		this->_lastError = ERROR_UNKNOWN;
+		this->_rxResetPackage();
+		return false;
+	}
+
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+bool PackageApi::_rxProcessRawAddData(void)
+{
+	if ((this->_rxRawIndex + 1) == this->_rawMaxSize) {
+		this->_lastError = ERROR_BUFFER_FULL;
+		this->_rxResetPackage();
+		return false;
+	}
+	this->_rxRawData[this->_rxRawIndex++] = this->_rxDecodedAuxData;
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+void PackageApi::_rxResetPackage(void)
+{
+	_rxDecodedPayloadSize = 0;
+	_rxDecodedPayloadIndex = 0;
+	_rxRawChecksum = 0xFF;
+	_rxRawSize = 0;
+	_rxRawIndex = 0;
+	_rxRawReady = false;
+	_rxRawState = STATE_START_DELIMITER;
+	_rxRawEscape = false;
+}
+
+bool PackageApi::_txAddData(uint8_t data)
+{
+	// Check for errors - Package size
+	if ((this->_txRawIndex + 2) >= this->_rawMaxSize) {
+		this->_lastError = ERROR_BUFFER_FULL;
+		return false;
+	}
+
+	// Escape characters DISABLED
+	if (!this->_configEscapeEnabled) {
+		this->_txRawData[this->_txRawIndex++] = data;
+		this->_lastError = ERROR_NONE;
+		return true;
+	}
+
+	// Escape characters is ENABLED
+	for (uint8_t i = 0; i < this->_configEscapeCharSize; i++) {
+		if (data == this->_configEscapeCharData[i]) {
+			this->_txRawData[this->_txRawIndex++] = this->_configEscapeCharacter;
+			this->_txRawData[this->_txRawIndex++] = data ^ this->_configEscapeXorDecoded;
+			this->_lastError = ERROR_NONE;
+			return true;
+		}
+	}
+	this->_txRawData[this->_txRawIndex++] = data;
+	this->_lastError = ERROR_NONE;
+	return true;
+}
+
+bool PackageApi::_txEncodePackage(void)
+{
+	uint8_t checksum = 0xFF;
+#if (GPDSE_DEBUG_MODULE_ALL == 1) || (GPDSE_DEBUG_MODULE_PACKAGE_API == 1)
+	uint8_t debBuf[30];
+	debModule_e debModule = DEB_MOD_PACKAGE_API;
+	debFunctionId_e debFunctionId = DEB_FUN_PACKAGE_API_TX_ENCODE_PACKAGE;
+	debugPackageApi(1);
+#endif
+
+	// Check for errors - Not initialized
+	if (!this->_checkInitialized()) {
+#if (GPDSE_DEBUG_MODULE_ALL == 1) || (GPDSE_DEBUG_MODULE_PACKAGE_API == 1)
+		debugPackageApi(2);
+#endif
+		return false;
+	}
+	// Check for errors - Zero payload size
+	if (this->_txDecodedPayloadSize == 0) {
+		this->_lastError = ERROR_BUFFER_SIZE_ZERO;
+#if (GPDSE_DEBUG_MODULE_ALL == 1) || (GPDSE_DEBUG_MODULE_PACKAGE_API == 1)
+		debugPackageApi(3);
+#endif
+		return false;
+	}
+
+	// Update data members
+	this->_txRawSize = 0;
+	this->_txRawIndex = 0;
+	this->_txDecodedPayloadIndex = 0;
+
+	// Create raw package
+	// Start delimiter
+	this->_txRawData[this->_txRawIndex++] = this->_configStartDelimiter;
+	checksum = 0xFF;
+
+	// Package ID
+	if (!this->_txAddData(this->_txDecodedId)) {
+#if (GPDSE_DEBUG_MODULE_ALL == 1) || (GPDSE_DEBUG_MODULE_PACKAGE_API == 1)
+		debugPackageApi(4);
+#endif
+		return false;
+	}
+	checksum -= this->_txDecodedId;
+	if (this->_txDecodedIdAutoIncrement) {
+		this->_txDecodedId = (this->_txDecodedId == 255) ? 1 : (this->_txDecodedId + 1);
+	}
+
+	// Destination address
+	if (!this->_txAddData(this->_txDecodedDestAddress)) {
+#if (GPDSE_DEBUG_MODULE_ALL == 1) || (GPDSE_DEBUG_MODULE_PACKAGE_API == 1)
+		debugPackageApi(5);
+#endif
+		return false;
+	}
+	checksum -= this->_txDecodedDestAddress;
+
+	// Source address
+	if (!this->_txAddData(this->_txDecodedSourAddress)) {
+#if (GPDSE_DEBUG_MODULE_ALL == 1) || (GPDSE_DEBUG_MODULE_PACKAGE_API == 1)
+		debugPackageApi(6);
+#endif
+		return false;
+	}
+	checksum -= this->_txDecodedSourAddress;
+
+	// Payload size
+	if (!this->_txAddData(this->_txDecodedPayloadSize)) {
+#if (GPDSE_DEBUG_MODULE_ALL == 1) || (GPDSE_DEBUG_MODULE_PACKAGE_API == 1)
+		debugPackageApi(7);
+#endif
+		return false;
+	}
+	checksum -= this->_txDecodedPayloadSize;
+
+	// Payload data
+	for (uint8_t i = 0; i < this->_txDecodedPayloadSize; i++) {
+		if (!this->_txAddData(this->_txDecodedPayloadData[i])) {
+#if (GPDSE_DEBUG_MODULE_ALL == 1) || (GPDSE_DEBUG_MODULE_PACKAGE_API == 1)
+			debugPackageApi(8);
+#endif
+			return false;
+		}
+		checksum -= this->_txDecodedPayloadData[i];
+	}
+
+	// Checksum
+	if (!this->_txAddData(checksum)) {
+#if (GPDSE_DEBUG_MODULE_ALL == 1) || (GPDSE_DEBUG_MODULE_PACKAGE_API == 1)
+		debugPackageApi(9);
+#endif
+		return false;
+	}
+
+	// Final package flags setup
+	this->_txRawSize = this->_txRawIndex;
+	this->_lastError = ERROR_NONE;
+#if (GPDSE_DEBUG_MODULE_ALL == 1) || (GPDSE_DEBUG_MODULE_PACKAGE_API == 1)
+	debugPackageApi(10);
+#endif
+	return true;
+}
+
+// =============================================================================
+// Class protected methods
+// =============================================================================
+
+/* NONE */
+
+// =============================================================================
+// General public functions definitions
+// =============================================================================
+
+/* NONE */
+
+// =============================================================================
+// Public functions definitions
+// =============================================================================
+
+/* NONE */

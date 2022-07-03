@@ -1,0 +1,34 @@
+/* -----------------------------------------------------------------------------
+ * Project:			GPDSE AVR8 Integrated Library
+ * File:			sevenSegments.h
+ * Module:			Seven segments display interface
+ * Author:			Leandro Schwarz
+ * Version:			1.1
+ * Last edition:	2015-12-10
+ * -------------------------------------------------------------------------- */
+
+#ifndef __SEVEN_SEGMENTS_H
+#define __SEVEN_SEGMENTS_H 11
+
+// -----------------------------------------------------------------------------
+// Header files ----------------------------------------------------------------
+
+#include "..\global_defines.h"
+#if __GLOBAL_DEFINES_H < 120
+	#error Error 100 - The defintion file is outdated (global_defines must be version 12.0 or greater).
+#endif
+
+// -----------------------------------------------------------------------------
+// New data types --------------------------------------------------------------
+
+typedef enum displayType_t{
+	DISPLAY_COMMON_ANODE	= 0,
+	DISPLAY_COMMON_CATHODE
+} displayType_t;
+
+// -----------------------------------------------------------------------------
+// Functions declarations ------------------------------------------------------
+
+uint8 hex2SevenSegments(uint8 hexValue, displayType_t displayType);
+
+#endif

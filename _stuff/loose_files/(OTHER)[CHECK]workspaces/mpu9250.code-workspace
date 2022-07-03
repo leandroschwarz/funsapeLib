@@ -1,0 +1,24 @@
+{
+    "folders": [
+        {
+            "name": "Project files",
+            "path": "."
+        }
+    ],
+    "settings": {
+        "cSpell.showAutocompleteSuggestions": true,
+        "C_Cpp.default.configurationProvider": "",
+        "files.exclude": {
+            "_hide/": true,
+            ".mxproject": true,
+            ".vscode/": false,
+            "*.code-workspace": true,
+            "*.ioc": false,
+            "*.pdsprj": true,
+            "*.pdsprj*workspace": true,
+            "build/": false,
+            "startup_stm32f*.s": true,
+            "STM32F*_FLASH.ld": true
+        },
+    }
+}

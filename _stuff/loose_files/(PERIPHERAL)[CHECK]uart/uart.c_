@@ -1,0 +1,46 @@
+#include "uart.h"
+
+void uartInit()
+{
+	UCSR0B = (1 << RXEN0) | (1 << TXEN0);
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
+
+	UBRR0 = (F_CPU / (16*UART_BAUD)) - 1;
+}
+
+void uartTransmit(char byte)
+{
+	while(!(UCSR0A & (1 << UDRE0)));
+	UDR0 = byte;
+}
+
+void uartPrint(char* msg, unsigned char length)
+{
+	while(length--) {
+		while(!(UCSR0A & (1 << UDRE0)));
+		UDR0 = *(msg++);
+	}
+}
+
+void uartPrints(char* msg)
+{
+	while((*msg) != 0) {
+		while(!(UCSR0A & (1 << UDRE0)));
+		UDR0 = *(msg++);
+	}
+}
+
+char uartReceive()
+{
+	while(!(UCSR0A & (1 << RXC0)));
+	return UDR0;
+}
+
+void uartGets(char* msg, unsigned char length)
+{
+	while(length--) {
+		while(!(UCSR0A & (1 << RXC0)));
+		*(msg++) = UDR0;
+	}
+}
+

@@ -1,0 +1,45 @@
+Differences:
+
+================================================================================
+MAX30101
+================================================================================
+
+Has 4 led current registers
+register 0x0C - LED1_PA[7:0]			Red
+register 0x0D - LED2_PA[7:0]			IR
+register 0x0E - LED3_PA[7:0]			Green 1
+register 0x0F - LED4_PA[7:0]			Green 2
+
+================================================================================
+MAX30102
+================================================================================
+
+Has 2 led current registers
+register 0x0C - LED1_PA[7:0]			Red
+register 0x0D - LED2_PA[7:0]			IR
+
+================================================================================
+MAX30105
+================================================================================
+
+Has one more interrupt (proximity threshold interrupt)
+
+Has 3 led current registers + pilot register
+register 0x0C - LED1_PA[7:0]			Red
+register 0x0D - LED2_PA[7:0]			IR
+register 0x0E - LED3_PA[7:0]			Green
+register 0x10 - PILOT_PA[7:0]			Pilot
+
+Has proximity threshold register
+register 0x30 - PROX_INT_THRESH[7:0]
+
+Bits	| 30101				| 30102				| 30105
+----------------------------------------------------------------
+000		| (Off)				| (Off)				| (Off)
+001		| (RED) LED1		| (RED) LED1		| (RED) LED1
+010		| (IR) LED2			| (IR) LED2			| (IR) LED2
+011		| (GREEN) LED3/4	| (Off)				| (GREEN) LED3
+100		| (Off)				| (Off)				| (Off)
+101		| RES				| RES				| (RED) PILOT
+110		| RES				| RES				| (IR) PILOT
+111		| RES				| RES				| (GREEN) P

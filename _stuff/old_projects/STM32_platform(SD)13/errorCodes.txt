@@ -1,0 +1,27 @@
+
+
+User project configuration errors
+
+#error		Error 1 - System frequency is too high.
+
+#warning	Verify your selection in "Microcontroller Selection" section!
+#error		Error 2 - No device selected.
+
+#warning	Verify your selection in "Microcontroller Selection" section!
+#error		Error 3 - More than one device are selected!
+
+#warning	The file must be outdated or corrupted!
+#error		Error 4 - The selected microcontroller is not supported!
+
+#warning	Verify your choices in "Debug Configuration" section!
+#error		Error 5 - Debug is enabled, but no output method is selected!
+
+
+
+[errorCode.txt] Error 100 - globalDefines.h - wrong build (globalDefines must be build __BUILD__).
+[errorCode.txt] Error 100 - globalDefines.h - wrong version (globalDefines must be version 13.0).
+[errorCode.txt] Error 101 - Build mismatch on header and source code files (__FILE_NAME__).
+[errorCode.txt] Error 101 - Version mismatch on header and source code files (ATmega328).
+[errorCode.txt] Error 102 - EEPROM size is not defined for the selected device.
+[errorCode.txt] Error 103 - EEPROM is not available for the selected device.
+[errorCode.txt] Error 104 - EEPROM is too large to handle.

@@ -1,0 +1,107 @@
+/* -----------------------------------------------------------------------------
+ * Project:     Project Name
+ * File:        fileName.c
+ * Author:      Project Author
+ * Created:		2017-03-16
+ * Modified:	2017-03-16
+ * Version:     1.0
+ * Purpose:     What this project does.
+ * -------------------------------------------------------------------------- */
+
+// -----------------------------------------------------------------------------
+// System definitions ----------------------------------------------------------
+
+#define F_CPU 16000000UL
+
+// -----------------------------------------------------------------------------
+// Header files ----------------------------------------------------------------
+
+#include "globalDefines.h"
+#include "ATMega328.h"
+#include "twiMaster.h"
+#include "usart.h"
+#include "spiMaster.h"
+
+// -----------------------------------------------------------------------------
+// Project definitions ---------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+// New data types --------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+// Function declaration --------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+// Global variables ------------------------------------------------------------
+
+spiMasterDevice_t mcp3201;
+
+// -----------------------------------------------------------------------------
+// Main function ---------------------------------------------------------------
+
+int main(void)
+{
+	// Variable declaration
+	uint8 buffer[10];
+	uint16 xValue, yValue, zValue;
+	uint8 aux8 = 0;
+
+	// Variable initialization
+	mcp3201 = createSpiMasterDevice();
+
+	// USART configuration
+	usartConfig(USART_MODE_ASYNCHRONOUS, USART_BAUD_9600, USART_DATA_BITS_8, USART_PARITY_NONE, USART_STOP_BIT_SINGLE);
+	usartEnableTransmitter();
+	usartStdio();
+	printf("Teste da USART\r\r");
+
+	// Enable Global Interrupts
+	sei();
+
+	// TWI configuration
+// 	twiMasterInit(10000);
+// 	buffer[0] = 0x16;
+// 	buffer[1] = 1;
+// 	twiMasterSendData(0x1D, TWI_MASTER_WRITE, buffer, 2);
+
+	// SPI configuration
+	spiMasterDeviceSetDataOrder(&mcp3201, SPI_MSB_FIRST);
+	spiMasterDeviceSetMode(&mcp3201, SPI_MODE_0);
+	spiMasterDeviceSetPort(&mcp3201, &DDRB, &PORTB, PB2);
+	spiMasterDeviceSetPrescaler(&mcp3201, SPI_PRESCALER_64);
+	spiMasterInit();
+	clrBit(PORTB, PB2);
+	aux8 = spiMasterSendReceiveData(((1 << 6) | 0x16) << 1);
+	buffer[0] = spiMasterSendReceiveData(0x01);
+	setBit(PORTB, PB2);
+
+	while(1){
+		clrBit(PORTB, PB2);
+		aux8 = spiMasterSendReceiveData(0x00 << 1);
+		buffer[0] = spiMasterSendReceiveData(0x00);
+		setBit(PORTB, PB2);
+		clrBit(PORTB, PB2);
+		aux8 = spiMasterSendReceiveData(0x01 << 1);
+		buffer[1] = spiMasterSendReceiveData(0x00);
+		setBit(PORTB, PB2);
+
+
+// 		printf("WHOAMI = %x %x\r", buffer[0], buffer[1]);
+// 		buffer[0] = 0x00;
+// 		twiMasterSendData(0x1D, TWI_MASTER_WRITE, buffer, 1);
+// 		twiMasterSendData(0x1D, TWI_MASTER_READ, buffer, 6);
+  		xValue = (((uint16)buffer[1]) << 8) | (uint16)buffer[0];
+//  		yValue = (((uint16)buffer[3]) << 8) | (uint16)buffer[2];
+//  		zValue = (((uint16)buffer[5]) << 8) | (uint16)buffer[4];
+  		printf("x = %04d ; y = %04d ; z = %04d\r", xValue, yValue, zValue);
+		_delay_ms(100);
+	}
+
+	return 0;
+}
+
+// -----------------------------------------------------------------------------
+// Interruption handlers -------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+// Function definitions --------------------------------------------------------

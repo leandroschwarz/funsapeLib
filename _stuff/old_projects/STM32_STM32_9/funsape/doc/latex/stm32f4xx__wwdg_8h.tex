@@ -1,0 +1,70 @@
+\hypertarget{stm32f4xx__wwdg_8h}{}\section{\+\_\+hide/\+M\+P\+U/\+S\+T\+M32\+F4/stm32f4xx\+\_\+wwdg.h File Reference}
+\label{stm32f4xx__wwdg_8h}\index{\+\_\+hide/\+M\+P\+U/\+S\+T\+M32\+F4/stm32f4xx\+\_\+wwdg.\+h@{\+\_\+hide/\+M\+P\+U/\+S\+T\+M32\+F4/stm32f4xx\+\_\+wwdg.\+h}}
+
+
+This file contains all the functions prototypes for the W\+W\+D\+G firmware library.  
+
+
+{\ttfamily \#include \char`\"{}stm32f4xx.\+h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___w_w_d_g___prescaler_ga55780dcf60a252724f5aae2ca37d91c5}{}\#define {\bfseries W\+W\+D\+G\+\_\+\+Prescaler\+\_\+1}~((uint32\+\_\+t)0x00000000)\label{group___w_w_d_g___prescaler_ga55780dcf60a252724f5aae2ca37d91c5}
+
+\item 
+\hypertarget{group___w_w_d_g___prescaler_ga2ac67d0a7f8691b5ebf0d7d77d6b5f08}{}\#define {\bfseries W\+W\+D\+G\+\_\+\+Prescaler\+\_\+2}~((uint32\+\_\+t)0x00000080)\label{group___w_w_d_g___prescaler_ga2ac67d0a7f8691b5ebf0d7d77d6b5f08}
+
+\item 
+\hypertarget{group___w_w_d_g___prescaler_gab11714e1816967802a8421587e54a2eb}{}\#define {\bfseries W\+W\+D\+G\+\_\+\+Prescaler\+\_\+4}~((uint32\+\_\+t)0x00000100)\label{group___w_w_d_g___prescaler_gab11714e1816967802a8421587e54a2eb}
+
+\item 
+\hypertarget{group___w_w_d_g___prescaler_ga7a4933366603869726bd5ea547d99f02}{}\#define {\bfseries W\+W\+D\+G\+\_\+\+Prescaler\+\_\+8}~((uint32\+\_\+t)0x00000180)\label{group___w_w_d_g___prescaler_ga7a4933366603869726bd5ea547d99f02}
+
+\item 
+\#define {\bfseries I\+S\+\_\+\+W\+W\+D\+G\+\_\+\+P\+R\+E\+S\+C\+A\+L\+E\+R}(P\+R\+E\+S\+C\+A\+L\+E\+R)
+\item 
+\hypertarget{group___w_w_d_g___prescaler_gab6ea714a2380b7d6547ba97363887868}{}\#define {\bfseries I\+S\+\_\+\+W\+W\+D\+G\+\_\+\+W\+I\+N\+D\+O\+W\+\_\+\+V\+A\+L\+U\+E}(V\+A\+L\+U\+E)~((V\+A\+L\+U\+E) $<$= 0x7\+F)\label{group___w_w_d_g___prescaler_gab6ea714a2380b7d6547ba97363887868}
+
+\item 
+\hypertarget{group___w_w_d_g___prescaler_ga4728877128cd60494692d8f14389112e}{}\#define {\bfseries I\+S\+\_\+\+W\+W\+D\+G\+\_\+\+C\+O\+U\+N\+T\+E\+R}(C\+O\+U\+N\+T\+E\+R)~(((C\+O\+U\+N\+T\+E\+R) $>$= 0x40) \&\& ((\+C\+O\+U\+N\+T\+E\+R) $<$= 0x7\+F))\label{group___w_w_d_g___prescaler_ga4728877128cd60494692d8f14389112e}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{group___w_w_d_g_ga7130f4dc861b9234b62e73f9f57f89a1}{W\+W\+D\+G\+\_\+\+De\+Init} (void)
+\begin{DoxyCompactList}\small\item\em Deinitializes the W\+W\+D\+G peripheral registers to their default reset values. \end{DoxyCompactList}\item 
+void \hyperlink{group___w_w_d_g_gafeaa2b52c31ba7baca7eb61d2d42e07b}{W\+W\+D\+G\+\_\+\+Set\+Prescaler} (uint32\+\_\+t W\+W\+D\+G\+\_\+\+Prescaler)
+\begin{DoxyCompactList}\small\item\em Sets the W\+W\+D\+G Prescaler. \end{DoxyCompactList}\item 
+void \hyperlink{group___w_w_d_g_gaf44a7bf8bf6b11b41cd89ff521fdd5a5}{W\+W\+D\+G\+\_\+\+Set\+Window\+Value} (uint8\+\_\+t Window\+Value)
+\begin{DoxyCompactList}\small\item\em Sets the W\+W\+D\+G window value. \end{DoxyCompactList}\item 
+void \hyperlink{group___w_w_d_g_gac8af66ea5254d3d78b60b9b7c7f29521}{W\+W\+D\+G\+\_\+\+Enable\+I\+T} (void)
+\begin{DoxyCompactList}\small\item\em Enables the W\+W\+D\+G Early Wakeup interrupt(\+E\+W\+I). \end{DoxyCompactList}\item 
+void \hyperlink{group___w_w_d_g_ga6e44cc35f133b28b9ad861f459bf8d76}{W\+W\+D\+G\+\_\+\+Set\+Counter} (uint8\+\_\+t Counter)
+\begin{DoxyCompactList}\small\item\em Sets the W\+W\+D\+G counter value. \end{DoxyCompactList}\item 
+void \hyperlink{group___w_w_d_g_ga10dc2554d0b504b5472e3ecf0f02a9e6}{W\+W\+D\+G\+\_\+\+Enable} (uint8\+\_\+t Counter)
+\begin{DoxyCompactList}\small\item\em Enables W\+W\+D\+G and load the counter value. \end{DoxyCompactList}\item 
+Flag\+Status \hyperlink{group___w_w_d_g_ga7df4882d45918b9b8249dfca1e44fabc}{W\+W\+D\+G\+\_\+\+Get\+Flag\+Status} (void)
+\begin{DoxyCompactList}\small\item\em Checks whether the Early Wakeup interrupt flag is set or not. \end{DoxyCompactList}\item 
+void \hyperlink{group___w_w_d_g_gabd2b5a6317c2e1a3ab0795838ce59dd2}{W\+W\+D\+G\+\_\+\+Clear\+Flag} (void)
+\begin{DoxyCompactList}\small\item\em Clears Early Wakeup interrupt flag. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This file contains all the functions prototypes for the W\+W\+D\+G firmware library. 
+
+\begin{DoxyAuthor}{Author}
+M\+C\+D Application Team 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+V1.\+0.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+30-\/\+September-\/2011 
+\end{DoxyDate}
+\begin{DoxyAttention}{Attention}
+
+\end{DoxyAttention}
+T\+H\+E P\+R\+E\+S\+E\+N\+T F\+I\+R\+M\+W\+A\+R\+E W\+H\+I\+C\+H I\+S F\+O\+R G\+U\+I\+D\+A\+N\+C\+E O\+N\+L\+Y A\+I\+M\+S A\+T P\+R\+O\+V\+I\+D\+I\+N\+G C\+U\+S\+T\+O\+M\+E\+R\+S W\+I\+T\+H C\+O\+D\+I\+N\+G I\+N\+F\+O\+R\+M\+A\+T\+I\+O\+N R\+E\+G\+A\+R\+D\+I\+N\+G T\+H\+E\+I\+R P\+R\+O\+D\+U\+C\+T\+S I\+N O\+R\+D\+E\+R F\+O\+R T\+H\+E\+M T\+O S\+A\+V\+E T\+I\+M\+E. A\+S A R\+E\+S\+U\+L\+T, S\+T\+M\+I\+C\+R\+O\+E\+L\+E\+C\+T\+R\+O\+N\+I\+C\+S S\+H\+A\+L\+L N\+O\+T B\+E H\+E\+L\+D L\+I\+A\+B\+L\+E F\+O\+R A\+N\+Y D\+I\+R\+E\+C\+T, I\+N\+D\+I\+R\+E\+C\+T O\+R C\+O\+N\+S\+E\+Q\+U\+E\+N\+T\+I\+A\+L D\+A\+M\+A\+G\+E\+S W\+I\+T\+H R\+E\+S\+P\+E\+C\+T T\+O A\+N\+Y C\+L\+A\+I\+M\+S A\+R\+I\+S\+I\+N\+G F\+R\+O\+M T\+H\+E C\+O\+N\+T\+E\+N\+T O\+F S\+U\+C\+H F\+I\+R\+M\+W\+A\+R\+E A\+N\+D/\+O\+R T\+H\+E U\+S\+E M\+A\+D\+E B\+Y C\+U\+S\+T\+O\+M\+E\+R\+S O\+F T\+H\+E C\+O\+D\+I\+N\+G I\+N\+F\+O\+R\+M\+A\+T\+I\+O\+N C\+O\+N\+T\+A\+I\+N\+E\+D H\+E\+R\+E\+I\+N I\+N C\+O\+N\+N\+E\+C\+T\+I\+O\+N W\+I\+T\+H T\+H\+E\+I\+R P\+R\+O\+D\+U\+C\+T\+S.
+
+\subsubsection*{\begin{center}\copyright{} C\+O\+P\+Y\+R\+I\+G\+H\+T 2011 S\+T\+Microelectronics\end{center} }

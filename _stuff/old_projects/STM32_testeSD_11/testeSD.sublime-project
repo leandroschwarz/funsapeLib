@@ -1,0 +1,41 @@
+{
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	],
+	"build_systems": [
+		{
+			"name" : "ARM build",
+			"working_dir": "${project_path}",
+			"file_regex": "^(.*):(\\d+):(\\d+):\\s*(.*)$",
+			"variants" : [
+				{
+					"name" : "compile",
+					"cmd" : [
+						"make", "all"
+					],
+				},
+				{
+					"name" : "run",
+					"cmd" : [
+						"make", "program"
+					],
+				},
+				{
+					"name" : "clean",
+					"cmd" : [
+						"make", "clean"
+					],
+				},
+				{
+					"name" : "clean-compile",
+					"cmd" : [
+						"make", "cleanCompile"
+					],
+				}
+			]
+		}
+	],
+}

@@ -1,0 +1,111 @@
+\hypertarget{stm32f4xx__iwdg_8c}{}\section{\+\_\+hide/\+M\+P\+U/\+S\+T\+M32\+F4/stm32f4xx\+\_\+iwdg.c File Reference}
+\label{stm32f4xx__iwdg_8c}\index{\+\_\+hide/\+M\+P\+U/\+S\+T\+M32\+F4/stm32f4xx\+\_\+iwdg.\+c@{\+\_\+hide/\+M\+P\+U/\+S\+T\+M32\+F4/stm32f4xx\+\_\+iwdg.\+c}}
+
+
+This file provides firmware functions to manage the following functionalities of the Independent watchdog (I\+W\+D\+G) peripheral\+:  
+
+
+{\ttfamily \#include \char`\"{}stm32f4xx\+\_\+iwdg.\+h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___i_w_d_g_ga830a9a1bad16c7043c86545f4c159a50}{}\#define {\bfseries K\+R\+\_\+\+K\+E\+Y\+\_\+\+R\+E\+L\+O\+A\+D}~((uint16\+\_\+t)0x\+A\+A\+A\+A)\label{group___i_w_d_g_ga830a9a1bad16c7043c86545f4c159a50}
+
+\item 
+\hypertarget{group___i_w_d_g_gaeaa0dd2da3f9d0cce0d708cfff1df545}{}\#define {\bfseries K\+R\+\_\+\+K\+E\+Y\+\_\+\+E\+N\+A\+B\+L\+E}~((uint16\+\_\+t)0x\+C\+C\+C\+C)\label{group___i_w_d_g_gaeaa0dd2da3f9d0cce0d708cfff1df545}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{group___i_w_d_g___group1_gae466681e5bdc11b353c508b89d75ca05}{I\+W\+D\+G\+\_\+\+Write\+Access\+Cmd} (uint16\+\_\+t I\+W\+D\+G\+\_\+\+Write\+Access)
+\begin{DoxyCompactList}\small\item\em Enables or disables write access to I\+W\+D\+G\+\_\+\+P\+R and I\+W\+D\+G\+\_\+\+R\+L\+R registers. \end{DoxyCompactList}\item 
+void \hyperlink{group___i_w_d_g___group1_ga4fa7f1cd690533a35ad9e4729c0450a3}{I\+W\+D\+G\+\_\+\+Set\+Prescaler} (uint8\+\_\+t I\+W\+D\+G\+\_\+\+Prescaler)
+\begin{DoxyCompactList}\small\item\em Sets I\+W\+D\+G Prescaler value. \end{DoxyCompactList}\item 
+void \hyperlink{group___i_w_d_g___group1_gae2a14752a0431f23cb80cebf202ac365}{I\+W\+D\+G\+\_\+\+Set\+Reload} (uint16\+\_\+t Reload)
+\begin{DoxyCompactList}\small\item\em Sets I\+W\+D\+G Reload value. \end{DoxyCompactList}\item 
+void \hyperlink{group___i_w_d_g___group1_ga7147ebabdc3fef97f532b171a4e70d49}{I\+W\+D\+G\+\_\+\+Reload\+Counter} (void)
+\begin{DoxyCompactList}\small\item\em Reloads I\+W\+D\+G counter with value defined in the reload register (write access to I\+W\+D\+G\+\_\+\+P\+R and I\+W\+D\+G\+\_\+\+R\+L\+R registers disabled). \end{DoxyCompactList}\item 
+void \hyperlink{group___i_w_d_g___group2_ga479b2921c86f8c67b819f5c4bea6bdb6}{I\+W\+D\+G\+\_\+\+Enable} (void)
+\begin{DoxyCompactList}\small\item\em Enables I\+W\+D\+G (write access to I\+W\+D\+G\+\_\+\+P\+R and I\+W\+D\+G\+\_\+\+R\+L\+R registers disabled). \end{DoxyCompactList}\item 
+Flag\+Status \hyperlink{group___i_w_d_g___group3_ga37f050cfbedc0c15f9e0816c0b22011e}{I\+W\+D\+G\+\_\+\+Get\+Flag\+Status} (uint16\+\_\+t I\+W\+D\+G\+\_\+\+F\+L\+A\+G)
+\begin{DoxyCompactList}\small\item\em Checks whether the specified I\+W\+D\+G flag is set or not. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This file provides firmware functions to manage the following functionalities of the Independent watchdog (I\+W\+D\+G) peripheral\+: 
+
+\begin{DoxyAuthor}{Author}
+M\+C\+D Application Team 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+V1.\+0.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+30-\/\+September-\/2011
+\begin{DoxyItemize}
+\item Prescaler and Counter configuration
+\item I\+W\+D\+G activation
+\item Flag management
+\end{DoxyItemize}
+\end{DoxyDate}
+\begin{DoxyVerb}*  
+*          ===================================================================
+*                                     IWDG features
+*          ===================================================================
+*    
+*          The IWDG can be started by either software or hardware (configurable
+*          through option byte).
+*            
+*          The IWDG is clocked by its own dedicated low-speed clock (LSI) and
+*          thus stays active even if the main clock fails.
+*          Once the IWDG is started, the LSI is forced ON and cannot be disabled
+*          (LSI cannot be disabled too), and the counter starts counting down from 
+*          the reset value of 0xFFF. When it reaches the end of count value (0x000)
+*          a system reset is generated.
+*          The IWDG counter should be reloaded at regular intervals to prevent
+*          an MCU reset.
+*                           
+*          The IWDG is implemented in the VDD voltage domain that is still functional
+*          in STOP and STANDBY mode (IWDG reset can wake-up from STANDBY).          
+*            
+*          IWDGRST flag in RCC_CSR register can be used to inform when a IWDG
+*          reset occurs.
+*            
+*          Min-max timeout value @32KHz (LSI): ~125us / ~32.7s
+*          The IWDG timeout may vary due to LSI frequency dispersion. STM32F4xx
+*          devices provide the capability to measure the LSI frequency (LSI clock
+*          connected internally to TIM5 CH4 input capture). The measured value
+*          can be used to have an IWDG timeout with an acceptable accuracy. 
+*          For more information, please refer to the STM32F4xx Reference manual
+*          
+*                            
+*          ===================================================================
+*                                 How to use this driver
+*          ===================================================================
+*          1. Enable write access to IWDG_PR and IWDG_RLR registers using
+*             IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable) function
+*               
+*          2. Configure the IWDG prescaler using IWDG_SetPrescaler() function
+*            
+*          3. Configure the IWDG counter value using IWDG_SetReload() function.
+*             This value will be loaded in the IWDG counter each time the counter
+*             is reloaded, then the IWDG will start counting down from this value.
+*            
+*          4. Start the IWDG using IWDG_Enable() function, when the IWDG is used
+*             in software mode (no need to enable the LSI, it will be enabled
+*             by hardware)
+*             
+*          5. Then the application program must reload the IWDG counter at regular
+*             intervals during normal operation to prevent an MCU reset, using
+*             IWDG_ReloadCounter() function.      
+*          
+*  \end{DoxyVerb}
+
+
+\begin{DoxyAttention}{Attention}
+
+\end{DoxyAttention}
+T\+H\+E P\+R\+E\+S\+E\+N\+T F\+I\+R\+M\+W\+A\+R\+E W\+H\+I\+C\+H I\+S F\+O\+R G\+U\+I\+D\+A\+N\+C\+E O\+N\+L\+Y A\+I\+M\+S A\+T P\+R\+O\+V\+I\+D\+I\+N\+G C\+U\+S\+T\+O\+M\+E\+R\+S W\+I\+T\+H C\+O\+D\+I\+N\+G I\+N\+F\+O\+R\+M\+A\+T\+I\+O\+N R\+E\+G\+A\+R\+D\+I\+N\+G T\+H\+E\+I\+R P\+R\+O\+D\+U\+C\+T\+S I\+N O\+R\+D\+E\+R F\+O\+R T\+H\+E\+M T\+O S\+A\+V\+E T\+I\+M\+E. A\+S A R\+E\+S\+U\+L\+T, S\+T\+M\+I\+C\+R\+O\+E\+L\+E\+C\+T\+R\+O\+N\+I\+C\+S S\+H\+A\+L\+L N\+O\+T B\+E H\+E\+L\+D L\+I\+A\+B\+L\+E F\+O\+R A\+N\+Y D\+I\+R\+E\+C\+T, I\+N\+D\+I\+R\+E\+C\+T O\+R C\+O\+N\+S\+E\+Q\+U\+E\+N\+T\+I\+A\+L D\+A\+M\+A\+G\+E\+S W\+I\+T\+H R\+E\+S\+P\+E\+C\+T T\+O A\+N\+Y C\+L\+A\+I\+M\+S A\+R\+I\+S\+I\+N\+G F\+R\+O\+M T\+H\+E C\+O\+N\+T\+E\+N\+T O\+F S\+U\+C\+H F\+I\+R\+M\+W\+A\+R\+E A\+N\+D/\+O\+R T\+H\+E U\+S\+E M\+A\+D\+E B\+Y C\+U\+S\+T\+O\+M\+E\+R\+S O\+F T\+H\+E C\+O\+D\+I\+N\+G I\+N\+F\+O\+R\+M\+A\+T\+I\+O\+N C\+O\+N\+T\+A\+I\+N\+E\+D H\+E\+R\+E\+I\+N I\+N C\+O\+N\+N\+E\+C\+T\+I\+O\+N W\+I\+T\+H T\+H\+E\+I\+R P\+R\+O\+D\+U\+C\+T\+S.
+
+\subsubsection*{\begin{center}\copyright{} C\+O\+P\+Y\+R\+I\+G\+H\+T 2011 S\+T\+Microelectronics\end{center} }

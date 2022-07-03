@@ -1,0 +1,341 @@
+/* =============================================================================
+ * Project:			FunSAPE++ Embedded Library
+ * File name:		mpu9250.hpp
+ * Module:			MPU9250 module interface for FunSAPE++ Embedded Library
+ * 					project
+ * Authors:			__AUTHORS_TO_REPLACE__
+ * Build:			__BUILD_TO_REPLACE__
+ * Last edition:	__DATE_TO_REPLACE__
+ * ========================================================================== */
+
+// =============================================================================
+// Include guard
+// =============================================================================
+
+#ifndef __MPU9250_HPP
+#define __MPU9250_HPP							__BUILD_TO_REPLACE__
+
+// =============================================================================
+// Dependencies
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Global definitions file -----------------------------------------------------
+
+#include "../funsapeLibGlobalDefines.hpp"
+#ifndef __FUNSAPE_LIB_GLOBAL_DEFINES_HPP
+#	error	[mpu9250.hpp] Error 9 - Global definitions file (funsapeLibGlobalDefines.hpp) is missing or corrupted!
+#elif __FUNSAPE_LIB_GLOBAL_DEFINES_HPP != __BUILD_TO_REPLACE__
+#	error	[mpu9250.hpp] Error 10 - Build mismatch between (mpu9250.hpp) and global definitions file (funsapeLibGlobalDefines.hpp)!
+#endif
+
+// -----------------------------------------------------------------------------
+// Header files - FunSAPE Library header files ---------------------------------
+
+#include "../util/funsapeLibHandler.hpp"
+#ifndef __FUNSAPE_LIB_HANDLER_HPP
+#	error	[mpu9250.hpp] Error 1 - Header file (funsapeLibHandler.hpp) is missing or corrupted!
+#elif __FUNSAPE_LIB_HANDLER_HPP != __BUILD_TO_REPLACE__
+#	error	[mpu9250.hpp] Error 2 - Build mismatch between (mpu9250.hpp) and (funsapeLibHandler.hpp) header files!
+#endif
+#include "../util/funsapeLibDebug.hpp"
+#ifndef __FUNSAPE_LIB_DEBUG_HPP
+#	error	[mpu9250.hpp] Error 1 - Header file (funsapeLibDebug.hpp) is missing or corrupted!
+#elif __FUNSAPE_LIB_DEBUG_HPP != __BUILD_TO_REPLACE__
+#	error	[mpu9250.hpp] Error 2 - Build mismatch between (mpu9250.hpp) and (funsapeLibDebug.hpp) header files!
+#endif
+
+// =============================================================================
+// Undefining previous definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Constant definitions
+// =============================================================================
+
+// #define SPI_SPEED_STANDARD				100000
+// #define SPI_SPEED_FAST					400000
+// #define SPI_BUFFER_LENGTH				32
+
+// =============================================================================
+// Macro-function definitions
+// *INDENT-OFF*
+// =============================================================================
+
+// NONE
+
+// *INDENT-ON*
+
+// =============================================================================
+// New data types
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Extern global variables
+// =============================================================================
+
+// NONE
+void showError(uint8_t errorCode);
+
+// =============================================================================
+// Mpu9250 - Class declaration
+// =============================================================================
+
+class Mpu9250
+{
+	// -------------------------------------------------------------------------
+	// New data types
+	// -------------------------------------------------------------------------
+
+public:
+	//     ////////     ACCELEROMETER SAMPLE RATE AND FILTER     ////////     //
+	enum class AccelConfig {
+		FREQ_4_KHZ_FILTER_FREQ_1046_HZ	= 0b1'000,
+		FREQ_1_KHZ_FILTER_FREQ_218_HZ	= 0b0'000,
+		FREQ_1_KHZ_FILTER_FREQ_99_HZ	= 0b0'010,
+		FREQ_1_KHZ_FILTER_FREQ_45_HZ	= 0b0'011,
+		FREQ_1_KHZ_FILTER_FREQ_21_HZ	= 0b0'100,
+		FREQ_1_KHZ_FILTER_FREQ_10_HZ	= 0b0'101,
+		FREQ_1_KHZ_FILTER_FREQ_5_HZ		= 0b0'110,
+		FREQ_1_KHZ_FILTER_FREQ_420_HZ	= 0b0'111,
+	};
+
+	//     //////////////     ACCELEROMETER FULL SCALE     //////////////     //
+	enum class AccelFullScale {
+		FULL_SCALE_2_G					= 0,
+		FULL_SCALE_4_G					= 1,
+		FULL_SCALE_8_G					= 2,
+		FULL_SCALE_16_G					= 3,
+	};
+
+	//     //////////     GYROSCOPE SAMPLE RATE AND FILTER     //////////     //
+	enum class GyroConfig {
+		FREQ_32_KHZ_FILTER_FREQ_8800_HZ	= 0b11'000,
+		FREQ_32_KHZ_FILTER_FREQ_3600_HZ	= 0b10'000,
+		FREQ_8_KHZ_FILTER_FREQ_250_HZ	= 0b00'000,
+		FREQ_1_KHZ_FILTER_FREQ_184_HZ	= 0b00'001,
+		FREQ_1_KHZ_FILTER_FREQ_92_HZ	= 0b00'010,
+		FREQ_1_KHZ_FILTER_FREQ_41_HZ	= 0b00'011,
+		FREQ_1_KHZ_FILTER_FREQ_20_HZ	= 0b00'100,
+		FREQ_1_KHZ_FILTER_FREQ_10_HZ	= 0b00'101,
+		FREQ_1_KHZ_FILTER_FREQ_5_HZ		= 0b00'110,
+		FREQ_8_KHZ_FILTER_FREQ_3600_HZ	= 0b00'111,
+	};
+
+	//     ////////////////     GYROSCOPE FULL SCALE     ////////////////     //
+	enum class GyroFullScale {
+		FULL_SCALE_250_DPS				= 0,
+		FULL_SCALE_500_DPS				= 1,
+		FULL_SCALE_1000_DPS				= 2,
+		FULL_SCALE_2000_DPS				= 3,
+	};
+
+private:
+	// NONE
+
+protected:
+	// NONE
+
+	// -------------------------------------------------------------------------
+	// Operators overloading
+	// -------------------------------------------------------------------------
+
+public:
+	// NONE
+
+private:
+	// NONE
+
+protected:
+	// NONE
+
+	// -------------------------------------------------------------------------
+	// Constructors
+	// -------------------------------------------------------------------------
+
+public:
+	Mpu9250(void);
+	~Mpu9250(void);
+
+	// -------------------------------------------------------------------------
+	// Methods - Inherited methods
+	// -------------------------------------------------------------------------
+
+public:
+	// NONE
+
+protected:
+	// NONE
+
+	// -------------------------------------------------------------------------
+	// Methods - Class own methods
+	// -------------------------------------------------------------------------
+
+public:
+	//     ///////////////////     INITIALIZATION     ///////////////////     //
+	bool init(
+			Handler *twiHandler_p,								// Communication handler
+			bool useAlternateAddress_p = false					// Use TWI alternate device address
+	);
+	bool init(
+			Handler *spiHandler_p,								// Communication handler
+			void (*actDevFuncCallback_p)(void),					// Funcion pointer to enable device in SPI mode
+			void (*deactDevFuncCallback_p)(void)				// Funcion pointer to disable device in SPI mode
+	);
+	bool restart(
+			void
+	);
+
+	//     ////////////////////     CHECK STATUS     ////////////////////     //
+	Error getLastError(
+			void
+	);
+
+	//     ////////////////     DEVICE CONFIGURATION     ////////////////     //
+	bool configAccel(
+			AccelConfig config_p,								// TODO: Describe parameter
+			AccelFullScale scale_p,								// TODO: Describe parameter
+			Axis axis_p = Axis::ALL								// TODO: Describe parameter
+	);
+	bool configGyro(
+			GyroConfig config_p	,								// TODO: Describe parameter
+			GyroFullScale scale_p,								// TODO: Describe parameter
+			Axis axis_p = Axis::ALL								// TODO: Describe parameter
+	);
+	bool performSelfTest(
+			Axis accelAxis_p = Axis::ALL,						// TODO: Describe parameter
+			Axis gyroAxis_p = Axis::ALL							// TODO: Describe parameter
+	);
+
+	//     /////////////////    RAW DATA MANAGEMENT     /////////////////     //
+	bool getAccelData(
+			int16_t *accelBuff_p,								// TODO: Describe parameter
+			Axis axis_p = Axis::ALL								// TODO: Describe parameter
+	);
+	bool getAccelOffset(
+			int16_t *accelBuff_p,								// TODO: Describe parameter
+			Axis axis_p = Axis::ALL								// TODO: Describe parameter
+	);
+	bool setAccelOffset(
+			int16_t *accelBuff_p,								// TODO: Describe parameter
+			Axis axis_p = Axis::ALL								// TODO: Describe parameter
+	);
+	bool getGyroData(
+			int16_t *gyroBuff_p,								// TODO: Describe parameter
+			Axis axis_p = Axis::ALL								// TODO: Describe parameter
+	);
+	bool getGyroOffset(
+			int16_t *gyroBuff_p,								// TODO: Describe parameter
+			Axis axis_p = Axis::ALL								// TODO: Describe parameter
+	);
+	bool setGyroOffset(
+			int16_t *gyroBuff_p,								// TODO: Describe parameter
+			Axis axis_p = Axis::ALL								// TODO: Describe parameter
+	);
+	bool getTempData(
+			int16_t *temp_p										// TODO: Describe parameter
+	);
+
+private:
+	//     ///////////////////////     STATUS     ///////////////////////     //
+	void _clearData(
+			void
+	);
+	bool _initialize(
+			void
+	);
+	bool _read(
+			uint8_t regAddr_p,
+			uint8_t *dataBuffer_p,
+			uint16_t bytesToRead_p
+	);
+	bool _write(
+			uint8_t regAddr_p,
+			uint8_t *dataBuffer_p,
+			uint16_t bytesToWrite_p
+	);
+
+protected:
+	// NONE
+
+	// -------------------------------------------------------------------------
+	// Properties
+	// -------------------------------------------------------------------------
+
+public:
+	// NONE
+
+private:
+	//     /////////////////     PERIPHERAL HANDLER     /////////////////     //
+	Handler		*_handler;
+	uint8_t		_i2cAddress						: 7;
+	void	(* _activateDevice)(void);
+	void	(* _deactivateDevice)(void);
+	bool		_useSpi							: 1;
+
+	//     /////////////////     CONTROL AND STATUS     /////////////////     //
+	bool		_initialized					: 1;
+	Error		_lastError;
+
+	//     ////////////////     SENSOR CONFIGURATION     ////////////////     //
+	bool		_accelDisableX				: 1;
+	bool		_accelDisableY				: 1;
+	bool		_accelDisableZ				: 1;
+	bool		_gyroDisableX				: 1;
+	bool		_gyroDisableY				: 1;
+	bool		_gyroDisableZ				: 1;
+
+protected:
+	// NONE
+
+}; // class Mpu9250
+
+// =============================================================================
+// Mpu9250 - Class overloading operators
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Global variables
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Externally defined global variables -----------------------------------------
+
+// NONE
+
+// -----------------------------------------------------------------------------
+// Internally defined global variables -----------------------------------------
+
+// NONE
+
+// =============================================================================
+// Mpu9250 - Class inline function definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// General public functions declarations
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// General inline functions definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// External default objects
+// =============================================================================
+
+// NONE
+
+#endif // __MPU9250_HPP

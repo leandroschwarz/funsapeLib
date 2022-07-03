@@ -1,0 +1,80 @@
+====================================
+Load date/time into backup registers
+====================================
+
+Add lines at the end of the RTC_DateUpdate() function in stm32f1xx_hal_rtc.c file:
+
+----------------------------------------
+	uint32_t dateToStore;
+	memcpy(&dateToStore, &hrtc->DateToUpdate, 4);
+	BKP->DR2 = dateToStore >> 16;
+	BKP->DR3 = dateToStore & 0xffff;
+----------------------------------------
+
+Add header to stm32f1xx_hal_rtc.c file:
+
+----------------------------------------
+#include <string.h>
+----------------------------------------
+
+===============================
+Load date from backup registers (*) may not be necessary
+===============================
+
+Add lines inside MX_RTC_Init() in rtc.c file:
+
+----------------------------------------
+	/* USER CODE BEGIN RTC_Init 2 */
+	else {
+		uint32_t dateMem;
+		dateMem = BKP->DR3;
+		dateMem |= BKP->DR2 << 16;
+		memcpy(&DateToUpdate, &dateMem, sizeof(uint32_t));
+		if(HAL_RTC_SetDate(&hrtc, &DateToUpdate, RTC_FORMAT_BCD) != HAL_OK) {
+			Error_Handler();
+		}
+		HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BCD);
+	}
+	/* USER CODE END RTC_Init 2 */
+----------------------------------------
+
+Add header to rtc.c file:
+
+----------------------------------------
+#include <string.h>
+----------------------------------------
+
+===============================
+Load date from backup registers (*) this do the trick
+===============================
+
+At the beginning of main() function, replace MX_RTC_Init() function call with some 
+date/time load/verification code:
+
+----------------------------------------
+	if(MUST_RESET_DATE) {
+		MX_RTC_Init();
+	} else {
+		uint32_t dateMem;
+		RTC_DateTypeDef DateToUpdate = {0};
+		RTC_TimeTypeDef sTime = {0};
+
+		hrtc.Instance = RTC;
+
+		dateMem = BKP->DR3;
+		dateMem |= BKP->DR2 << 16;
+
+		memcpy(&DateToUpdate, &dateMem, sizeof(uint32_t));
+		if(HAL_RTC_SetDate(&hrtc, &DateToUpdate, RTC_FORMAT_BCD) != HAL_OK) {
+			Error_Handler();
+		}
+		HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BCD);
+		HAL_RTC_MspInit(&hrtc);
+	}
+----------------------------------------
+
+Add header to main.h file:
+
+----------------------------------------
+#include <string.h>
+----------------------------------------

@@ -1,0 +1,103 @@
+//---------------------------------------------------------------------------
+
+#ifndef funsapeSerialPortH
+#define funsapeSerialPortH
+//---------------------------------------------------------------------------
+
+#include <windows.h>
+#include <fileapi.h>
+#include <synchapi.h>
+#include <process.h>
+#include <vector>
+#include <System.Classes.hpp>
+#include "circularBuffer.h"
+
+#define SERIAL_MAX_RX               256     // Input buffer max size
+#define SERIAL_MAX_TX               256     // output buffer max size
+
+#define SERIAL_CONNECTED            0
+#define SERIAL_DISCONNECTED         1
+#define SERIAL_DATA_SENT            2
+#define SERIAL_DATA_ARRIVAL         3
+#define SERIAL_RING                 4
+#define SERIAL_CD_ON                5
+#define SERIAL_CD_OFF               6
+
+class funsapeSerialPort
+{
+
+
+	// Methods
+public:
+	//     ///////////////////////     STATUS     ///////////////////////     //
+	int getNbrOfBytes(
+		void
+	);
+
+	//     ////////////////////    CONFIGURATION     ////////////////////     //
+	bool connect(
+		uint16_t        portNumber_p,
+		uint32_t        baudRate_p      = 9'600,
+		DataBits        dataBits_p      = DataBits::DATA_BITS_8,
+		ParityMode      parityMode_p    = ParityMode:: NO_PARITY,
+		StopBits        stopBits_p      = StopBits::ONE,
+		PortDirection   direction_p     = PortDirection::TX_RX,
+		FlowControl     flowControl_p   = FlowControl::NO_CONTROL,
+		PortSharing     sharingFlags_p  = PortSharing::NO_SHARE
+	);
+	void run(
+		void
+	);
+	bool setManagerFunction(
+		void (*managerFunction_p)(uint32_t object_p, uint32_t event_p)
+	);
+	bool setOnConnectCallback(
+		void (*callbackFunction_p)(void)
+	);
+	bool setOnDisconnectCallback(
+		void (*callbackFunction_p)(void)
+	);
+	bool setOnRescanPortCallback(
+		void (*callbackFunction_p)(void)
+	);
+	bool scan(
+		std::vector<AnsiString> *ports_p
+	);
+	char * getDataInBuffer(void) {
+		return(this->_rxTempBuffer);
+	}
+	int getDataInSize(void) {
+		return(this->_rxTempBufferLength);
+	}
+	void dataHasBeenRead(
+		void
+	);
+	bool disconnect(
+		void
+	);
+
+private:
+
+	// Properties
+private:
+	//     ///////////////////////     STATUS     ///////////////////////     //
+	ErrorCode               _lastError;
+	bool                    _isOpenned                      : 1;
+	bool                    _isReady                        : 1;
+	bool                    _isRxInProgress                 : 1;
+	bool                    _isTxInProgress                 : 1;
+	bool                    _isWaitCommEventInProgress      : 1;
+
+	//     ////////////////////    CONFIGURATION     ////////////////////     //
+	char                        _rxTempBuffer[SERIAL_MAX_RX];
+	char                        _txTempBuffer[SERIAL_MAX_TX];
+	uint16_t                    _maxRxTempBuffer;
+	uint16_t                    _rxTempBufferLength;
+	uint16_t                    _txTempBufferLength;
+
+
+	//     //////////////////    WINDOWS VARIABLES     //////////////////     //
+	DCB                         _dcb;
+};
+
+#endif

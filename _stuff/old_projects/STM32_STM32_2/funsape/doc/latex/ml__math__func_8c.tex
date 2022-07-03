@@ -1,0 +1,122 @@
+\hypertarget{ml__math__func_8c}{}\section{\+\_\+hide/\+M\+P\+U/core/mllite/ml\+\_\+math\+\_\+func.c File Reference}
+\label{ml__math__func_8c}\index{\+\_\+hide/\+M\+P\+U/core/mllite/ml\+\_\+math\+\_\+func.\+c@{\+\_\+hide/\+M\+P\+U/core/mllite/ml\+\_\+math\+\_\+func.\+c}}
+
+
+Math Functions.  
+
+
+{\ttfamily \#include \char`\"{}mlmath.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}ml\+\_\+math\+\_\+func.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}mlinclude.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___m_l___m_a_t_h___f_u_n_c_ga62d167c190cec4de6aa50a37d40690e5}{}float {\bfseries inv\+\_\+compass\+\_\+angle} (const long $\ast$compass, const long $\ast$grav, const long $\ast$quat)\label{group___m_l___m_a_t_h___f_u_n_c_ga62d167c190cec4de6aa50a37d40690e5}
+
+\item 
+unsigned long \hyperlink{group___m_l___m_a_t_h___f_u_n_c_gab635211d9782d84e7c3d0b1ccb68aa81}{inv\+\_\+get\+\_\+gyro\+\_\+sum\+\_\+of\+\_\+sqr} (const long $\ast$gyro)
+\begin{DoxyCompactList}\small\item\em The gyro data magnitude squared \+: (1 degree per second)$^\wedge$2 = 2$^\wedge$6 = 2$^\wedge$\+G\+Y\+R\+O\+\_\+\+M\+A\+G\+\_\+\+S\+Q\+R\+\_\+\+S\+H\+I\+F\+T. \end{DoxyCompactList}\item 
+long \hyperlink{group___m_l___m_a_t_h___f_u_n_c_gacac2907175548abdde305e1b2641de07}{inv\+\_\+q29\+\_\+mult} (long a, long b)
+\item 
+long \hyperlink{group___m_l___m_a_t_h___f_u_n_c_ga572aa31c45e6708b665b272d5d09638c}{inv\+\_\+q30\+\_\+mult} (long a, long b)
+\item 
+\hypertarget{group___m_l___m_a_t_h___f_u_n_c_ga5801e703eee447b996b08b7c92e24aec}{}long {\bfseries inv\+\_\+q30\+\_\+div} (long a, long b)\label{group___m_l___m_a_t_h___f_u_n_c_ga5801e703eee447b996b08b7c92e24aec}
+
+\item 
+long \hyperlink{group___m_l___m_a_t_h___f_u_n_c_gafa06cc6295033c677dc7666c009e0d15}{inv\+\_\+q\+\_\+shift\+\_\+mult} (long a, long b, int shift)
+\item 
+void \hyperlink{group___m_l___m_a_t_h___f_u_n_c_ga2243fbcb27c7f42925e0636ff7c0433f}{inv\+\_\+q\+\_\+mult} (const long $\ast$q1, const long $\ast$q2, long $\ast$q\+Prod)
+\item 
+void \hyperlink{group___m_l___m_a_t_h___f_u_n_c_ga6e2659b140af2b48c595b46c68b18740}{inv\+\_\+q\+\_\+add} (long $\ast$q1, long $\ast$q2, long $\ast$q\+Sum)
+\item 
+\hypertarget{group___m_l___m_a_t_h___f_u_n_c_ga2a31f51865ee2e76f3797ceae34aee07}{}void {\bfseries inv\+\_\+vector\+\_\+normalize} (long $\ast$vec, int length)\label{group___m_l___m_a_t_h___f_u_n_c_ga2a31f51865ee2e76f3797ceae34aee07}
+
+\item 
+\hypertarget{group___m_l___m_a_t_h___f_u_n_c_gac0d243c35da31640b4052bee16f20410}{}void {\bfseries inv\+\_\+q\+\_\+normalize} (long $\ast$q)\label{group___m_l___m_a_t_h___f_u_n_c_gac0d243c35da31640b4052bee16f20410}
+
+\item 
+\hypertarget{group___m_l___m_a_t_h___f_u_n_c_gac47863a76566476365bb1f48bff9d5a4}{}void {\bfseries inv\+\_\+q\+\_\+invert} (const long $\ast$q, long $\ast$q\+Inverted)\label{group___m_l___m_a_t_h___f_u_n_c_gac47863a76566476365bb1f48bff9d5a4}
+
+\item 
+\hypertarget{group___m_l___m_a_t_h___f_u_n_c_ga70ec1e22ed6bd67e2612a7ed89e58fcb}{}double {\bfseries quaternion\+\_\+to\+\_\+rotation\+\_\+angle} (const long $\ast$quat)\label{group___m_l___m_a_t_h___f_u_n_c_ga70ec1e22ed6bd67e2612a7ed89e58fcb}
+
+\item 
+void \hyperlink{group___m_l___m_a_t_h___f_u_n_c_gaa3d8df79a162945136785b64827b3b6b}{inv\+\_\+q\+\_\+rotate} (const long $\ast$q, const long $\ast$in, long $\ast$out)
+\item 
+\hypertarget{group___m_l___m_a_t_h___f_u_n_c_ga7ac898115807d805ddf4f01bebdf00d6}{}void {\bfseries inv\+\_\+q\+\_\+multf} (const float $\ast$q1, const float $\ast$q2, float $\ast$q\+Prod)\label{group___m_l___m_a_t_h___f_u_n_c_ga7ac898115807d805ddf4f01bebdf00d6}
+
+\item 
+\hypertarget{group___m_l___m_a_t_h___f_u_n_c_ga8569cd2a84d6e55b6a5abf12dceb610a}{}void {\bfseries inv\+\_\+q\+\_\+addf} (const float $\ast$q1, const float $\ast$q2, float $\ast$q\+Sum)\label{group___m_l___m_a_t_h___f_u_n_c_ga8569cd2a84d6e55b6a5abf12dceb610a}
+
+\item 
+\hypertarget{group___m_l___m_a_t_h___f_u_n_c_ga9bcf2fdef51b9af50ed04ab8608c47b2}{}void {\bfseries inv\+\_\+q\+\_\+normalizef} (float $\ast$q)\label{group___m_l___m_a_t_h___f_u_n_c_ga9bcf2fdef51b9af50ed04ab8608c47b2}
+
+\item 
+void \hyperlink{group___m_l___m_a_t_h___f_u_n_c_ga766647ca9f7a170610d4791d9fd9a84c}{inv\+\_\+q\+\_\+norm4} (float $\ast$q)
+\item 
+\hypertarget{group___m_l___m_a_t_h___f_u_n_c_gad6f33e93121e63d399bc34556cac5f51}{}void {\bfseries inv\+\_\+q\+\_\+invertf} (const float $\ast$q, float $\ast$q\+Inverted)\label{group___m_l___m_a_t_h___f_u_n_c_gad6f33e93121e63d399bc34556cac5f51}
+
+\item 
+void \hyperlink{group___m_l___m_a_t_h___f_u_n_c_gaf5bee1c125eea806e70641aa5fbbba4c}{inv\+\_\+quaternion\+\_\+to\+\_\+rotation} (const long $\ast$quat, long $\ast$rot)
+\item 
+void \hyperlink{group___m_l___m_a_t_h___f_u_n_c_ga1d948e29386dfcfc891c8797ac88982e}{inv\+\_\+quaternion\+\_\+to\+\_\+rotation\+\_\+vector} (const long $\ast$quat, long $\ast$rot)
+\item 
+unsigned char $\ast$ \hyperlink{group___m_l___m_a_t_h___f_u_n_c_ga0362c108df5c721baa460650f01ba5a4}{inv\+\_\+int32\+\_\+to\+\_\+big8} (long x, unsigned char $\ast$big8)
+\item 
+long \hyperlink{group___m_l___m_a_t_h___f_u_n_c_gaba573c3e25d67c8b904d1a1c391300b5}{inv\+\_\+big8\+\_\+to\+\_\+int32} (const unsigned char $\ast$big8)
+\item 
+short \hyperlink{group___m_l___m_a_t_h___f_u_n_c_ga6327c698c3519078999a322af6302697}{inv\+\_\+big8\+\_\+to\+\_\+int16} (const unsigned char $\ast$big8)
+\item 
+short \hyperlink{group___m_l___m_a_t_h___f_u_n_c_gae37db20dee5504b415829ea2540d6b3c}{inv\+\_\+little8\+\_\+to\+\_\+int16} (const unsigned char $\ast$little8)
+\item 
+unsigned char $\ast$ \hyperlink{group___m_l___m_a_t_h___f_u_n_c_ga1f623513136cfd5f0d43899406211b52}{inv\+\_\+int16\+\_\+to\+\_\+big8} (short x, unsigned char $\ast$big8)
+\item 
+\hypertarget{group___m_l___m_a_t_h___f_u_n_c_ga710756eb622c7cbd12c413ebbf657a04}{}void {\bfseries inv\+\_\+matrix\+\_\+det\+\_\+inc} (float $\ast$a, float $\ast$b, int $\ast$n, int x, int y)\label{group___m_l___m_a_t_h___f_u_n_c_ga710756eb622c7cbd12c413ebbf657a04}
+
+\item 
+\hypertarget{group___m_l___m_a_t_h___f_u_n_c_gadb9a1d920f6ead2410c38c8e3f5357c2}{}void {\bfseries inv\+\_\+matrix\+\_\+det\+\_\+incd} (double $\ast$a, double $\ast$b, int $\ast$n, int x, int y)\label{group___m_l___m_a_t_h___f_u_n_c_gadb9a1d920f6ead2410c38c8e3f5357c2}
+
+\item 
+\hypertarget{group___m_l___m_a_t_h___f_u_n_c_ga6ca85c2e0377aa39f1e9ed1b863182ee}{}float {\bfseries inv\+\_\+matrix\+\_\+det} (float $\ast$p, int $\ast$n)\label{group___m_l___m_a_t_h___f_u_n_c_ga6ca85c2e0377aa39f1e9ed1b863182ee}
+
+\item 
+\hypertarget{group___m_l___m_a_t_h___f_u_n_c_gaef1d31cbf004bf2a582fa9e9859b0fdb}{}double {\bfseries inv\+\_\+matrix\+\_\+detd} (double $\ast$p, int $\ast$n)\label{group___m_l___m_a_t_h___f_u_n_c_gaef1d31cbf004bf2a582fa9e9859b0fdb}
+
+\item 
+float \hyperlink{group___m_l___m_a_t_h___f_u_n_c_ga41a5855eb5bfa8efa2dd74cd24f2d31f}{inv\+\_\+wrap\+\_\+angle} (float ang)
+\item 
+float \hyperlink{group___m_l___m_a_t_h___f_u_n_c_ga1e70a82f49c800deecb68d8a99962a13}{inv\+\_\+angle\+\_\+diff} (float ang1, float ang2)
+\item 
+uint32\+\_\+t \hyperlink{group___m_l___m_a_t_h___f_u_n_c_ga893ed65f1b2bdd2f45883d1a7df04820}{inv\+\_\+checksum} (const unsigned char $\ast$str, int len)
+\item 
+unsigned short \hyperlink{group___m_l___m_a_t_h___f_u_n_c_ga3ff6037a69f37bb6174355936ad67ef3}{inv\+\_\+orientation\+\_\+matrix\+\_\+to\+\_\+scalar} (const signed char $\ast$mtx)
+\item 
+void \hyperlink{group___m_l___m_a_t_h___f_u_n_c_ga0ae75a3c90c2a789023d6127eb1ead3b}{inv\+\_\+convert\+\_\+to\+\_\+body} (unsigned short orientation, const long $\ast$input, long $\ast$output)
+\item 
+void \hyperlink{group___m_l___m_a_t_h___f_u_n_c_ga0d3f6e3fa02ec46ae815dbf425fc54f4}{inv\+\_\+convert\+\_\+to\+\_\+chip} (unsigned short orientation, const long $\ast$input, long $\ast$output)
+\item 
+void \hyperlink{group___m_l___m_a_t_h___f_u_n_c_gade70dcbaa891a856859d0eb7f6108435}{inv\+\_\+convert\+\_\+to\+\_\+body\+\_\+with\+\_\+scale} (unsigned short orientation, long sensitivity, const long $\ast$input, long $\ast$output)
+\item 
+double \hyperlink{group___m_l___m_a_t_h___f_u_n_c_gacf458dc7b0bdc54c3c5d40e0bc953d58}{inv\+\_\+vector\+\_\+norm} (const float $\ast$x)
+\item 
+\hypertarget{group___m_l___m_a_t_h___f_u_n_c_gae77353df1ab3c096ae6e7013e30c7518}{}void {\bfseries inv\+\_\+init\+\_\+biquad\+\_\+filter} (\hyperlink{structinv__biquad__filter__t}{inv\+\_\+biquad\+\_\+filter\+\_\+t} $\ast$p\+Filter, float $\ast$p\+Biquad\+Coeff)\label{group___m_l___m_a_t_h___f_u_n_c_gae77353df1ab3c096ae6e7013e30c7518}
+
+\item 
+\hypertarget{group___m_l___m_a_t_h___f_u_n_c_gadeb045e2633c0ce32e48578a91b91cbf}{}void {\bfseries inv\+\_\+calc\+\_\+state\+\_\+to\+\_\+match\+\_\+output} (\hyperlink{structinv__biquad__filter__t}{inv\+\_\+biquad\+\_\+filter\+\_\+t} $\ast$p\+Filter, float input)\label{group___m_l___m_a_t_h___f_u_n_c_gadeb045e2633c0ce32e48578a91b91cbf}
+
+\item 
+\hypertarget{group___m_l___m_a_t_h___f_u_n_c_ga8f95f5adf70c8b16f7bd71c34888e449}{}float {\bfseries inv\+\_\+biquad\+\_\+filter\+\_\+process} (\hyperlink{structinv__biquad__filter__t}{inv\+\_\+biquad\+\_\+filter\+\_\+t} $\ast$p\+Filter, float input)\label{group___m_l___m_a_t_h___f_u_n_c_ga8f95f5adf70c8b16f7bd71c34888e449}
+
+\item 
+\hypertarget{group___m_l___m_a_t_h___f_u_n_c_ga3a5990c08438c6b56022d152fe200756}{}void {\bfseries inv\+\_\+get\+\_\+cross\+\_\+product\+\_\+vec} (float $\ast$cgcross, float compass\mbox{[}3\mbox{]}, float grav\mbox{[}3\mbox{]})\label{group___m_l___m_a_t_h___f_u_n_c_ga3a5990c08438c6b56022d152fe200756}
+
+\item 
+\hypertarget{group___m_l___m_a_t_h___f_u_n_c_ga2f77699717b935bf4143106d3b9fc566}{}void {\bfseries ml\+Matrix\+Vector\+Mult} (long matrix\mbox{[}9\mbox{]}, const long vec\+In\mbox{[}3\mbox{]}, long $\ast$vec\+Out)\label{group___m_l___m_a_t_h___f_u_n_c_ga2f77699717b935bf4143106d3b9fc566}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Math Functions. 
+

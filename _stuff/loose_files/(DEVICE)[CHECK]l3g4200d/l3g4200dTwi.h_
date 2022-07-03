@@ -1,0 +1,248 @@
+/* -----------------------------------------------------------------------------
+ * Project:			GPDSE AVR8 Library
+ * File:			l3g4200dTwi.h
+ * Module:			L3G4200D - 3-Axis Digital Gyroscope in Two Wire Interface
+ * Author:			Leandro Schwarz
+ *					Hazael dos Santos Batista
+ * Build:			1
+ * Last edition:	October 26, 2017
+ * -------------------------------------------------------------------------- */
+
+/*!
+ \file	l3g4200dTwi.h
+ \author	Leandro Schwarz
+ \author	Hazael dos Santos Batista
+ \date		October 26, 2017
+ \brief		L3G4200D - 3-Axis Digital Gyroscope in Two Wire Interface
+
+ The L3G4200D is a low-power three-axis angular rate sensor. This module interfaces a L3G4200D in I2C mode.
+*/
+
+#ifndef __L3G4200DTWI_H
+#define __L3G4200DTWI_H 1
+
+// -----------------------------------------------------------------------------
+// Header files ----------------------------------------------------------------
+
+#include "globalDefines.h"
+#include "twiMaster.h"
+#if __GLOBALDEFINES_H != 1
+	#error Error 100 - globalDefines.h - wrong build (globalDefines must be build 1).
+#endif
+
+// -----------------------------------------------------------------------------
+// Constant definitions --------------------------------------------------------
+
+#define L3G4200D_WHO_AM_I_VALUE		0xD3
+#define L3G4200D_AUTO_INCREMENT		1 << 7
+
+// -----------------------------------------------------------------------------
+// New data types --------------------------------------------------------------
+
+/*!
+	\brief L3G4200D register map enumeration.
+
+	Register map of the L3G4200D. When a register is written or read, the pointer is automatically incremented.
+ */
+typedef enum l3g4200dRegisters_t{
+	L3G4200D_WHO_AM_I		= 0x0F,	/*!< Fixed device ID code (0xD3). */
+	L3G4200D_CTRL_REG1		= 0x20,	/*!< Control Register 1. */
+	L3G4200D_CTRL_REG2		= 0x21,	/*!< Control Register 2. */
+	L3G4200D_CTRL_REG3		= 0x22,	/*!< Control Register 3. */
+	L3G4200D_CTRL_REG4		= 0x23,	/*!< Control Register 4. */
+	L3G4200D_CTRL_REG5		= 0x24,	/*!< Control Register 5. */
+	L3G4200D_REFERENCE		= 0x25,	/*!< Reference register for relative measurements. */
+	L3G4200D_OUT_TEMP		= 0x26,	/*!< Temperature value register. */
+	L3G4200D_STATUS_REG		= 0x27,	/*!< Status register. */
+	L3G4200D_OUT_X_L		= 0x28,	/*!< X output (LSB) register. */
+	L3G4200D_OUT_X_H		= 0x29,	/*!< X output (MSB) register. */
+	L3G4200D_OUT_Y_L		= 0x2A,	/*!< Y output (LSB) register. */
+	L3G4200D_OUT_Y_H		= 0x2B,	/*!< Y output (MSB) register. */
+	L3G4200D_OUT_Z_L		= 0x2C,	/*!< Z output (LSB) register. */
+	L3G4200D_OUT_Z_H		= 0x2D,	/*!< Z output (MSB) register. */
+	L3G4200D_FIFO_CTRL_REG	= 0x2E,	/*!< FIFO control register. */
+	L3G4200D_FIFO_SRC_REG	= 0x2F,	/*!< FIFO source register. */
+	L3G4200D_INT1_CFG		= 0x30,	/*!< Interrupt configuration register. */
+	L3G4200D_INT1_SRC		= 0x31,	/*!< Interrupt source register. */
+	L3G4200D_INT1_TSH_XH	= 0x32,	/*!< X threshold (MSB) for interruption generation circuit. */
+	L3G4200D_INT1_TSH_XL	= 0x33,	/*!< X threshold (LSB) for interruption generation circuit. */
+	L3G4200D_INT1_TSH_YH	= 0x34,	/*!< Y threshold (MSB) for interruption generation circuit. */
+	L3G4200D_INT1_TSH_YL	= 0x35,	/*!< Y threshold (LSB) for interruption generation circuit. */
+	L3G4200D_INT1_TSH_ZH	= 0x36,	/*!< Z threshold (MSB) for interruption generation circuit. */
+	L3G4200D_INT1_TSH_ZL	= 0x37,	/*!< Z threshold (LSB) for interruption generation circuit. */
+	L3G4200D_INT1_DURATION	= 0x38	/*!< Minimum duration (ms) of the interrupt event to be recognized. */
+} l3g4200dRegisters_t;
+
+/*!
+	\brief L3G4200D TWI slave address enumeration.
+
+	TWI slave address selection enumeration.
+ */
+typedef enum l3g4200dTwiAddress_t{
+	L3G4200D_ADDRESS_0x68	= 0,	/*!< TWI slave address 0x68. */
+	L3G4200D_ADDRESS_0x69	= 1		/*!< TWI slave address 0x69. */
+} l3g4200dTwiAddress_t;
+
+/*
+L3G4200D_CTRL_REG1
+	DR[1:0]
+	BW[1:0]
+L3G4200D_CTRL_REG2
+	HP[1:0]
+	HPCF[3:0]
+L3G4200D_CTRL_REG3
+	I1_Int1
+	I1_Boot
+	H_Lactive
+	PP_OD
+	I2_DRDY
+	I2_WTM
+	I2_ORun
+	I2_Empty
+L3G4200D_CTRL_REG4
+	BDU
+	BLE
+	FS[1:0]
+	ST[1:0]
+	SIM
+L3G4200D_CTRL_REG5
+	BOOT
+	FIFO_EN
+	HPen
+	INT1_Sel[1:0]
+	Out_Sel[1:0]
+L3G4200D_REFERENCE
+L3G4200D_OUT_TEMP
+L3G4200D_FIFO_CTRL_REG
+	FM[2:0]
+	WTM[4:0]
+L3G4200D_FIFO_SRC_REG
+	WTM
+	OVRN
+	EMPTY
+	FSS[4:0]
+L3G4200D_INT1_CFG
+	AND/OR
+	LIR
+	ZHIE
+	ZLIE
+	YHIE
+	YLIE
+	XHIE
+	XLIE
+L3G4200D_INT1_SRC
+	IA
+	ZH
+	ZL
+	YH
+	YL
+	XH
+	XL
+L3G4200D_INT1_TSH_XH
+L3G4200D_INT1_TSH_XL
+L3G4200D_INT1_TSH_YH
+L3G4200D_INT1_TSH_YL
+L3G4200D_INT1_TSH_ZH
+L3G4200D_INT1_TSH_ZL
+L3G4200D_INT1_DURATION
+	WAIT
+	D[6:0]
+*/
+
+/*!
+	\brief Power modes enumeration.
+
+	Power modes of the L3G4200D.
+ */
+typedef enum l3g4200dPowerMode_t{
+	L3G4200D_POWER_DOWN = 0,	/*!< Power-down mode. */
+	L3G4200D_SLEEP		= 1,	/*!< Sleep mode. */
+	L3G4200D_NORMAL		= 2		/*!< Normal mode. */
+} l3g4200dPowerMode_t;
+
+/*!
+	\brief Active angles flag enumeration.
+
+	Active angles to be used during normal mode of the L3G4200D.
+ */
+typedef enum l3g4200dActiveAnglesFlags_t{
+	L3G4200D_NONE		= 0,	/*!< Disables all angle measurements. */
+	L3G4200D_X_ANGLE	= 1,	/*!< Enables X angle measurement. */
+	L3G4200D_Y_ANGLE	= 2,	/*!< Enables Y angle measurement. */
+	L3G4200D_Z_ANGLE	= 4		/*!< Enables Z angle measurement. */
+} l3g4200dActiveAnglesFlags_t;
+
+/*!
+	\brief Data rate enumeration.
+
+	Output data rate to be used during normal mode of the L3G4200D.
+ */
+typedef enum l3g4200dDataRates_t{
+	L3G4200D_100_Hz		= 0,	/*!< Sets output data rates to 100 Hz. */
+	L3G4200D_200_Hz		= 1,	/*!< Sets output data rates to 200 Hz. */
+	L3G4200D_400_Hz		= 2,	/*!< Sets output data rates to 400 Hz. */
+	L3G4200D_800_Hz		= 4		/*!< Sets output data rates to 800 Hz. */
+} l3g4200dDataRates_t;
+
+/*!
+	\brief Filter bandwidth enumeration.
+
+	Filter bandwidth selection to be used during normal mode of the L3G4200D. Refer to datasheet;
+ */
+typedef enum l3g4200dFilterBandwidth_t{
+	L3G4200D_BW0		= 0,	/*!< Filter bandwidth 0 - refer to datasheet. */
+	L3G4200D_BW1		= 1,	/*!< Filter bandwidth 1 - refer to datasheet. */
+	L3G4200D_BW2		= 2,	/*!< Filter bandwidth 2 - refer to datasheet. */
+	L3G4200D_BW3		= 4		/*!< Filter bandwidth 3 - refer to datasheet. */
+} l3g4200dFilterBandwidth_t;
+
+/*!
+	\brief Data status register flags.
+
+	Data status register flags.
+ */
+typedef enum l3g4200dDataStatusFlags_t{
+	L3G4200D_NEW_DATA	= 1,	/*!< The data returned is new. */
+	L3G4200D_DATA_LOST	= 2,	/*!< Some data has been lost. */
+} l3g4200dDataStatusFlags_t;
+
+/*!
+	\brief L3G4200D configuration struct.
+
+	Stores the L3G4200D configurations.
+ */
+typedef struct l3g4200dConfiguration_t{
+	uint8					deviceAddress;			/*!< I2C slave address. */
+	uint8					unusedBits		: 8;
+} l3g4200dConfiguration_t;
+
+
+
+
+
+
+
+
+
+
+
+// -----------------------------------------------------------------------------
+// Global variables ------------------------------------------------------------
+
+/*! Global variable that stores the L3G4200D configuration. */
+extern l3g4200dConfiguration_t l3g4200dConfiguration;
+
+// -----------------------------------------------------------------------------
+// Macrofunctions --------------------------------------------------------------
+
+/* NONE */
+
+// -----------------------------------------------------------------------------
+// Function declarations -------------------------------------------------------
+
+/*! Initializes the L3G4200D. */
+bool_t l3g4200dInit(l3g4200dTwiAddress_t twiAddress);
+/*! Reads gyroscope values. */
+void l3g4200dDataGet(int16 * xValue, int16 * yValue, int16 * zValue, l3g4200dDataStatusFlags_t * dataStatus);
+
+#endif

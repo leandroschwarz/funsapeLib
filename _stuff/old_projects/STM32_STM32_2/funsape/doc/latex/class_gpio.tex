@@ -1,0 +1,180 @@
+\hypertarget{class_gpio}{}\section{Gpio Class Reference}
+\label{class_gpio}\index{Gpio@{Gpio}}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_gpio_a99fed5d9b35a8389c40c63eaaa8385dc}{}\hyperlink{class_gpio_a99fed5d9b35a8389c40c63eaaa8385dc}{Gpio} (void)\label{class_gpio_a99fed5d9b35a8389c40c63eaaa8385dc}
+
+\begin{DoxyCompactList}\small\item\em Construct a new \hyperlink{class_gpio_a99fed5d9b35a8389c40c63eaaa8385dc}{Gpio\+::\+Gpio} object. \end{DoxyCompactList}\item 
+\hyperlink{class_gpio_af6c85b01275e46b59ab0fd53b267a1b0}{Gpio} (G\+P\+I\+O\+\_\+\+Type\+Def $\ast$gpio\+Port\+\_\+p, uint16\+\_\+t gpio\+Pin\+\_\+p)
+\begin{DoxyCompactList}\small\item\em Construct a new \hyperlink{class_gpio_a99fed5d9b35a8389c40c63eaaa8385dc}{Gpio\+::\+Gpio} object. \end{DoxyCompactList}\item 
+\hypertarget{class_gpio_a0c1b7069e8485e81ffee504bac6d720d}{}\hyperlink{class_gpio_a0c1b7069e8485e81ffee504bac6d720d}{$\sim$\+Gpio} (void)\label{class_gpio_a0c1b7069e8485e81ffee504bac6d720d}
+
+\begin{DoxyCompactList}\small\item\em Destroy the \hyperlink{class_gpio_a99fed5d9b35a8389c40c63eaaa8385dc}{Gpio\+::\+Gpio} object. \end{DoxyCompactList}\item 
+Error \hyperlink{class_gpio_a257ddbd4f1b691fed8dfcdd3853cac90}{get\+Last\+Error} (void)
+\item 
+bool \hyperlink{class_gpio_affa4d2741c705c5e40a3e2137b303fed}{init} (G\+P\+I\+O\+\_\+\+Type\+Def $\ast$gpio\+Port\+\_\+p, uint16\+\_\+t gpio\+Pin\+\_\+p)
+\item 
+bool \hyperlink{class_gpio_ab1acc5af68efdcaa0ff428ebd98e84f7}{clr} (void)
+\item 
+bool \hyperlink{class_gpio_a40af09a22962f57fb0184eb4759acee3}{cpl} (void)
+\item 
+bool \hyperlink{class_gpio_a47c4e23e74ff7b2b3eaadac7695474e2}{set} (void)
+\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_gpio_a1335d7adece4c84dcac27da9d8db0690}{}void {\bfseries \+\_\+clear\+Data} (void)\label{class_gpio_a1335d7adece4c84dcac27da9d8db0690}
+
+\item 
+\hypertarget{class_gpio_a1de620134902313c8b73b64355d6a5f4}{}void {\bfseries \+\_\+deinitialize} (void)\label{class_gpio_a1de620134902313c8b73b64355d6a5f4}
+
+\item 
+bool \hyperlink{class_gpio_a297109bc058b535736ff05bc94cce678}{\+\_\+initialize} (G\+P\+I\+O\+\_\+\+Type\+Def $\ast$gpio\+Port\+\_\+p, uint16\+\_\+t gpio\+Pin\+\_\+p)
+\item 
+bool \hyperlink{class_gpio_ab9bc464ad94cdc5d15ad47b45d07ba12}{\+\_\+is\+Initialized} (void)
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_gpio_ac8d7e1f4c3fb55220e0d742a65d3f6f5}{}bool {\bfseries \+\_\+initialized}\+: 1\label{class_gpio_ac8d7e1f4c3fb55220e0d742a65d3f6f5}
+
+\item 
+\hypertarget{class_gpio_a0ffac9059f018d074d5833571f27a612}{}Error {\bfseries \+\_\+last\+Error}\label{class_gpio_a0ffac9059f018d074d5833571f27a612}
+
+\item 
+\hypertarget{class_gpio_ae8ca344ab7340e1ca018b0a87505354c}{}uint16\+\_\+t {\bfseries \+\_\+pin}\label{class_gpio_ae8ca344ab7340e1ca018b0a87505354c}
+
+\item 
+\hypertarget{class_gpio_a347443eb64d58a346e143472fc253a20}{}G\+P\+I\+O\+\_\+\+Type\+Def $\ast$ {\bfseries \+\_\+port}\label{class_gpio_a347443eb64d58a346e143472fc253a20}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_gpio_af6c85b01275e46b59ab0fd53b267a1b0}{}\index{Gpio@{Gpio}!Gpio@{Gpio}}
+\index{Gpio@{Gpio}!Gpio@{Gpio}}
+\subsubsection[{Gpio}]{\setlength{\rightskip}{0pt plus 5cm}Gpio\+::\+Gpio (
+\begin{DoxyParamCaption}
+\item[{G\+P\+I\+O\+\_\+\+Type\+Def $\ast$}]{gpio\+Port\+\_\+p, }
+\item[{uint16\+\_\+t}]{gpio\+Pin\+\_\+p}
+\end{DoxyParamCaption}
+)}\label{class_gpio_af6c85b01275e46b59ab0fd53b267a1b0}
+
+
+Construct a new \hyperlink{class_gpio_a99fed5d9b35a8389c40c63eaaa8385dc}{Gpio\+::\+Gpio} object. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em gpio\+Port\+\_\+p} & \\
+\hline
+\mbox{\tt in}  & {\em gpio\+Pin\+\_\+p} & \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_gpio_a297109bc058b535736ff05bc94cce678}{}\index{Gpio@{Gpio}!\+\_\+initialize@{\+\_\+initialize}}
+\index{\+\_\+initialize@{\+\_\+initialize}!Gpio@{Gpio}}
+\subsubsection[{\+\_\+initialize}]{\setlength{\rightskip}{0pt plus 5cm}bool Gpio\+::\+\_\+initialize (
+\begin{DoxyParamCaption}
+\item[{G\+P\+I\+O\+\_\+\+Type\+Def $\ast$}]{gpio\+Port\+\_\+p, }
+\item[{uint16\+\_\+t}]{gpio\+Pin\+\_\+p}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}\label{class_gpio_a297109bc058b535736ff05bc94cce678}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em gpio\+Port\+\_\+p} & \\
+\hline
+\mbox{\tt in}  & {\em gpio\+Pin\+\_\+p} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true 
+
+false 
+\end{DoxyReturn}
+\hypertarget{class_gpio_ab9bc464ad94cdc5d15ad47b45d07ba12}{}\index{Gpio@{Gpio}!\+\_\+is\+Initialized@{\+\_\+is\+Initialized}}
+\index{\+\_\+is\+Initialized@{\+\_\+is\+Initialized}!Gpio@{Gpio}}
+\subsubsection[{\+\_\+is\+Initialized}]{\setlength{\rightskip}{0pt plus 5cm}bool Gpio\+::\+\_\+is\+Initialized (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}\label{class_gpio_ab9bc464ad94cdc5d15ad47b45d07ba12}
+\begin{DoxyReturn}{Returns}
+true 
+
+false 
+\end{DoxyReturn}
+\hypertarget{class_gpio_ab1acc5af68efdcaa0ff428ebd98e84f7}{}\index{Gpio@{Gpio}!clr@{clr}}
+\index{clr@{clr}!Gpio@{Gpio}}
+\subsubsection[{clr}]{\setlength{\rightskip}{0pt plus 5cm}bool Gpio\+::clr (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{class_gpio_ab1acc5af68efdcaa0ff428ebd98e84f7}
+\begin{DoxyReturn}{Returns}
+true 
+
+false 
+\end{DoxyReturn}
+\hypertarget{class_gpio_a40af09a22962f57fb0184eb4759acee3}{}\index{Gpio@{Gpio}!cpl@{cpl}}
+\index{cpl@{cpl}!Gpio@{Gpio}}
+\subsubsection[{cpl}]{\setlength{\rightskip}{0pt plus 5cm}bool Gpio\+::cpl (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{class_gpio_a40af09a22962f57fb0184eb4759acee3}
+\begin{DoxyReturn}{Returns}
+true 
+
+false 
+\end{DoxyReturn}
+\hypertarget{class_gpio_a257ddbd4f1b691fed8dfcdd3853cac90}{}\index{Gpio@{Gpio}!get\+Last\+Error@{get\+Last\+Error}}
+\index{get\+Last\+Error@{get\+Last\+Error}!Gpio@{Gpio}}
+\subsubsection[{get\+Last\+Error}]{\setlength{\rightskip}{0pt plus 5cm}Error Gpio\+::get\+Last\+Error (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{class_gpio_a257ddbd4f1b691fed8dfcdd3853cac90}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\hypertarget{class_gpio_affa4d2741c705c5e40a3e2137b303fed}{}\index{Gpio@{Gpio}!init@{init}}
+\index{init@{init}!Gpio@{Gpio}}
+\subsubsection[{init}]{\setlength{\rightskip}{0pt plus 5cm}bool Gpio\+::init (
+\begin{DoxyParamCaption}
+\item[{G\+P\+I\+O\+\_\+\+Type\+Def $\ast$}]{gpio\+Port\+\_\+p, }
+\item[{uint16\+\_\+t}]{gpio\+Pin\+\_\+p}
+\end{DoxyParamCaption}
+)}\label{class_gpio_affa4d2741c705c5e40a3e2137b303fed}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em gpio\+Port\+\_\+p} & \\
+\hline
+\mbox{\tt in}  & {\em gpio\+Pin\+\_\+p} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true 
+
+false 
+\end{DoxyReturn}
+\hypertarget{class_gpio_a47c4e23e74ff7b2b3eaadac7695474e2}{}\index{Gpio@{Gpio}!set@{set}}
+\index{set@{set}!Gpio@{Gpio}}
+\subsubsection[{set}]{\setlength{\rightskip}{0pt plus 5cm}bool Gpio\+::set (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{class_gpio_a47c4e23e74ff7b2b3eaadac7695474e2}
+\begin{DoxyReturn}{Returns}
+true 
+
+false 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+funsape\+Lib\+Gpio.\+hpp\item 
+funsape\+Lib\+Gpio.\+cpp\end{DoxyCompactItemize}

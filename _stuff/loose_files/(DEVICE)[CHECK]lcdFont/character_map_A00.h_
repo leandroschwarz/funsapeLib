@@ -1,0 +1,26 @@
+/* -----------------------------------------------------------------------------
+ * File:			character_map_A00.h
+ * Author:			Felipe Broering
+ * 					Sávio Magalhães Fernandes
+ * Version:			1.0
+ * Last edition:	25/06/2015
+ * -------------------------------------------------------------------------- */
+ 
+#ifndef __CHARACTER_MAP_A00_H
+#define __CHARACTER_MAP_A00_H 10
+
+// -----------------------------------------------------------------------------
+// Header files ----------------------------------------------------------------
+ 
+#include "LS_defines.h"
+#if __LS_DEFINES_H < 110
+		#error Error 100 - The defintion file is outdated (LS_defines must be version 11.0 or greater).
+#endif
+#include <avr/pgmspace.h>
+
+// -----------------------------------------------------------------------------
+// Global variables ------------------------------------------------------------
+
+extern uint8 tca00[256][5];
+
+#endif

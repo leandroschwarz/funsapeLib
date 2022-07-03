@@ -1,0 +1,51 @@
+/* -----------------------------------------------------------------------------
+ * Project:			GPDSE AVR8 Library
+ * File:			mma7455Spi.h
+ * Module:			SPI interface for MMA7455 accelerometer
+ * Authors:			Hazael dos Santos Batista
+ *					Leandro Schwarz
+ * Build:			1
+ * Last edition:	March 21, 2018
+ * -------------------------------------------------------------------------- */
+
+#ifndef __MMA7455_SPI_H
+#define __MMA7455_SPI_H 1
+
+// -----------------------------------------------------------------------------
+// Header files ----------------------------------------------------------------
+
+#include "globalDefines.h"
+#if __GLOBAL_DEFINES_H != 1
+	#error Error 100 - globalDefines.h - wrong build (globalDefines must be build 1).
+#endif
+#include <spiMaster.h>
+
+// -----------------------------------------------------------------------------
+// Constant definitions --------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+// New data types --------------------------------------------------------------
+
+typedef struct mma7455Spi_t {
+	reg_t *	csDDR;
+	reg_t *	csPORT;
+	uint8_t	csBit		: 3;
+	bool_t	initialized	: 1;
+	uint8_t	unusedBits	: 4;
+} mma7455Spi_t;
+
+// -----------------------------------------------------------------------------
+// Macrofunctions --------------------------------------------------------------
+
+#define mma7455SpiCreate() (mma7455Spi_t){.csDDR = NULL, .csPORT = NULL, .csBit = 0, .initialized = FALSE, .unusedBits = 0}
+
+// -----------------------------------------------------------------------------
+// Function declarations -------------------------------------------------------
+
+void mma7455SpiSetPort(mma7455Spi_t * device, reg_t * csDDR, reg_t * csPORT, uint8_t csBit);
+
+bool_t mma7455SpiWhoAmI(mma7455Spi_t * device);
+void mma7455SpiReadData(mma7455Spi_t * device, int16_t * xValue, int16_t * yValue, int16_t * zValue);
+void mma7455SpiReadData8Bits(mma7455Spi_t * device, int8_t * xValue, int8_t * yValue, int8_t * zValue);
+
+#endif

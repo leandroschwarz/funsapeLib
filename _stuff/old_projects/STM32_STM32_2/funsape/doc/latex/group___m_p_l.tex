@@ -1,0 +1,82 @@
+\hypertarget{group___m_p_l}{}\section{mpl}
+\label{group___m_p_l}\index{mpl@{mpl}}
+
+
+Motion Library -\/ Start Point Initializes M\+P\+L.  
+
+
+\subsection*{Files}
+\begin{DoxyCompactItemize}
+\item 
+file \hyperlink{mpl_8c}{mpl.\+c}
+\begin{DoxyCompactList}\small\item\em M\+P\+L start point. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___m_p_l_gaa1a1f898ca9f60e0edd26ad644a131ab}{inv\+\_\+init\+\_\+mpl} (void)
+\begin{DoxyCompactList}\small\item\em Initializes the M\+P\+L. Should be called first and once. \end{DoxyCompactList}\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___m_p_l_gaf179a96755fbe87bab43ac7dae97caa2}{inv\+\_\+get\+\_\+version} (char $\ast$$\ast$version)
+\begin{DoxyCompactList}\small\item\em used to get the M\+P\+L version. \end{DoxyCompactList}\item 
+\hyperlink{structinv__error__t}{inv\+\_\+error\+\_\+t} \hyperlink{group___m_p_l_ga0f2aa09b1e0db8f568bbfd94028fb246}{inv\+\_\+start\+\_\+mpl} (void)
+\begin{DoxyCompactList}\small\item\em Starts the M\+P\+L. Typically called after \hyperlink{group___m_p_l_gaa1a1f898ca9f60e0edd26ad644a131ab}{inv\+\_\+init\+\_\+mpl()} or after a inv\+\_\+stop\+\_\+mpl() to start the M\+P\+L back up an running. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___m_p_l_ga7845775c45d2ef0179a096920253fe8e}{}const char {\bfseries ml\+\_\+ver} \mbox{[}$\,$\mbox{]} = \char`\"{}Inven\+Sense M\+A 5.\+1.\+2\char`\"{}\label{group___m_p_l_ga7845775c45d2ef0179a096920253fe8e}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Motion Library -\/ Start Point Initializes M\+P\+L. 
+
+
+
+\subsection{Function Documentation}
+\hypertarget{group___m_p_l_gaf179a96755fbe87bab43ac7dae97caa2}{}\index{mpl@{mpl}!inv\+\_\+get\+\_\+version@{inv\+\_\+get\+\_\+version}}
+\index{inv\+\_\+get\+\_\+version@{inv\+\_\+get\+\_\+version}!mpl@{mpl}}
+\subsubsection[{inv\+\_\+get\+\_\+version}]{\setlength{\rightskip}{0pt plus 5cm}{\bf inv\+\_\+error\+\_\+t} inv\+\_\+get\+\_\+version (
+\begin{DoxyParamCaption}
+\item[{char $\ast$$\ast$}]{version}
+\end{DoxyParamCaption}
+)}\label{group___m_p_l_gaf179a96755fbe87bab43ac7dae97caa2}
+
+
+used to get the M\+P\+L version. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em version} & a string where the M\+P\+L version gets stored. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+I\+N\+V\+\_\+\+S\+U\+C\+C\+E\+S\+S if successful or a non-\/zero error code otherwise. 
+\end{DoxyReturn}
+\hypertarget{group___m_p_l_gaa1a1f898ca9f60e0edd26ad644a131ab}{}\index{mpl@{mpl}!inv\+\_\+init\+\_\+mpl@{inv\+\_\+init\+\_\+mpl}}
+\index{inv\+\_\+init\+\_\+mpl@{inv\+\_\+init\+\_\+mpl}!mpl@{mpl}}
+\subsubsection[{inv\+\_\+init\+\_\+mpl}]{\setlength{\rightskip}{0pt plus 5cm}{\bf inv\+\_\+error\+\_\+t} inv\+\_\+init\+\_\+mpl (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{group___m_p_l_gaa1a1f898ca9f60e0edd26ad644a131ab}
+
+
+Initializes the M\+P\+L. Should be called first and once. 
+
+\begin{DoxyReturn}{Returns}
+Returns I\+N\+V\+\_\+\+S\+U\+C\+C\+E\+S\+S if successful or an error code if not. 
+\end{DoxyReturn}
+\hypertarget{group___m_p_l_ga0f2aa09b1e0db8f568bbfd94028fb246}{}\index{mpl@{mpl}!inv\+\_\+start\+\_\+mpl@{inv\+\_\+start\+\_\+mpl}}
+\index{inv\+\_\+start\+\_\+mpl@{inv\+\_\+start\+\_\+mpl}!mpl@{mpl}}
+\subsubsection[{inv\+\_\+start\+\_\+mpl}]{\setlength{\rightskip}{0pt plus 5cm}{\bf inv\+\_\+error\+\_\+t} inv\+\_\+start\+\_\+mpl (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{group___m_p_l_ga0f2aa09b1e0db8f568bbfd94028fb246}
+
+
+Starts the M\+P\+L. Typically called after \hyperlink{group___m_p_l_gaa1a1f898ca9f60e0edd26ad644a131ab}{inv\+\_\+init\+\_\+mpl()} or after a inv\+\_\+stop\+\_\+mpl() to start the M\+P\+L back up an running. 
+
+\begin{DoxyReturn}{Returns}
+I\+N\+V\+\_\+\+S\+U\+C\+C\+E\+S\+S if successful or a non-\/zero error code otherwise. 
+\end{DoxyReturn}

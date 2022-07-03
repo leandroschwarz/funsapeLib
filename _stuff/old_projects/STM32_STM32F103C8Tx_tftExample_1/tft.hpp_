@@ -1,0 +1,197 @@
+
+
+
+#ifndef __TFT_HPP
+#define __TFT_HPP
+
+#include "funsapeLibGlobalDefines.hpp"
+#include "util/funsapeLibDebug.hpp"
+
+class Tft
+{
+public:
+	enum class Controller {
+		HX8347A							= 0,
+		ILI9327							= 1,
+		SSD1289							= 2,
+		ILI9325C						= 3,
+		ILI9325D_8						= 4,
+		ILI9325D_16						= 5,
+		HX8340B_8						= 6,
+		HX8340B_S						= 7,
+		HX8352A							= 8,
+		ST7735							= 9,
+		PCF8833							= 10,
+		S1D19122						= 11,
+		SSD1963_480						= 12,
+		SSD1963_800						= 13,
+		S6D1121_8						= 14,
+		S6D1121_16						= 15,
+		SSD1289LATCHED					= 16,
+		ILI9341_16						= 17,
+		ILI9341_8						= 18,
+		SSD1289_8						= 19,
+		SSD1963_800ALT					= 20,
+		ILI9481							= 21,
+		ILI9325D_16ALT					= 22,
+		S6D0164							= 23,
+		ILI9341_S5P						= 25,
+		ILI9341_S4P						= 26,
+		R61581							= 27,
+		ILI9486							= 28,
+		CPLD							= 29,
+		HX8353C							= 30,
+	};
+	enum class InterfaceMode {
+		PARALLEL_8_BITS					= 0,
+		PARALLEL_16_BITS				= 1,
+		PARALLEL_16_BITS_LATCHED		= 2,
+		SERIAL_4_PINS					= 3,
+		SERIAL_5_PINS					= 4,
+	};
+
+public:
+	Tft(
+			Controller controllerModel_p = Controller::ILI9325D_8
+	);
+	bool setDataPort8Bits(
+			ioReg_t dataPort_p,
+			ioPin_t dataFirst_p,
+			ioPin_t dataOffset_p
+	);
+	bool setControlPort(
+			ioReg_t controlPort_p,
+			ioPin_t controlCs_p,
+			ioPin_t controlRd_p,
+			ioPin_t controlRs_p,
+			ioPin_t controlRst_p,
+			ioPin_t controlWr_p
+	);
+	bool setControllerModel(
+			Controller controllerModel_p
+	);
+	bool init(
+			DisplayOrientation orientation_p = DisplayOrientation::LANDSCAPE
+	);
+	Error getLastError(void);
+
+	// void	InitLCD(uint8_t orientation = LANDSCAPE);
+	// void	clrScr();
+	// void	drawPixel(int x, int y);
+	// void	drawLine(int x1, int y1, int x2, int y2);
+	// void	fillScr(uint8_t r, uint8_t g, uint8_t b);
+	// void	fillScr(uint16_t color);
+	// void	drawRect(int x1, int y1, int x2, int y2);
+	// void	drawRoundRect(int x1, int y1, int x2, int y2);
+	// void	fillRect(int x1, int y1, int x2, int y2);
+	// void	fillRoundRect(int x1, int y1, int x2, int y2);
+	// void	drawCircle(int x, int y, int radius);
+	// void	fillCircle(int x, int y, int radius);
+	// void	setColor(uint8_t r, uint8_t g, uint8_t b);
+	// void	setColor(uint16_t color);
+	// uint16_t	getColor();
+	// void	setBackColor(uint8_t r, uint8_t g, uint8_t b);
+	// void	setBackColor(uint32_t color);
+	// uint16_t	getBackColor();
+	// void	print(char *st, int x, int y, int deg = 0);
+	// void	print(String st, int x, int y, int deg = 0);
+	// void	printNumI(long num, int x, int y, int length = 0, char filler = ' ');
+	// void	printNumF(double num, uint8_t dec, int x, int y, char divider = '.', int length = 0, char filler = ' ');
+	// void	setFont(uint8_t *font);
+	// uint8_t *getFont();
+	// uint8_t	getFontXsize();
+	// uint8_t	getFontYsize();
+	// void	drawBitmap(int x, int y, int sx, int sy, bitmapdatatype data, int scale = 1);
+	// void	drawBitmap(int x, int y, int sx, int sy, bitmapdatatype data, int deg, int rox, int roy);
+	// void	lcdOff();
+	// void	lcdOn();
+	// void	setContrast(char c);
+	// int		getDisplayXSize();
+	// int		getDisplayYSize();
+	// void	setBrightness(uint8_t br);
+	// void	setDisplayPage(uint8_t page);
+	// void	setWritePage(uint8_t page);
+
+	/*
+		The functions and variables below should not normally be used.
+		They have been left publicly available for use in add-on libraries
+		that might need access to the lower level functions of Tft.
+
+		Please note that these functions and variables are not documented
+		and I do not provide support on how to use them.
+	*/
+	// uint8_t			fch, fcl, bch, bcl;
+	// uint8_t			orient;
+	// long			disp_x_size, disp_y_size;
+	// uint8_t			display_model, display_transfer_mode, display_serial_mode;
+	// regtype			*P_RS, *P_WR, *P_CS, *P_RST, *P_SDA, *P_SCL, *P_ALE;
+	// regsize			B_RS, B_WR, B_CS, B_RST, B_SDA, B_SCL, B_ALE;
+	// uint8_t			__p1, __p2, __p3, __p4, __p5;
+	// _current_font	cfont;
+	// bool			_transparent;
+
+	// void LCD_Writ_Bus(char VH, char VL, uint8_t mode);
+	// void LCD_Write_DATA(char VH, char VL);
+	// void LCD_Write_DATA(char VL);
+	// void LCD_Write_Bus_8(char VL);
+	// void LCD_Write_DATA_8(char VL);
+	// void _hw_special_init();
+	// void setPixel(uint16_t color);
+	// void drawHLine(int x, int y, int l);
+	// void drawVLine(int x, int y, int l);
+	// void printChar(uint8_t c, int x, int y);
+	// void setXY(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
+	// void clrXY();
+	// void rotateChar(uint8_t c, int x, int y, int pos, int deg);
+	// void _set_direction_registers(uint8_t mode);
+	// void _fast_fill_16(int ch, int cl, long pix);
+	// void _fast_fill_8(int ch, long pix);
+	// void _convert_float(char *buf, double num, int width, uint8_t prec);
+
+// #if defined(ENERGIA)
+// 	volatile uint32_t *portOutputRegister(int value);
+// #endif
+
+private:
+	//     /////////////////    DATA INTERFACE PINS     /////////////////     //
+	ioReg_t				_dataLowPort;
+	ioPin_t				_dataLowFirst;
+	ioPin_t				_dataLowOffset;
+	ioReg_t				_dataHighPort;
+	ioPin_t				_dataHighFirst;
+	ioPin_t				_dataHighOffset;
+	ioPin_t				_dataSda;
+	ioPin_t				_dataScl;
+
+	//     ///////////////     CONTROL INTERFACE PINS     ///////////////     //
+	ioReg_t				_controlPort;
+	ioPin_t				_controlCs;
+	ioPin_t				_controlRd;
+	ioPin_t				_controlRs;
+	ioPin_t				_controlRst;
+	ioPin_t				_controlWr;
+	ioPin_t				_controlSer;
+
+	//     //////////////     CONFIGURATION AND STATUS     //////////////     //
+	bool				_controllerSet			: 1;
+	bool				_controlPortSet			: 1;
+	bool				_dataPortSet			: 1;
+	bool				_initialized			: 1;
+	InterfaceMode		_interfaceMode;
+	Controller			_controllerModel;
+	Error				_lastError;
+	DisplayOrientation	_displayOrientation		: 1;
+
+	//     /////////////////    DISPLAY INFORMATION     /////////////////     //
+	uint16_t			_displayMaxX			: 10;
+	uint16_t			_displayMaxY			: 10;
+};
+
+void setIoPinMode(ioReg_t GPIOx, ioPin_t GPIO_Pin, PinDirection direction);
+
+
+
+
+
+
+#endif // __TFT_HPP

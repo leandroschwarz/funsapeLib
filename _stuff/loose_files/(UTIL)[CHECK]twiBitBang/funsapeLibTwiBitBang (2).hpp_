@@ -1,0 +1,215 @@
+/* =============================================================================
+ * Project:			FunSAPE++ Embedded Library
+ * File name:		flTwiBitBangBitBang.hpp
+ * Module:			TWI Bit Bang Interface for FunSAPE++ Embedded Library
+ *					project
+ * Authors:			__AUTHORS_TO_REPLACE__
+ * Build:			__BUILD_TO_REPLACE__
+ * Last edition:	__DATE_TO_REPLACE__
+ * ========================================================================== */
+
+// =============================================================================
+// Include guard
+// =============================================================================
+
+#ifndef __FL_TWI_BIT_BANG_HPP
+#define __FL_TWI_BIT_BANG_HPP					__BUILD_TO_REPLACE__
+
+// =============================================================================
+// Dependencies
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Global definitions file -----------------------------------------------------
+
+#include "../flGlobalDefines.hpp"
+#ifndef __FL_GLOBAL_DEFINES_HPP
+#	error	[flTwiBitBang.hpp] Error 10 - Global definitions file (flGlobalDefines.hpp) is missing or corrupted!
+#elif __FL_GLOBAL_DEFINES_HPP != __BUILD_TO_REPLACE__
+#	error	[flTwiBitBang.hpp] Error 11 - Build mismatch between (flTwiBitBang.hpp) and global definitions file (flGlobalDefines.hpp)!
+#endif
+
+// -----------------------------------------------------------------------------
+// FunSAPE Library header files ------------------------------------------------
+
+#include "flHandler.hpp"
+#ifndef __FL_HANDLER_HPP
+#	error	[flTwiBitBang.hpp] Error 12 - Required module (flHandler.hpp) is missing or corrupted!
+#elif __FL_HANDLER_HPP != __BUILD_TO_REPLACE__
+#	error [flTwiBitBang.hpp] Error 103 - Required module (flHandler.hpp) must be build __BUILD_TO_REPLACE__.
+#endif
+
+// =============================================================================
+// Undefining previous definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Constant definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Macro-function definitions
+// *INDENT-OFF*
+// =============================================================================
+
+// NONE
+
+// *INDENT-ON*
+
+// =============================================================================
+// New data types
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// TwiBitBang - Class declaration
+// =============================================================================
+
+class TwiBitBang : public Handler
+{
+	// -------------------------------------------------------------------------
+	// New data types ----------------------------------------------------------
+
+public:
+	enum class TwiOperation {
+		WRITE	= 0x00,
+		READ	= 0x01
+	};
+
+private:
+	// NONE
+
+protected:
+	// NONE
+
+	// -------------------------------------------------------------------------
+	// Operators overloading ---------------------------------------------------
+
+public:
+	// NONE
+
+private:
+	// NONE
+
+protected:
+	// NONE
+
+	// -------------------------------------------------------------------------
+	// Constructors ------------------------------------------------------------
+
+public:
+	TwiBitBang(void);
+	~TwiBitBang(void);											// TODO: Implement function
+
+	// -------------------------------------------------------------------------
+	// Methods - Inherited public methods --------------------------------------
+
+public:
+	bool					read(uint8_t reg_p, uint8_t *dataBuffer_p, uint16_t bytesToRead_p);
+	bool					write(uint8_t reg_p, uint8_t *dataBuffer_p, uint16_t bytesToWrite_p);
+	Handler::HandlerType	getHandlerType(void);
+
+private:
+	// NONE
+
+protected:
+	// NONE
+
+	// -------------------------------------------------------------------------
+	// Methods - Own methods ---------------------------------------------------
+
+public:
+#if defined(_FUNSAPE_PLATFORM_ARM_STM32)						// ARM implementation
+	// TODO: ARM implementation
+	bool init(I2C_HandleTypeDef *twiHandler_p, uint16_t bufSize_p = 20);
+#elif defined(_FUNSAPE_PLATFORM_AVR)							// AVR implementation
+	bool init(uint16_t bufSize_p = 20);
+#endif
+	bool setTimeOut(uint16_t timeOut_p);
+	Error getLastError(void);
+
+private:
+	bool _reset(void);
+	bool _initialize(void);
+	bool _process(uint8_t reg_p, uint8_t *dataBuffer_p, uint16_t bytesToProcess_p);
+	bool _transmit(void);
+
+protected:
+	// NONE
+
+	// -------------------------------------------------------------------------
+	// Properties --------------------------------------------------------------
+
+public:
+	// NONE
+
+private:
+	//     /////////////////    PERIPHERAL HANDLER     //////////////////     //
+#if defined(_FUNSAPE_PLATFORM_ARM_STM32)
+	I2C_HandleTypeDef	*_twiHandler;
+#elif defined(_FUNSAPE_PLATFORM_AVR)
+#endif
+
+	//     //////////////    CONFIGURATION AND STATUS     ///////////////     //
+	bool				_initialized			: 1;
+	bool				_isBusy					: 1;
+	Error				_lastError;
+	uint16_t			_timeOut;
+	bool				_readWrite				: 1;	// true = read, false = write
+	bool				_fastStandardSpeed		: 1;	// true = fast speed, false =standard speed
+
+	//     ////////////////////     DATA BUFFER      ////////////////////     //
+	uint8_t				*_bufferData;
+	uint16_t			_bufferIndex;
+	uint16_t			_bufferLength;
+	uint16_t			_bufferMaxSize;
+
+protected:
+	// NONE
+
+}; // class TwiBitBang
+
+// =============================================================================
+// TwiBitBang - Class overloading operators
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Global variables
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Externally defined global variables -----------------------------------------
+
+// NONE
+
+// -----------------------------------------------------------------------------
+// Internally defined global variables -----------------------------------------
+
+// NONE
+
+// =============================================================================
+// TwiBitBang - Class inline function definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// General public functions declarations
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// General inline functions definitions
+// =============================================================================
+
+// NONE
+
+#endif // __FL_TWI_BIT_BANG_HPP

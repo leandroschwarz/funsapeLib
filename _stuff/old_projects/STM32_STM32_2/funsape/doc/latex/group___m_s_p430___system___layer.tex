@@ -1,0 +1,121 @@
+\hypertarget{group___m_s_p430___system___layer}{}\section{M\+S\+P430 System Layer}
+\label{group___m_s_p430___system___layer}\index{M\+S\+P430 System Layer@{M\+S\+P430 System Layer}}
+
+
+M\+S\+P430 System Layer A\+P\+Is. To interface with any platform, e\+M\+P\+L needs access to various system layer functions.  
+
+
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___m_s_p430___system___layer_ga6821bafc3c88dfb2e433a095df9940c6}{}\#define {\bfseries B\+U\+F\+\_\+\+S\+I\+Z\+E}~(256)\label{group___m_s_p430___system___layer_ga6821bafc3c88dfb2e433a095df9940c6}
+
+\item 
+\hypertarget{group___m_s_p430___system___layer_gaf09b64f369b27803e9b840ebde07a532}{}\#define {\bfseries P\+A\+C\+K\+E\+T\+\_\+\+L\+E\+N\+G\+T\+H}~(23)\label{group___m_s_p430___system___layer_gaf09b64f369b27803e9b840ebde07a532}
+
+\item 
+\hypertarget{group___m_s_p430___system___layer_ga2eb1ff1c6bbd4b37e197ad694d26375c}{}\#define {\bfseries P\+A\+C\+K\+E\+T\+\_\+\+D\+E\+B\+U\+G}~(1)\label{group___m_s_p430___system___layer_ga2eb1ff1c6bbd4b37e197ad694d26375c}
+
+\item 
+\hypertarget{group___m_s_p430___system___layer_gaa8f5d0807280172e075735882266756f}{}\#define {\bfseries P\+A\+C\+K\+E\+T\+\_\+\+Q\+U\+A\+T}~(2)\label{group___m_s_p430___system___layer_gaa8f5d0807280172e075735882266756f}
+
+\item 
+\hypertarget{group___m_s_p430___system___layer_ga01ec1bff07ef38453df28ebc8d6a1832}{}\#define {\bfseries P\+A\+C\+K\+E\+T\+\_\+\+D\+A\+T\+A}~(3)\label{group___m_s_p430___system___layer_ga01ec1bff07ef38453df28ebc8d6a1832}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{group___m_s_p430___system___layer_ga1b638933f33e37f42042f64cbc408821}{\+\_\+\+M\+L\+Print\+Log} (int priority, const char $\ast$tag, const char $\ast$fmt,...)
+\begin{DoxyCompactList}\small\item\em Prints a variable argument log message. U\+S\+B output will be formatted as follows\+:~\newline
+packet\mbox{[}0\mbox{]} = \$~\newline
+packet\mbox{[}1\mbox{]} = packet type (1\+: debug, 2\+: quat, 3\+: data)~\newline
+packet\mbox{[}2\mbox{]} = ~\newline
+ for debug packets\+: log priority~\newline
+ for quaternion packets\+: unused~\newline
+ for data packets\+: packet content (accel, gyro, etc)~\newline
+packet\mbox{[}3-\/20\mbox{]} = data~\newline
+packet\mbox{[}21\mbox{]} = \textbackslash{}r~\newline
+packet\mbox{[}22\mbox{]} = \textbackslash{}n. \end{DoxyCompactList}\item 
+void \hyperlink{group___m_s_p430___system___layer_gac781b96a931ab4eb1ad191ce53e4f0d1}{e\+M\+P\+L\+\_\+send\+\_\+quat} (long $\ast$quat)
+\begin{DoxyCompactList}\small\item\em Send a quaternion packet via U\+A\+R\+T. The host is expected to use the data in this packet to graphically represent the device orientation. To send quaternion in the same manner as any other data packet, use e\+M\+P\+L\+\_\+send\+\_\+data. \end{DoxyCompactList}\item 
+void \hyperlink{group___m_s_p430___system___layer_ga6eb41d95d28b12994f2722bda7fab49d}{e\+M\+P\+L\+\_\+send\+\_\+data} (unsigned char type, long $\ast$data)
+\begin{DoxyCompactList}\small\item\em Send a data packet via U\+A\+R\+T. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+M\+S\+P430 System Layer A\+P\+Is. To interface with any platform, e\+M\+P\+L needs access to various system layer functions. 
+
+
+
+\subsection{Function Documentation}
+\hypertarget{group___m_s_p430___system___layer_ga1b638933f33e37f42042f64cbc408821}{}\index{M\+S\+P430 System Layer@{M\+S\+P430 System Layer}!\+\_\+\+M\+L\+Print\+Log@{\+\_\+\+M\+L\+Print\+Log}}
+\index{\+\_\+\+M\+L\+Print\+Log@{\+\_\+\+M\+L\+Print\+Log}!M\+S\+P430 System Layer@{M\+S\+P430 System Layer}}
+\subsubsection[{\+\_\+\+M\+L\+Print\+Log}]{\setlength{\rightskip}{0pt plus 5cm}int \+\_\+\+M\+L\+Print\+Log (
+\begin{DoxyParamCaption}
+\item[{int}]{priority, }
+\item[{const char $\ast$}]{tag, }
+\item[{const char $\ast$}]{fmt, }
+\item[{}]{...}
+\end{DoxyParamCaption}
+)}\label{group___m_s_p430___system___layer_ga1b638933f33e37f42042f64cbc408821}
+
+
+Prints a variable argument log message. U\+S\+B output will be formatted as follows\+:~\newline
+packet\mbox{[}0\mbox{]} = \$~\newline
+packet\mbox{[}1\mbox{]} = packet type (1\+: debug, 2\+: quat, 3\+: data)~\newline
+packet\mbox{[}2\mbox{]} = ~\newline
+ for debug packets\+: log priority~\newline
+ for quaternion packets\+: unused~\newline
+ for data packets\+: packet content (accel, gyro, etc)~\newline
+packet\mbox{[}3-\/20\mbox{]} = data~\newline
+packet\mbox{[}21\mbox{]} = \textbackslash{}r~\newline
+packet\mbox{[}22\mbox{]} = \textbackslash{}n. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em priority} & Log priority (based on Android). \\
+\hline
+\mbox{\tt in}  & {\em tag} & File specific string. \\
+\hline
+\mbox{\tt in}  & {\em fmt} & String of text with optional format tags.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 if successful. 
+\end{DoxyReturn}
+\hypertarget{group___m_s_p430___system___layer_ga6eb41d95d28b12994f2722bda7fab49d}{}\index{M\+S\+P430 System Layer@{M\+S\+P430 System Layer}!e\+M\+P\+L\+\_\+send\+\_\+data@{e\+M\+P\+L\+\_\+send\+\_\+data}}
+\index{e\+M\+P\+L\+\_\+send\+\_\+data@{e\+M\+P\+L\+\_\+send\+\_\+data}!M\+S\+P430 System Layer@{M\+S\+P430 System Layer}}
+\subsubsection[{e\+M\+P\+L\+\_\+send\+\_\+data}]{\setlength{\rightskip}{0pt plus 5cm}void e\+M\+P\+L\+\_\+send\+\_\+data (
+\begin{DoxyParamCaption}
+\item[{unsigned char}]{type, }
+\item[{long $\ast$}]{data}
+\end{DoxyParamCaption}
+)}\label{group___m_s_p430___system___layer_ga6eb41d95d28b12994f2722bda7fab49d}
+
+
+Send a data packet via U\+A\+R\+T. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em type} & Contents of packet (P\+A\+C\+K\+E\+T\+\_\+\+D\+A\+T\+A\+\_\+\+A\+C\+C\+E\+L, etc). \\
+\hline
+\mbox{\tt in}  & {\em data} & Data (length dependent on contents). \\
+\hline
+\end{DoxyParams}
+\hypertarget{group___m_s_p430___system___layer_gac781b96a931ab4eb1ad191ce53e4f0d1}{}\index{M\+S\+P430 System Layer@{M\+S\+P430 System Layer}!e\+M\+P\+L\+\_\+send\+\_\+quat@{e\+M\+P\+L\+\_\+send\+\_\+quat}}
+\index{e\+M\+P\+L\+\_\+send\+\_\+quat@{e\+M\+P\+L\+\_\+send\+\_\+quat}!M\+S\+P430 System Layer@{M\+S\+P430 System Layer}}
+\subsubsection[{e\+M\+P\+L\+\_\+send\+\_\+quat}]{\setlength{\rightskip}{0pt plus 5cm}void e\+M\+P\+L\+\_\+send\+\_\+quat (
+\begin{DoxyParamCaption}
+\item[{long $\ast$}]{quat}
+\end{DoxyParamCaption}
+)}\label{group___m_s_p430___system___layer_gac781b96a931ab4eb1ad191ce53e4f0d1}
+
+
+Send a quaternion packet via U\+A\+R\+T. The host is expected to use the data in this packet to graphically represent the device orientation. To send quaternion in the same manner as any other data packet, use e\+M\+P\+L\+\_\+send\+\_\+data. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em quat} & Quaternion data. \\
+\hline
+\end{DoxyParams}

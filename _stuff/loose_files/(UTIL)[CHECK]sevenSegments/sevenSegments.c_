@@ -1,0 +1,49 @@
+/* -----------------------------------------------------------------------------
+ * Project:			GPDSE AVR8 Library
+ * File:			sevenSegments.c
+ * Module:			Seven segments display interface
+ * Author:			Leandro Schwarz
+ * Version:			1.0
+ * Last edition:	2015-08-31
+ * -------------------------------------------------------------------------- */
+
+// -----------------------------------------------------------------------------
+// Header files ----------------------------------------------------------------
+
+#include "sevenSegments.h"
+#if __SEVEN_SEGMENTS_H != 10
+	#error Error 101 - Version mismatch on header and source code files (sevenSegments).
+#endif
+
+/* -----------------------------------------------------------------------------
+ * Seven segments display decoder.
+ * -------------------------------------------------------------------------- */
+
+uint8 hex2SevenSegments(uint8 hexValue, displayType_t displayType)
+{
+	uint8 data = 0;
+
+	switch(hexValue){ // PGFEDCBA
+	case 0x00:	data = 0b00111111;	break;
+	case 0x01:	data = 0b00000110;	break;
+	case 0x02:	data = 0b01011011;	break;
+	case 0x03:	data = 0b01001111;	break;
+	case 0x04:	data = 0b01100110;	break;
+	case 0x05:	data = 0b01101101;	break;
+	case 0x06:	data = 0b01111101;	break;
+	case 0x07:	data = 0b00000111;	break;
+	case 0x08:	data = 0b01111111;	break;
+	case 0x09:	data = 0b01101111;	break;
+	case 0x0A:	data = 0b01110111;	break;
+	case 0x0B:	data = 0b01111100;	break;
+	case 0x0C:	data = 0b00111001;	break;
+	case 0x0D:	data = 0b01011110;	break;
+	case 0x0E:	data = 0b01111001;	break;
+	case 0x0F:	data = 0b01110001;	break;
+		// OFF
+	case 0xFF:	data = 0b00000000;	break;
+	}
+	data = (displayType == DISPLAY_COMMON_CATHODE)?data:(~data);
+
+	return data;
+}

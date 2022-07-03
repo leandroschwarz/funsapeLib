@@ -1,0 +1,271 @@
+/* =============================================================================
+ * Project:			FunSAPE++ Embedded Library
+ * File name:		funsapeLibGpio.hpp
+ * Module:			GPIO Peripheral Interface for FunSAPE++ Embedded Library
+ *					project
+ * Authors:			__AUTHORS_TO_REPLACE__
+ * Build:			__BUILD_TO_REPLACE__
+ * Last edition:	__DATE_TO_REPLACE__
+ * ========================================================================== */
+
+// =============================================================================
+// Dependencies
+// =============================================================================
+
+#include "funsapeLibGpio.hpp"
+#ifndef __FUNSAPE_LIB_GPIO_HPP
+#	error	[funsapeLibGpio.cpp] Error 1 - Header file (funsapeLibGpio.hpp) is missing or corrupted!
+#elif __FUNSAPE_LIB_GPIO_HPP != __BUILD_TO_REPLACE__
+#	error	[funsapeLibGpio.cpp] Error 13 - Build mismatch between source (funsapeLibGpio.cpp) and header (funsapeLibGpio.hpp) files!
+#endif
+
+// =============================================================================
+// File exclusive - Constants
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// File exclusive - New data types
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// File exclusive - Macro-functions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Global variables
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Static functions declarations
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Class constructors
+// =============================================================================
+
+#if defined(_FUNSAPE_PLATFORM_AVR)
+Gpio::Gpio(allGpioControl_s *instance_p, pinsMask_e pinsMask_p)
+#elif defined(_FUNSAPE_PLATFORM_ARM_STM32)
+// TODO: Implement for ARM
+Gpio::Gpio(void *instance_p, pinsMask_e pinsMask_p)
+#endif
+{
+	// Resets data members
+	this->_instance						= nullptr;
+	this->_initialized					= false;
+	this->_pinsMask						= 0;
+
+	// Checks for errors
+	if(!isPointerValid(instance_p)) {
+		// Returns error
+		this->_lastError = Error::ARGUMENT_POINTER_NULL;
+//		debugMessage(Error::ARGUMENT_POINTER_NULL);
+		return;
+	}
+	if(pinsMask_p == 0) {
+		// Returns error
+		this->_lastError = Error::GPIO_NO_PIN_SET;
+//		debugMessage(Error::GPIO_NO_PIN_SET);
+		return;
+	}
+
+	// Updates data members
+	this->_instance = instance_p;
+	this->_pinsMask = pinsMask_p;
+	this->_initialized = true;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+//	debugMessage(Error::NONE);
+	return;
+}
+
+Gpio::~Gpio(void)
+{
+	// Returns successfully
+	return;
+}
+
+// =============================================================================
+// Inherited methods - Public
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Inherited methods - Protected
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Class own methods - Public
+// =============================================================================
+
+bool Gpio::addPin(pinsMask_e pinsMask_p)
+{
+	// Checks for errors
+	if(pinsMask_p == 0) {
+		// Returns error
+		this->_lastError = Error::GPIO_NO_PIN_SET;
+//		debugMessage(Error::GPIO_NO_PIN_SET);
+		return false;
+	}
+
+	// Update data members
+	setMask(this->_pinsMask, pinsMask_p, 0);
+	this->_initialized = (this->_pinsMask == 0) ? false : true;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+//	debugMessage(Error::NONE);
+	return true;
+}
+
+bool Gpio::removePin(pinsMask_e pinsMask_p)
+{
+	// Checks for errors
+	if(pinsMask_p == 0) {
+		// Returns error
+		this->_lastError = Error::GPIO_NO_PIN_SET;
+//		debugMessage(Error::GPIO_NO_PIN_SET);
+		return false;
+	}
+
+	// Update data members
+	clrMask(this->_pinsMask, pinsMask_p, 0);
+	this->_initialized = (this->_pinsMask == 0) ? false : true;
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+//	debugMessage(Error::NONE);
+	return true;
+}
+
+bool Gpio::setMode(PinMode pinMode_p)
+{
+	// Checks for erros
+	if(!this->_initialized) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+//		debugMessage(Error::NOT_INITIALIZED);
+		return false;
+	}
+
+	// Performs action
+	switch(pinMode_p) {
+
+	case PinMode::INPUT_TRISTATE:
+#if defined(_FUNSAPE_PLATFORM_AVR)
+		clrMask(this->_instance->portDir, this->_pinsMask, 0);
+		clrMask(this->_instance->portOut, this->_pinsMask, 0);
+#elif defined(_FUNSAPE_PLATFORM_ARM_STM32)
+
+#endif
+		break;
+
+	case PinMode::INPUT_PULL_UP:
+#if defined(_FUNSAPE_PLATFORM_AVR)
+		clrMask(this->_instance->portDir, this->_pinsMask, 0);
+		setMask(this->_instance->portOut, this->_pinsMask, 0);
+#elif defined(_FUNSAPE_PLATFORM_ARM_STM32)
+
+#endif
+		break;
+	case PinMode::OUTPUT:
+#if defined(_FUNSAPE_PLATFORM_AVR)
+		setMask(this->_instance->portDir, this->_pinsMask, 0);
+#elif defined(_FUNSAPE_PLATFORM_ARM_STM32)
+
+#endif
+		break;
+	}
+
+	// Returns successfully
+	this->_lastError = Error::NONE;
+//	debugMessage(Error::NONE);
+	return true;
+}
+
+#if defined(_FUNSAPE_PLATFORM_ARM_STM32)
+bool Gpio::setDriverMode(DriverMode driverMode_p)
+{
+	return false;
+}
+#endif
+
+#if defined(_FUNSAPE_PLATFORM_ARM_STM32)
+bool Gpio::setSpeed(PinSpeed pinSpeed_p)
+{
+	return false;
+
+}
+#endif
+
+ioPin_t Gpio::read(void)
+{
+	// Checks for erros
+	if(!this->_initialized) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+//		debugMessage(Error::NOT_INITIALIZED);
+		return 0;
+	}
+
+	return this->_instance->portIn;
+}
+
+void Gpio::write(ioPin_t value_p)
+{
+	// Checks for erros
+	if(!this->_initialized) {
+		// Returns error
+		this->_lastError = Error::NOT_INITIALIZED;
+//		debugMessage(Error::NOT_INITIALIZED);
+		return;
+	}
+
+	ioPin_t auxPin = this->_instance->portOut;
+	clrMask(auxPin, this->_pinsMask, 0);
+	setMask(auxPin, (value_p & this->_pinsMask), 0);
+	this->_instance->portOut = auxPin;
+
+	return;
+}
+
+void Gpio::set(void)
+{
+	setMask(this->_instance->portOut, this->_pinsMask, 0);
+}
+
+void Gpio::reset(void)
+{
+	clrMask(this->_instance->portOut, this->_pinsMask, 0);
+}
+
+void Gpio::toggle(void)
+{
+	cplMask(this->_instance->portOut, this->_pinsMask, 0);
+}
+
+// =============================================================================
+// Class own methods - Private
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Class own methods - Protected
+// =============================================================================
+
+// NONE

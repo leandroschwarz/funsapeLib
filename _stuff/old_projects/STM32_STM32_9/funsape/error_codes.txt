@@ -1,0 +1,185 @@
+// =============================================================================
+// Error codes
+// =============================================================================
+
+// =============================================================================
+// Error 1
+// =============================================================================
+
+Cause:		Project configuration file not found
+Caller:		Global definitons file ONLY
+
+Message:	[__GLOBAL_DEFINITIONS_HEADER__] Error 1 - Project configuration file (__PROJECT_CONFIG_HEADER__) is missing or corrupted!
+
+// =============================================================================
+// Error 2
+// =============================================================================
+
+Cause:		Project configuration file version mismatch
+Caller:		Global definitons file ONLY
+
+Message:	[__GLOBAL_DEFINITIONS_HEADER__] Error 2 - Build mismatch between project configuration file (__PROJECT_CONFIG_HEADER__) and global definitions file (__GLOBAL_DEFINITIONS_HEADER__)!
+
+// =============================================================================
+// Error 3
+// =============================================================================
+
+Cause:		Platforms support file not found
+Caller:		Project configuration file ONLY
+
+Message:	[__PROJECT_CONFIG_HEADER__] Error 3 - Platforms support file (__PLATFORM_SUPPORT_HEADER__) is missing or corrupted!
+
+// =============================================================================
+// Error 4
+// =============================================================================
+
+Cause:		Platforms support file version mismatch
+Caller:		Project configuration file ONLY
+
+Message:	[__PROJECT_CONFIG_HEADER__] Error 4 - Build mismatch between platforms support file (__PLATFORM_SUPPORT_HEADER__) and project configuration file (__PROJECT_CONFIG_HEADER__)!
+
+// =============================================================================
+// Error 5
+// =============================================================================
+
+Cause:		Microcontroller model is known but unsupported
+Caller:		Project configuration file ONLY
+
+Message:	[__PROJECT_CONFIG_HEADER__] Error 5 - Microcontroller unsupported!
+
+// =============================================================================
+// Error 6
+// =============================================================================
+
+Cause:		Platform is known but unsupported
+Caller:		Project configuration file ONLY
+
+Message:	[__PROJECT_CONFIG_HEADER__] Error 6 - Platform unsupported!
+
+// =============================================================================
+// Error 7
+// =============================================================================
+
+Cause:		Platform support listing file not found
+Caller:		Platforms support file ONLY
+
+Message:	[__PLATFORM_SUPPORT_HEADER__] Error 7 - Platform support listing file (__CALLED_HEADER_FILE__) is missing or corrupted!
+
+// =============================================================================
+// Error 8
+// =============================================================================
+
+Cause:		Platform support listing file version mismatch
+Caller:		Platforms support file ONLY
+
+Message:	[__PLATFORM_SUPPORT_HEADER__] Error 8 - Build mismatch between platform support listing file (__CALLED_HEADER_FILE__) and patform support file (__PLATFORM_SUPPORT_HEADER__)!
+
+// =============================================================================
+// Error 9
+// =============================================================================
+
+Cause:		Microcontroller was already defined
+Caller:		Platforms support file ONLY
+
+Message:	[__PLATFORM_SUPPORT_HEADER__] Error 9 - Microcontroller already defined!
+
+// =============================================================================
+// Error 10
+// =============================================================================
+
+Cause:		Microcontroller model is unknown
+Caller:		Platforms support file ONLY
+
+Message:	[__PLATFORM_SUPPORT_HEADER__] Error 10 - Microcontroller not defined!
+
+// =============================================================================
+// Error 11
+// =============================================================================
+
+Cause:		Platform is unknown
+Caller:		Platforms support file ONLY
+
+Message:	[__PLATFORM_SUPPORT_HEADER__] Error 11 - Platform unsupported!
+
+// =============================================================================
+// Error 12
+// =============================================================================
+
+Cause:		Global definitons file not found
+Caller:		header file ANY
+
+Message:	[__CURRENT_HEADER_FILE__] Error 12 - Global definitions file (__GLOBAL_DEFINITIONS_HEADER__) is missing or corrupted!
+
+// =============================================================================
+// Error 13
+// =============================================================================
+
+Cause:		Global definitons file version mismatch
+Caller:		header file ANY
+
+Message:	[__CURRENT_HEADER_FILE__] Error 13 - Build mismatch between global definitions file (__GLOBAL_DEFINITIONS_HEADER__) and current header file (__CURRENT_HEADER_FILE__)!
+
+// =============================================================================
+// Error 14
+// =============================================================================
+
+Cause:		Module header file not found
+Caller:		header file ANY
+
+Message:	[__CURRENT_HEADER_FILE__] Error 14 - Required module (__CALLED_HEADER_FILE__) is missing or corrupted!
+
+// =============================================================================
+// Error 15
+// =============================================================================
+
+Cause:		Module header file version mismatch
+Caller:		header file ANY
+
+Message:	[__CURRENT_HEADER_FILE__] Error 15 - Build mismatch between required module (__CALLED_HEADER_FILE__) and current header file (__CURRENT_HEADER_FILE__)!
+
+// =============================================================================
+// Error 16
+// =============================================================================
+
+Cause:		Header file not found
+Caller:		source file ANY
+
+Message:	[__CURRENT_SOURCE_FILE__] Error 16 - Header file (__CALLED_HEADER_FILE__) is missing or corrupted!
+
+// =============================================================================
+// Error 17
+// =============================================================================
+
+Cause:		Header and source file version mismatch
+Caller:		source file ANY
+
+Message:	[__CURRENT_SOURCE_FILE__] Error 17 - Build mismatch between source (__CURRENT_SOURCE_FILE__) and header (__CALLED_HEADER_FILE__) files!
+
+// =============================================================================
+// Error 18
+// =============================================================================
+
+Cause:		Feature unsupported/unimplemented for selected platform
+Caller:		header file ANY
+
+Message:	[__CURRENT_HEADER_FILE__] Error 18 - Feature is unsupported or was not implemented for selected platform!
+
+// =============================================================================
+// Error 19
+// =============================================================================
+
+Cause:		Module was not enabled in platform HAL files
+Caller:		header file ANY
+
+Message:	[__CURRENT_HEADER_FILE__] Error 19 - Module was not enabled in platform HAL files!
+
+// =============================================================================
+// Constants
+// =============================================================================
+
+__CALLED_HEADER_FILE__
+__CURRENT_HEADER_FILE__
+__CURRENT_SOURCE_FILE__
+__GLOBAL_DEFINITIONS_HEADER__
+__PLATFORM_SUPPORT_HEADER__
+__PROJECT_CONFIG_HEADER__

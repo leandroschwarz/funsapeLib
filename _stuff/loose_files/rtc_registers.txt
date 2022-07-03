@@ -1,0 +1,135 @@
+
+RTC_CRH
+    [15:3]  r       Reserved, forced by hardware to 0.
+    [2]     r/w     OWIE    Overflow interrupt enable
+    [1]     r/w     ALRIE   Alarm interrupt enable
+    [0]     r/w     SECIE   Second interrupt enable
+
+RTC_CRL
+    [15:6]  r       Reserved, forced by hardware to 0.
+    [5]     r       RTOFF RTC operation OFF
+                        0: Last write operation on RTC registers is still ongoing.
+                        1: Last write operation on RTC registers terminated.
+    [4]     rc0     CNF Configuration flag
+                        Set by software to enter in configuration mode so as to allow new values to
+                            be written in the RTC_CNT, RTC_ALR or RTC_PRL registers. The write operation is only
+                            executed when the CNF bit is reset by software after has been set.
+    [3]     rc0     RSF Registers synchronized flag
+                        Set by hardware at each time the RTC_CNT and RTC_DIV registers are updated
+                            and cleared by software. Before any read operation after an APB1 reset or an APB1 clock
+                            stop, this bit must be cleared by software, and the user application must wait until it is set to
+                            be sure that the RTC_CNT, RTC_ALR or RTC_PRL registers are synchronized.
+    [2]     rc0     OWF Overflow flag
+                        Set by hardware when the 32-bit programmable counter overflows. An interrupt is
+                            generated if OWIE=1 in the RTC_CRH register. It can be cleared only by software.
+    [1]     rc0     ALRF Alarm flag
+                        Set by hardware when the 32-bit programmable counter reaches the threshold set
+                            in the RTC_ALR register. An interrupt is generated if ALRIE=1 in the RTC_CRH register. It
+                            can be cleared only by software.
+    [0]     rc0     SECF Second flag
+                        Set by hardware when the 32-bit programmable prescaler overflows, thus
+                            incrementing the RTC counter. Hence this flag provides a periodic signal with a period
+                            corresponding to the resolution programmed for the RTC counter (usually one second). An
+                            interrupt is generated if SECIE=1 in the RTC_CRH register. It can be cleared only by
+                            software.
+
+RTC_PRLH
+    [15:4]  r       Reserved, forced by hardware to 0.
+    [3:0]   w       PRL[19:16] RTC prescaler reload value high.
+
+RTC_PRLL
+    [15:0]  w       PRL[15:0] RTC prescaler reload value low
+
+RTC_DIVH
+    [15:4]  r       Reserved, forced by hardware to 0.
+    [3:0]   r       RTC_DIV[19:16] RTC clock divider high
+
+RTC_DIVL
+    [15:0]  r       RTC_DIV[15:0] RTC clock divider low
+
+RTC_CNTH
+    [15:0]  rw      RTC_CNT[31:16] RTC counter high
+
+RTC_CNTL
+    [15:0]  rw      RTC_CNT[15:0] RTC counter low
+
+RTC_ALRH
+    [15:0]  w       RTC_ALR[31:16] RTC alarm high
+
+RTC_ALRL
+    [15:0]  w       RTC_ALR[15:0] RTC alarm low
+
+After reset, access to the Backup registers and RTC is disabled and the Backup domain (BKP) is protected against possible parasitic write access. To enable access to the Backup registers and the RTC, proceed as follows:
+    - enable the power and backup interface clocks by setting the PWREN and BKPEN bits in the RCC_APB1ENR register
+    - set the DBP bit the Power Control register (PWR_CR) to enable access to the Backup registers and RTC.
+
+To write in the RTC_PRL, RTC_CNT, RTC_ALR registers, the peripheral must enter Configuration mode. Configuration procedure:
+    1. Poll RTOFF, wait until its value goes to ‘1’
+    2. Set the CNF bit to enter configuration mode
+    3. Write to one or more RTC registers
+    4. Clear the CNF bit to exit configuration mode
+    5. Poll RTOFF, wait until its value goes to ‘1’ to check the end of the write operation.
+
+// *INDENT-OFF*
+/*
+RTC_TimeTypeDef
+    uint8_t Hours
+    uint8_t Minutes
+    uint8_t Seconds
+RTC_AlarmTypeDef
+    RTC_TimeTypeDef AlarmTime
+    uint32_t Alarm
+
+RTC_InitTypeDef
+    uint32_t AsynchPrediv
+    uint32_t OutPut
+
+RTC_DateTypeDef
+    uint8_t WeekDay
+    uint8_t Month
+    uint8_t Date
+    uint8_t Year
+
+RTC_HandleTypeDef
+    RTC_TypeDef * Instance
+        __IO uint32_t CRH;
+        __IO uint32_t CRL;
+        __IO uint32_t PRLH;
+        __IO uint32_t PRLL;
+        __IO uint32_t DIVH;
+        __IO uint32_t DIVL;
+        __IO uint32_t CNTH;
+        __IO uint32_t CNTL;
+        __IO uint32_t ALRH;
+        __IO uint32_t ALRL;
+    RTC_InitTypeDef Init
+        uint32_t AsynchPrediv
+        uint32_t OutPut
+    RTC_DateTypeDef DateToUpdate
+        uint8_t WeekDay
+        uint8_t Month
+        uint8_t Date
+        uint8_t Year
+    HAL_LockTypeDef Lock {HAL_UNLOCKED = 0x00U,HAL_LOCKED   = 0x01U}
+    __IO HAL_RTCStateTypeDef State
+
+HAL_RTC_Init
+HAL_RTC_DeInit
+HAL_RTC_MspInit
+HAL_RTC_MspDeInit
+HAL_RTC_SetTime
+HAL_RTC_GetTime
+HAL_RTC_SetDate
+HAL_RTC_GetDate
+HAL_RTC_SetAlarm
+HAL_RTC_SetAlarm_IT
+HAL_RTC_GetAlarm
+HAL_RTC_DeactivateAlarm
+HAL_RTC_AlarmIRQHandler
+HAL_RTC_AlarmAEventCallback
+HAL_RTC_PollForAlarmAEvent
+HAL_RTC_GetState
+HAL_RTC_WaitForSynchro
+HAL_RTC_Init
+
+*/

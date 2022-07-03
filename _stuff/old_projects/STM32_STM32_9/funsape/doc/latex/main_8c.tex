@@ -1,0 +1,123 @@
+\hypertarget{main_8c}{}\section{\+\_\+hide/\+M\+P\+U/main.c File Reference}
+\label{main_8c}\index{\+\_\+hide/\+M\+P\+U/main.\+c@{\+\_\+hide/\+M\+P\+U/main.\+c}}
+
+
+Test app for e\+M\+P\+L using the Motion Driver D\+M\+P image.  
+
+
+{\ttfamily \#include \char`\"{}stm32f4xx.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}stdio.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}uart.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}i2c.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}gpio.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}main.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}board-\/st\+\_\+discovery.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}inv\+\_\+mpu.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}inv\+\_\+mpu\+\_\+dmp\+\_\+motion\+\_\+driver.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}invensense.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}invensense\+\_\+adv.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}e\+M\+P\+L\+\_\+outputs.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}mltypes.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}mpu.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}log.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}packet.\+h\char`\"{}}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structrx__s}{rx\+\_\+s}
+\item 
+struct \hyperlink{structhal__s}{hal\+\_\+s}
+\item 
+struct \hyperlink{structplatform__data__s}{platform\+\_\+data\+\_\+s}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group__e_m_p_l_ga83c044582a9fec2e45f8858efa5885b8}{}\#define {\bfseries P\+R\+I\+N\+T\+\_\+\+A\+C\+C\+E\+L}~(0x01)\label{group__e_m_p_l_ga83c044582a9fec2e45f8858efa5885b8}
+
+\item 
+\hypertarget{group__e_m_p_l_ga1f7cea00edafdbe1570199b28042ddd3}{}\#define {\bfseries P\+R\+I\+N\+T\+\_\+\+G\+Y\+R\+O}~(0x02)\label{group__e_m_p_l_ga1f7cea00edafdbe1570199b28042ddd3}
+
+\item 
+\hypertarget{group__e_m_p_l_ga709f1d5781d96858850143298f88104c}{}\#define {\bfseries P\+R\+I\+N\+T\+\_\+\+Q\+U\+A\+T}~(0x04)\label{group__e_m_p_l_ga709f1d5781d96858850143298f88104c}
+
+\item 
+\hypertarget{group__e_m_p_l_gae55039e3cf38b78e1ec327c3e81d2859}{}\#define {\bfseries P\+R\+I\+N\+T\+\_\+\+C\+O\+M\+P\+A\+S\+S}~(0x08)\label{group__e_m_p_l_gae55039e3cf38b78e1ec327c3e81d2859}
+
+\item 
+\hypertarget{group__e_m_p_l_gabfb66b3aafb997de9897c558dfc34b8e}{}\#define {\bfseries P\+R\+I\+N\+T\+\_\+\+E\+U\+L\+E\+R}~(0x10)\label{group__e_m_p_l_gabfb66b3aafb997de9897c558dfc34b8e}
+
+\item 
+\hypertarget{group__e_m_p_l_ga83fe59ee63a2dd6ba73760f07a21ee95}{}\#define {\bfseries P\+R\+I\+N\+T\+\_\+\+R\+O\+T\+\_\+\+M\+A\+T}~(0x20)\label{group__e_m_p_l_ga83fe59ee63a2dd6ba73760f07a21ee95}
+
+\item 
+\hypertarget{group__e_m_p_l_ga39965157fdb18499d2665cdb203971dd}{}\#define {\bfseries P\+R\+I\+N\+T\+\_\+\+H\+E\+A\+D\+I\+N\+G}~(0x40)\label{group__e_m_p_l_ga39965157fdb18499d2665cdb203971dd}
+
+\item 
+\hypertarget{group__e_m_p_l_gafc50e337bac90191d386f47e3cf49a7d}{}\#define {\bfseries P\+R\+I\+N\+T\+\_\+\+P\+E\+D\+O}~(0x80)\label{group__e_m_p_l_gafc50e337bac90191d386f47e3cf49a7d}
+
+\item 
+\hypertarget{group__e_m_p_l_ga247e0609bfe123b5d988f0c63e99bf76}{}\#define {\bfseries P\+R\+I\+N\+T\+\_\+\+L\+I\+N\+E\+A\+R\+\_\+\+A\+C\+C\+E\+L}~(0x100)\label{group__e_m_p_l_ga247e0609bfe123b5d988f0c63e99bf76}
+
+\item 
+\hypertarget{group__e_m_p_l_ga31581e6a5034c28ac6270530f4b17e51}{}\#define {\bfseries P\+R\+I\+N\+T\+\_\+\+G\+R\+A\+V\+I\+T\+Y\+\_\+\+V\+E\+C\+T\+O\+R}~(0x200)\label{group__e_m_p_l_ga31581e6a5034c28ac6270530f4b17e51}
+
+\item 
+\hypertarget{group__e_m_p_l_ga96e2dc57b8fe509f98cbbb52811717c3}{}\#define {\bfseries A\+C\+C\+E\+L\+\_\+\+O\+N}~(0x01)\label{group__e_m_p_l_ga96e2dc57b8fe509f98cbbb52811717c3}
+
+\item 
+\hypertarget{group__e_m_p_l_ga1abb1b0f967cb0c0f3a0910f18241889}{}\#define {\bfseries G\+Y\+R\+O\+\_\+\+O\+N}~(0x02)\label{group__e_m_p_l_ga1abb1b0f967cb0c0f3a0910f18241889}
+
+\item 
+\hypertarget{group__e_m_p_l_gac4b29ad9d2af05af504ca053f3c5d76d}{}\#define {\bfseries C\+O\+M\+P\+A\+S\+S\+\_\+\+O\+N}~(0x04)\label{group__e_m_p_l_gac4b29ad9d2af05af504ca053f3c5d76d}
+
+\item 
+\hypertarget{group__e_m_p_l_ga37210bcb4e70d9199030fb7cd89135e7}{}\#define {\bfseries M\+O\+T\+I\+O\+N}~(0)\label{group__e_m_p_l_ga37210bcb4e70d9199030fb7cd89135e7}
+
+\item 
+\hypertarget{group__e_m_p_l_ga35a7dc3ebde5e1980ce1412334326f28}{}\#define {\bfseries N\+O\+\_\+\+M\+O\+T\+I\+O\+N}~(1)\label{group__e_m_p_l_ga35a7dc3ebde5e1980ce1412334326f28}
+
+\item 
+\hypertarget{group__e_m_p_l_ga292d717406e906831952ce46612fe4cd}{}\#define {\bfseries D\+E\+F\+A\+U\+L\+T\+\_\+\+M\+P\+U\+\_\+\+H\+Z}~(20)\label{group__e_m_p_l_ga292d717406e906831952ce46612fe4cd}
+
+\item 
+\hypertarget{group__e_m_p_l_gae69620948dea1b76e0ab7843ab719db7}{}\#define {\bfseries F\+L\+A\+S\+H\+\_\+\+S\+I\+Z\+E}~(512)\label{group__e_m_p_l_gae69620948dea1b76e0ab7843ab719db7}
+
+\item 
+\hypertarget{group__e_m_p_l_ga923aad67335bb52801a4f8dfc0b0fef0}{}\#define {\bfseries F\+L\+A\+S\+H\+\_\+\+M\+E\+M\+\_\+\+S\+T\+A\+R\+T}~((void$\ast$)0x1800)\label{group__e_m_p_l_ga923aad67335bb52801a4f8dfc0b0fef0}
+
+\item 
+\hypertarget{group__e_m_p_l_ga77888d9bc269c75d63baf58cd000c7d9}{}\#define {\bfseries P\+E\+D\+O\+\_\+\+R\+E\+A\+D\+\_\+\+M\+S}~(1000)\label{group__e_m_p_l_ga77888d9bc269c75d63baf58cd000c7d9}
+
+\item 
+\hypertarget{group__e_m_p_l_ga209a05c6769a81d074903aaffe2f44a6}{}\#define {\bfseries T\+E\+M\+P\+\_\+\+R\+E\+A\+D\+\_\+\+M\+S}~(500)\label{group__e_m_p_l_ga209a05c6769a81d074903aaffe2f44a6}
+
+\item 
+\hypertarget{group__e_m_p_l_ga0718d456616de258f21190908610fdf6}{}\#define {\bfseries C\+O\+M\+P\+A\+S\+S\+\_\+\+R\+E\+A\+D\+\_\+\+M\+S}~(100)\label{group__e_m_p_l_ga0718d456616de258f21190908610fdf6}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group__e_m_p_l_ga97b092893abbc0853590db8530636b63}{}void {\bfseries gyro\+\_\+data\+\_\+ready\+\_\+cb} (void)\label{group__e_m_p_l_ga97b092893abbc0853590db8530636b63}
+
+\item 
+int \hyperlink{group__e_m_p_l_ga840291bc02cba5474a4cb46a9b9566fe}{main} (void)
+\begin{DoxyCompactList}\small\item\em main entry point. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group__e_m_p_l_ga359d30cf3d94f8046df41f14467c36de}{}volatile uint32\+\_\+t {\bfseries hal\+\_\+timestamp} = 0\label{group__e_m_p_l_ga359d30cf3d94f8046df41f14467c36de}
+
+\item 
+\hypertarget{group__e_m_p_l_ga5bfb2c29b84492416fe0a885d4664132}{}volatile unsigned char {\bfseries rx\+\_\+new}\label{group__e_m_p_l_ga5bfb2c29b84492416fe0a885d4664132}
+
+\item 
+\hypertarget{group__e_m_p_l_ga56d9a02ae0e768d49fd95fd014c47b07}{}unsigned char $\ast$ {\bfseries mpl\+\_\+key} = (unsigned char$\ast$)\char`\"{}e\+M\+P\+L 5.\+1\char`\"{}\label{group__e_m_p_l_ga56d9a02ae0e768d49fd95fd014c47b07}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Test app for e\+M\+P\+L using the Motion Driver D\+M\+P image. 
+

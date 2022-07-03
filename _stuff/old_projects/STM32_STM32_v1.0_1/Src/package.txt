@@ -1,0 +1,31 @@
+
+
+
+Header
+1 Byte		StartDelimiter
+2 Bytes		PackageIndex
+8 Bytes		PackageInfo
+
+Samples(26 x 19 Bytes)
+2 Bytes		ECG1
+2 Bytes		ECG2
+2 Bytes		ECG3
+2 Bytes		MPU1_X
+2 Bytes		MPU1_Y
+2 Bytes		MPU1_Z
+2 Bytes		MPU2_X
+2 Bytes		MPU2_Y
+2 Bytes		MPU2_Z
+2 Bytes		MPU3_X
+2 Bytes		MPU3_Y
+2 Bytes		MPU3_Z
+2 Bytes		MPU4_X
+2 Bytes		MPU4_Y
+2 Bytes		MPU4_Z
+2 Bytes		PPG1_IR
+2 Bytes		PPG1_RD
+2 Bytes		PPG2_IR
+2 Bytes		PPG2_RD
+
+Footer
+1 Byte		NULL

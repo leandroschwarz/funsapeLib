@@ -1,0 +1,20 @@
+
+
+Overhead = 15 bytes
+
+========================================
+1 amostra (intervalo de 10ms)
+========================================
+ECG1	2 bytes x 1 vezes = 2 bytes
+ECG2	2 bytes x 1 vezes = 2 bytes
+ECG3	2 bytes x 1 vezes = 2 bytes
+MPU1	6 bytes x 4 vezes = 24 bytes
+MPU2	6 bytes x 4 vezes = 24 bytes
+MPU3	6 bytes x 4 vezes = 24 bytes
+MPU4	6 bytes x 4 vezes = 24 bytes
+PPG1	4 bytes x 1 vezes = 4 bytes
+PPG2	4 bytes x 4 vezes = 16 bytes
+----------------------------------------
+TOTAL						122 bytes
+
+Buffer de 2048 = 16 amostras + 81 brancos + overhead

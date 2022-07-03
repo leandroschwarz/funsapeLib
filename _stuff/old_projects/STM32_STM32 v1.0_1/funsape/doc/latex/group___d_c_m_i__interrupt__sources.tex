@@ -1,0 +1,46 @@
+\hypertarget{group___d_c_m_i__interrupt__sources}{}\section{D\+C\+M\+I\+\_\+interrupt\+\_\+sources}
+\label{group___d_c_m_i__interrupt__sources}\index{D\+C\+M\+I\+\_\+interrupt\+\_\+sources@{D\+C\+M\+I\+\_\+interrupt\+\_\+sources}}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___d_c_m_i__interrupt__sources_gadaec1a969aa5f1f993157c3b7930ee15}{}\#define {\bfseries D\+C\+M\+I\+\_\+\+I\+T\+\_\+\+F\+R\+A\+M\+E}~((uint16\+\_\+t)0x0001)\label{group___d_c_m_i__interrupt__sources_gadaec1a969aa5f1f993157c3b7930ee15}
+
+\item 
+\hypertarget{group___d_c_m_i__interrupt__sources_ga5afbb2e1a8b64d9e042da18d8304667e}{}\#define {\bfseries D\+C\+M\+I\+\_\+\+I\+T\+\_\+\+O\+V\+F}~((uint16\+\_\+t)0x0002)\label{group___d_c_m_i__interrupt__sources_ga5afbb2e1a8b64d9e042da18d8304667e}
+
+\item 
+\hypertarget{group___d_c_m_i__interrupt__sources_gaef8a30c349bbe77a26052613053c0201}{}\#define {\bfseries D\+C\+M\+I\+\_\+\+I\+T\+\_\+\+E\+R\+R}~((uint16\+\_\+t)0x0004)\label{group___d_c_m_i__interrupt__sources_gaef8a30c349bbe77a26052613053c0201}
+
+\item 
+\hypertarget{group___d_c_m_i__interrupt__sources_gac60620cc8cfcff9063bb141f75bdedf6}{}\#define {\bfseries D\+C\+M\+I\+\_\+\+I\+T\+\_\+\+V\+S\+Y\+N\+C}~((uint16\+\_\+t)0x0008)\label{group___d_c_m_i__interrupt__sources_gac60620cc8cfcff9063bb141f75bdedf6}
+
+\item 
+\hypertarget{group___d_c_m_i__interrupt__sources_gab31edbfaa9359494beda9324bbe3a70d}{}\#define {\bfseries D\+C\+M\+I\+\_\+\+I\+T\+\_\+\+L\+I\+N\+E}~((uint16\+\_\+t)0x0010)\label{group___d_c_m_i__interrupt__sources_gab31edbfaa9359494beda9324bbe3a70d}
+
+\item 
+\hypertarget{group___d_c_m_i__interrupt__sources_ga73bb15913a02e43fa9e4519f16d8566b}{}\#define {\bfseries I\+S\+\_\+\+D\+C\+M\+I\+\_\+\+C\+O\+N\+F\+I\+G\+\_\+\+I\+T}(I\+T)~((((I\+T) \& (uint16\+\_\+t)0x\+F\+F\+E0) == 0x0000) \&\& ((\+I\+T) != 0x0000))\label{group___d_c_m_i__interrupt__sources_ga73bb15913a02e43fa9e4519f16d8566b}
+
+\item 
+\#define {\bfseries I\+S\+\_\+\+D\+C\+M\+I\+\_\+\+G\+E\+T\+\_\+\+I\+T}(I\+T)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{group___d_c_m_i__interrupt__sources_ga03e77e43829150f92a861421250355e5}{}\index{D\+C\+M\+I\+\_\+interrupt\+\_\+sources@{D\+C\+M\+I\+\_\+interrupt\+\_\+sources}!I\+S\+\_\+\+D\+C\+M\+I\+\_\+\+G\+E\+T\+\_\+\+I\+T@{I\+S\+\_\+\+D\+C\+M\+I\+\_\+\+G\+E\+T\+\_\+\+I\+T}}
+\index{I\+S\+\_\+\+D\+C\+M\+I\+\_\+\+G\+E\+T\+\_\+\+I\+T@{I\+S\+\_\+\+D\+C\+M\+I\+\_\+\+G\+E\+T\+\_\+\+I\+T}!D\+C\+M\+I\+\_\+interrupt\+\_\+sources@{D\+C\+M\+I\+\_\+interrupt\+\_\+sources}}
+\subsubsection[{I\+S\+\_\+\+D\+C\+M\+I\+\_\+\+G\+E\+T\+\_\+\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+S\+\_\+\+D\+C\+M\+I\+\_\+\+G\+E\+T\+\_\+\+I\+T(
+\begin{DoxyParamCaption}
+\item[{}]{I\+T}
+\end{DoxyParamCaption}
+)}\label{group___d_c_m_i__interrupt__sources_ga03e77e43829150f92a861421250355e5}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+(((IT) == DCMI\_IT\_FRAME) || \(\backslash\)
+                            ((IT) == DCMI\_IT\_OVF) || \(\backslash\)
+                            ((IT) == DCMI\_IT\_ERR) || \(\backslash\)
+                            ((IT) == DCMI\_IT\_VSYNC) || \(\backslash\)
+                            ((IT) == DCMI\_IT\_LINE))
+\end{DoxyCode}

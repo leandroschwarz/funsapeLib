@@ -1,0 +1,117 @@
+
+
+
+#define printRegs(txBuff_p) do { \
+		sprintf((char *)txBuff_p, "TIM7_ARR  = 0x%08lX\r", regArr); \
+		HAL_UART_Transmit(&huart3, (uint8_t *)txBuff_p, strlen((char *)txBuff_p), 100); \
+		sprintf((char *)txBuff_p, "TIM7_CNT  = 0x%08lX\r", regCnt); \
+		HAL_UART_Transmit(&huart3, (uint8_t *)txBuff_p, strlen((char *)txBuff_p), 100); \
+		sprintf((char *)txBuff_p, "TIM7_CR1  = 0x%08lX\r", regCr1); \
+		HAL_UART_Transmit(&huart3, (uint8_t *)txBuff_p, strlen((char *)txBuff_p), 100); \
+		sprintf((char *)txBuff_p, "TIM7_CR2  = 0x%08lX\r", regCr2); \
+		HAL_UART_Transmit(&huart3, (uint8_t *)txBuff_p, strlen((char *)txBuff_p), 100); \
+		sprintf((char *)txBuff_p, "TIM7_DIER = 0x%08lX\r", regDier); \
+		HAL_UART_Transmit(&huart3, (uint8_t *)txBuff_p, strlen((char *)txBuff_p), 100); \
+		sprintf((char *)txBuff_p, "TIM7_EGR  = 0x%08lX\r", regEgr); \
+		HAL_UART_Transmit(&huart3, (uint8_t *)txBuff_p, strlen((char *)txBuff_p), 100); \
+		sprintf((char *)txBuff_p, "TIM7_PSC  = 0x%08lX\r", regPsc); \
+		HAL_UART_Transmit(&huart3, (uint8_t *)txBuff_p, strlen((char *)txBuff_p), 100); \
+		sprintf((char *)txBuff_p, "TIM7_SR   = 0x%08lX\r", regSr); \
+		HAL_UART_Transmit(&huart3, (uint8_t *)txBuff_p, strlen((char *)txBuff_p), 100); \
+	} while(0)
+
+
+void reverseString(char *string_p)
+{
+	uint8_t fs = strlen(string_p);
+	uint8_t hs = (fs / 2);
+
+	fs = - 1;
+	for(uint8_t i = 0; i < hs; i++) {
+		string_p[  i   ] ^= string_p[fs - i];
+		string_p[fs - i] ^= string_p[  i   ];
+		string_p[  i   ] ^= string_p[fs - i];
+	}
+
+	// Nothing to return because the pointer was used
+	return;
+}
+
+template<typename T> char *convertToBinaryAscii(T value, bool zeroFill = false)
+{
+	uint8_t nBits	= (8 * sizeof(T));
+	char *auxStr	= (char *)calloc((nBits + 1), sizeof(char));
+
+	uint8_t i = 0;
+	for(i = 0; i < nBits; i++) {
+		if((value == 0) && (!zeroFill)) {
+			break;
+		}
+		auxStr[i] = (0x01 & value) ? (char)0x31 : (char)0x30;
+		value >>= 1;
+	}
+	auxStr[i] = '\0';
+//	reverseString(auxStr);
+
+	// reverse
+	uint8_t fullSize = strlen(auxStr);
+	uint8_t halfSize = (fullSize / 2);
+	for(uint8_t i = 0; i < halfSize; i++) {
+		auxStr[i] ^= auxStr[fullSize - i - 1];
+		auxStr[fullSize - i - 1] ^= auxStr[i];
+		auxStr[i] ^= auxStr[fullSize - i - 1];
+	}
+	return auxStr;
+}
+
+
+	// if(!ppgSensor.getTemperature(&auxFloat, ThermometricScale::CELSIUS)) {
+	// 	funsapeStatus = ppgSensor.getLastError();
+	// 	debugMessage((uint16_t)funsapeStatus);
+	// 	myErrorHandler(PPG_SENSOR_1_GET_TEMPERATURE);
+	// }
+
+
+
+
+	while(0) {
+		
+		
+		
+		
+		uint8_t	auxBuffer[5];
+		uint8_t bufferStatus[2 * LOOPS];
+		uint8_t bufferTemp[3 * LOOPS];
+		char bufferUart[25 + (28 * (LOOPS - 1)) + 1];
+
+		auxBuffer[0] = 0x01;
+		twi1.writeReg(0x21, auxBuffer, 1);
+		for(uint8_t i = 0; i < LOOPS; i++) {
+			twi1.readReg(0x0, auxBuffer, 2);
+			bufferStatus[2 * i + 0] = auxBuffer[0];
+			bufferStatus[2 * i + 1] = auxBuffer[1];
+			twi1.readReg(0x21, auxBuffer, 3);
+			bufferTemp[3 * i + 0] = auxBuffer[0];
+			bufferTemp[3 * i + 1] = auxBuffer[1];
+			bufferTemp[3 * i + 2] = auxBuffer[2];
+		}
+		sprintf(bufferUart, "0x%02X 0x%02X, 0x%02X 0x%02X 0x%02X", bufferStatus[0], bufferStatus[1], bufferTemp[0], bufferTemp[1], bufferTemp[2]);
+		for(uint8_t i = 0; i < (LOOPS - 1); i++) {
+			sprintf(bufferUart, "%s | 0x%02X 0x%02X, 0x%02X 0x%02X 0x%02X", bufferUart, bufferStatus[2 * i + 2], bufferStatus[2 * i + 3], bufferTemp[3 * i + 3], bufferTemp[3 * i + 4], bufferTemp[3 * i + 5]);
+		}
+		sprintf(bufferUart, "%s\r", bufferUart);
+		HAL_UART_Transmit(&huart3, (uint8_t *)bufferUart, strlen(bufferUart), 100);
+		while(1) {
+			ledToggle();
+			delayMs(100);
+		}
+		* /
+
+		///////////////////////////////
+		/*
+				while(1) {
+					ledToggle();
+					delayMs(250);
+				}
+			}
+		*/

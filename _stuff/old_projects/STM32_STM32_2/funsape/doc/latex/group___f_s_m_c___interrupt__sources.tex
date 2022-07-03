@@ -1,0 +1,38 @@
+\hypertarget{group___f_s_m_c___interrupt__sources}{}\section{F\+S\+M\+C\+\_\+\+Interrupt\+\_\+sources}
+\label{group___f_s_m_c___interrupt__sources}\index{F\+S\+M\+C\+\_\+\+Interrupt\+\_\+sources@{F\+S\+M\+C\+\_\+\+Interrupt\+\_\+sources}}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___f_s_m_c___interrupt__sources_gac483854bd6f90d8c7899a597a0c0ab1a}{}\#define {\bfseries F\+S\+M\+C\+\_\+\+I\+T\+\_\+\+Rising\+Edge}~((uint32\+\_\+t)0x00000008)\label{group___f_s_m_c___interrupt__sources_gac483854bd6f90d8c7899a597a0c0ab1a}
+
+\item 
+\hypertarget{group___f_s_m_c___interrupt__sources_ga59b5839854074008fb36fa86ec50a0c7}{}\#define {\bfseries F\+S\+M\+C\+\_\+\+I\+T\+\_\+\+Level}~((uint32\+\_\+t)0x00000010)\label{group___f_s_m_c___interrupt__sources_ga59b5839854074008fb36fa86ec50a0c7}
+
+\item 
+\hypertarget{group___f_s_m_c___interrupt__sources_ga8e4b9589c9981c900b5f2e84581a9693}{}\#define {\bfseries F\+S\+M\+C\+\_\+\+I\+T\+\_\+\+Falling\+Edge}~((uint32\+\_\+t)0x00000020)\label{group___f_s_m_c___interrupt__sources_ga8e4b9589c9981c900b5f2e84581a9693}
+
+\item 
+\hypertarget{group___f_s_m_c___interrupt__sources_ga40a38f097a75f27a700e626905fa9a38}{}\#define {\bfseries I\+S\+\_\+\+F\+S\+M\+C\+\_\+\+I\+T}(I\+T)~((((I\+T) \& (uint32\+\_\+t)0x\+F\+F\+F\+F\+F\+F\+C7) == 0x00000000) \&\& ((\+I\+T) != 0x00000000))\label{group___f_s_m_c___interrupt__sources_ga40a38f097a75f27a700e626905fa9a38}
+
+\item 
+\#define {\bfseries I\+S\+\_\+\+F\+S\+M\+C\+\_\+\+G\+E\+T\+\_\+\+I\+T}(I\+T)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{group___f_s_m_c___interrupt__sources_gae2a57d0b15e025212489ec1421ff245d}{}\index{F\+S\+M\+C\+\_\+\+Interrupt\+\_\+sources@{F\+S\+M\+C\+\_\+\+Interrupt\+\_\+sources}!I\+S\+\_\+\+F\+S\+M\+C\+\_\+\+G\+E\+T\+\_\+\+I\+T@{I\+S\+\_\+\+F\+S\+M\+C\+\_\+\+G\+E\+T\+\_\+\+I\+T}}
+\index{I\+S\+\_\+\+F\+S\+M\+C\+\_\+\+G\+E\+T\+\_\+\+I\+T@{I\+S\+\_\+\+F\+S\+M\+C\+\_\+\+G\+E\+T\+\_\+\+I\+T}!F\+S\+M\+C\+\_\+\+Interrupt\+\_\+sources@{F\+S\+M\+C\+\_\+\+Interrupt\+\_\+sources}}
+\subsubsection[{I\+S\+\_\+\+F\+S\+M\+C\+\_\+\+G\+E\+T\+\_\+\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+S\+\_\+\+F\+S\+M\+C\+\_\+\+G\+E\+T\+\_\+\+I\+T(
+\begin{DoxyParamCaption}
+\item[{}]{I\+T}
+\end{DoxyParamCaption}
+)}\label{group___f_s_m_c___interrupt__sources_gae2a57d0b15e025212489ec1421ff245d}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+(((IT) == FSMC\_IT\_RisingEdge) || \(\backslash\)
+                            ((IT) == FSMC\_IT\_Level) || \(\backslash\)
+                            ((IT) == FSMC\_IT\_FallingEdge))
+\end{DoxyCode}

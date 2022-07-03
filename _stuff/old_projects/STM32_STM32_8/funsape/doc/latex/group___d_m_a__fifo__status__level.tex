@@ -1,0 +1,47 @@
+\hypertarget{group___d_m_a__fifo__status__level}{}\section{D\+M\+A\+\_\+fifo\+\_\+status\+\_\+level}
+\label{group___d_m_a__fifo__status__level}\index{D\+M\+A\+\_\+fifo\+\_\+status\+\_\+level@{D\+M\+A\+\_\+fifo\+\_\+status\+\_\+level}}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___d_m_a__fifo__status__level_gace4b567c96b1c95618a4894875d8123b}{}\#define {\bfseries D\+M\+A\+\_\+\+F\+I\+F\+O\+Status\+\_\+\+Less1\+Quarter\+Full}~((uint32\+\_\+t)0x00000000 $<$$<$ 3)\label{group___d_m_a__fifo__status__level_gace4b567c96b1c95618a4894875d8123b}
+
+\item 
+\hypertarget{group___d_m_a__fifo__status__level_ga258d41ce51005eea1c5a69fcf07d8e42}{}\#define {\bfseries D\+M\+A\+\_\+\+F\+I\+F\+O\+Status\+\_\+1\+Quarter\+Full}~((uint32\+\_\+t)0x00000001 $<$$<$ 3)\label{group___d_m_a__fifo__status__level_ga258d41ce51005eea1c5a69fcf07d8e42}
+
+\item 
+\hypertarget{group___d_m_a__fifo__status__level_ga0dd0faeb4ac9de3dbdcd7ca6dd5bb9e4}{}\#define {\bfseries D\+M\+A\+\_\+\+F\+I\+F\+O\+Status\+\_\+\+Half\+Full}~((uint32\+\_\+t)0x00000002 $<$$<$ 3)\label{group___d_m_a__fifo__status__level_ga0dd0faeb4ac9de3dbdcd7ca6dd5bb9e4}
+
+\item 
+\hypertarget{group___d_m_a__fifo__status__level_ga418c64b77f903c558471d22eeabde439}{}\#define {\bfseries D\+M\+A\+\_\+\+F\+I\+F\+O\+Status\+\_\+3\+Quarters\+Full}~((uint32\+\_\+t)0x00000003 $<$$<$ 3)\label{group___d_m_a__fifo__status__level_ga418c64b77f903c558471d22eeabde439}
+
+\item 
+\hypertarget{group___d_m_a__fifo__status__level_gaacba9ad22e39ed92d2b4ae9ebece654c}{}\#define {\bfseries D\+M\+A\+\_\+\+F\+I\+F\+O\+Status\+\_\+\+Empty}~((uint32\+\_\+t)0x00000004 $<$$<$ 3)\label{group___d_m_a__fifo__status__level_gaacba9ad22e39ed92d2b4ae9ebece654c}
+
+\item 
+\hypertarget{group___d_m_a__fifo__status__level_gaf7ea7373a08730e773cbc048c9965dc2}{}\#define {\bfseries D\+M\+A\+\_\+\+F\+I\+F\+O\+Status\+\_\+\+Full}~((uint32\+\_\+t)0x00000005 $<$$<$ 3)\label{group___d_m_a__fifo__status__level_gaf7ea7373a08730e773cbc048c9965dc2}
+
+\item 
+\#define {\bfseries I\+S\+\_\+\+D\+M\+A\+\_\+\+F\+I\+F\+O\+\_\+\+S\+T\+A\+T\+U\+S}(S\+T\+A\+T\+U\+S)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{group___d_m_a__fifo__status__level_ga6980114eab3b3eea701f3802dd97dc12}{}\index{D\+M\+A\+\_\+fifo\+\_\+status\+\_\+level@{D\+M\+A\+\_\+fifo\+\_\+status\+\_\+level}!I\+S\+\_\+\+D\+M\+A\+\_\+\+F\+I\+F\+O\+\_\+\+S\+T\+A\+T\+U\+S@{I\+S\+\_\+\+D\+M\+A\+\_\+\+F\+I\+F\+O\+\_\+\+S\+T\+A\+T\+U\+S}}
+\index{I\+S\+\_\+\+D\+M\+A\+\_\+\+F\+I\+F\+O\+\_\+\+S\+T\+A\+T\+U\+S@{I\+S\+\_\+\+D\+M\+A\+\_\+\+F\+I\+F\+O\+\_\+\+S\+T\+A\+T\+U\+S}!D\+M\+A\+\_\+fifo\+\_\+status\+\_\+level@{D\+M\+A\+\_\+fifo\+\_\+status\+\_\+level}}
+\subsubsection[{I\+S\+\_\+\+D\+M\+A\+\_\+\+F\+I\+F\+O\+\_\+\+S\+T\+A\+T\+U\+S}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+S\+\_\+\+D\+M\+A\+\_\+\+F\+I\+F\+O\+\_\+\+S\+T\+A\+T\+U\+S(
+\begin{DoxyParamCaption}
+\item[{}]{S\+T\+A\+T\+U\+S}
+\end{DoxyParamCaption}
+)}\label{group___d_m_a__fifo__status__level_ga6980114eab3b3eea701f3802dd97dc12}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+(((STATUS) == DMA\_FIFOStatus\_Less1QuarterFull ) || \(\backslash\)
+                                    ((STATUS) == DMA\_FIFOStatus\_HalfFull)          || \(\backslash\)
+                                    ((STATUS) == DMA\_FIFOStatus\_1QuarterFull)      || \(\backslash\)
+                                    ((STATUS) == DMA\_FIFOStatus\_3QuartersFull)     || \(\backslash\)
+                                    ((STATUS) == DMA\_FIFOStatus\_Full)              || \(\backslash\)
+                                    ((STATUS) == DMA\_FIFOStatus\_Empty))
+\end{DoxyCode}

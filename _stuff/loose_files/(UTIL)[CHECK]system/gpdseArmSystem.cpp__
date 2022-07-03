@@ -1,0 +1,181 @@
+/* =============================================================================
+ * Project:		GPSDE++ ARM Library
+ * File name:	gpdseArmSystem.cpp
+ * Module:		System definitions for GPDSE++ ARM Library project
+ * Author:		Leandro Schwarz
+ * Build:		__BUILD_MACRO_TO_BE_CHANGED__
+ * Date:		__DATE_MACRO_TO_BE_CHANGED__
+ * ========================================================================== */
+
+// =============================================================================
+// System file dependencies
+// =============================================================================
+
+#include "gpdseArmSystem.h"
+#if __GPDSE_ARM_SYSTEM_H != __BUILD_MACRO_TO_BE_CHANGED__
+#	error Build mismatch on header and source code files (gpdseArmSystem).
+#endif
+
+// =============================================================================
+// Constants - File exclusive
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Global variables
+// =============================================================================
+
+SystemStatus systemStatus;
+
+// =============================================================================
+// Public Functions Definitions
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Class constructors
+// =============================================================================
+
+SystemStatus::SystemStatus(uint32_t mainClock)
+{
+	this->cpuClock_ = mainClock;
+#if defined(_PLATFORM_AVR_)
+	this->mainSourceClock_ = mainClock;
+	this->clockPrescaler_ = SYSTEM_CLOCK_PRESCALER_1;
+#endif
+	this->lastError_ = ERROR_NONE;
+	this->stopwatchMark_ = 0;
+	this->stopwatchHalted_ = false;
+	this->lastError_ = ERROR_NONE;
+}
+
+// =============================================================================
+// Class public methods
+// =============================================================================
+
+#if defined(_PLATFORM_AVR_)
+bool SystemStatus::changeClockPrescaler(systemClockPrescaler_e prescaler)
+{
+	uint8_t auxPrescaler = 0;
+
+	// Decode prescaler
+	switch (prescaler) {
+	case SYSTEM_CLOCK_PRESCALER_1:
+		auxPrescaler = 0;
+		break;
+	case SYSTEM_CLOCK_PRESCALER_2:
+		auxPrescaler = 1;
+		break;
+	case SYSTEM_CLOCK_PRESCALER_4:
+		auxPrescaler = 2;
+		break;
+	case SYSTEM_CLOCK_PRESCALER_8:
+		auxPrescaler = 3;
+		break;
+	case SYSTEM_CLOCK_PRESCALER_32:
+		auxPrescaler = 4;
+		break;
+	case SYSTEM_CLOCK_PRESCALER_64:
+		auxPrescaler = 5;
+		break;
+	case SYSTEM_CLOCK_PRESCALER_128:
+		auxPrescaler = 6;
+		break;
+	case SYSTEM_CLOCK_PRESCALER_256:
+		auxPrescaler = 7;
+		break;
+	default:
+		this->lastError_ = ERROR_CLOCK_PRESCALER_UNSUPPORTED;
+		return false;
+	}
+
+	// Changes system clock prescaler
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		CLKPR = 0b10000000;
+		CLKPR = auxPrescaler;
+	}
+
+	// Verifies if the change was successful
+	asm volatile("nop");
+	if ((CLKPR & 0x7F) != auxPrescaler) {
+		this->lastError_ = ERROR_CLOCK_PRESCALER_CHANGE_FAILED;
+		return false;
+	}
+
+	// Update member data
+	this->clockPrescaler_ = prescaler;
+	this->cpuClock_ = this->mainSourceClock_ / prescaler;
+	this->lastError_ = ERROR_NONE;
+
+	return true;
+}
+#endif
+
+uint32_t SystemStatus::getCpuClock(void)
+{
+	return this->cpuClock_;
+}
+
+error_e SystemStatus::getLastError(void)
+{
+	return this->lastError_;
+}
+
+uint32_t SystemStatus::readStopwatch(void)
+{
+	return this->stopwatchValue_;
+}
+
+void SystemStatus::resumeStopwatch(void)
+{
+	this->stopwatchHalted_ = false;
+}
+
+void SystemStatus::pauseStopwatch(void)
+{
+	this->stopwatchHalted_ = true;
+}
+
+void SystemStatus::resetStopwatch(void)
+{
+	this->stopwatchValue_ = 0;
+	this->stopwatchMark_ = 0;
+}
+
+void SystemStatus::setStopwatchMark(void)
+{
+	this->stopwatchMark_ = this->stopwatchValue_;
+}
+
+void SystemStatus::incrementStopwatch(void)
+{
+	this->stopwatchValue_++;
+}
+
+uint32_t SystemStatus::calculateElapsedTime(bool setNewMark)
+{
+	uint32_t start = this->stopwatchMark_;
+	uint32_t current = this->stopwatchValue_;
+	uint32_t elapsed = 0;
+
+	elapsed = (current > start) ? (current - start) : (((0xFFFFFFFF - start)  + current) + 1);
+	if (setNewMark) {
+		this->stopwatchMark_ = current;
+	}
+
+	return elapsed;
+}
+
+// =============================================================================
+// Class private methods
+// =============================================================================
+
+// NONE
+
+// =============================================================================
+// Class public methods
+// =============================================================================
+
+// NONE

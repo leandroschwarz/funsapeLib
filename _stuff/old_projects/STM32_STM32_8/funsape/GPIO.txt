@@ -1,0 +1,92 @@
+GPIO
+
+32-bit configuration registers (GPIOx_CRL, GPIOx_CRH)
+32-bit data registers (GPIOx_IDR, GPIOx_ODR)
+32-bit set/reset register (GPIOx_BSRR)
+16-bit reset register (GPIOx_BRR)
+32-bit locking register (GPIOx_LCKR)
+
+MODE									CNF[1:0]	MODE[1:0]	PxODR register
+• Output push-pull						00			SPEED		0-1
+• Output open-drain						01			SPEED		0-1
+• Alternate function push-pull			10			SPEED		Don't care
+• Alternate function open-drain			11			SPEED		Don't care
+• Input analog							00			00			Don't care
+• Input floating						01			00			Don't care
+• Input-pull-down						10			00			0
+• Input pull-up							10			00			1
+
+SPEED									MODE[1:0]
+Reserved								00
+Maximum output speed 10 MHz				01
+Maximum output speed 2 MHz				10
+Maximum output speed 50 MHz				11
+
+Input configuration
+-> A read access to the Input Data Register obtains the I/O State
+
+Output configuration
+-> A read access to the Input Data Register gets the I/O state in open drain mode
+-> A read access to the Output Data register gets the last written value in Push-Pull mode
+
+Registers
+
+GPIOx_CRL	=> Port configuration register low
+-> Address offset: 0x00
+-> Reset value: 0x4444 4444
+	-> CNFy[1:0]: Port x configuration bits (y= 0 .. 7)
+	-> MODEy[1:0]: Port x mode bits (y= 0 .. 7)
+
+GPIOx_CRH	=> Port configuration register high
+-> Address offset: 0x04
+-> Reset value: 0x4444 4444
+	-> CNFy[1:0]: Port x configuration bits (y= 8 .. 15)
+	-> MODEy[1:0]: Port x mode bits (y= 8 .. 15)
+	
+GPIOx_IDR	=> Port input data register
+-> Address offset: 0x08h
+-> Reset value: 0x0000 XXXX
+	-> IDRy: Port input data (y= 0 .. 15)
+
+GPIOx_ODR	=> Port output data register
+-> Address offset: 0x0C
+-> Reset value: 0x0000 0000
+	-> ODRy: Port output data (y= 0 .. 15)
+
+GPIOx_BSRR	=> Port bit set/reset register
+-> Address offset: 0x10
+-> Reset value: 0x0000 0000
+	-> BRy: Port x Reset bit y (y= 0 .. 15)
+	-> BSy: Port x Set bit y (y= 0 .. 15)
+
+GPIOx_BRR	=> Port bit reset register
+-> Address offset: 0x14
+-> Reset value: 0x0000 0000
+	-> BRy: Port x Reset bit y (y= 0 .. 15)
+
+When changing modes
+
+Case studies:
+	Since its impossible to change both MODE and VALUE of the pin at the same time, it's necessary to determine which parameter must be changed first in order to avoid undesired results.
+
+
+Considerations: For clarity, it is necessary to explain some terms and definitions that are used in this section.
+
+CONNECTION	=> Electrical connection between the pin of the microcontroller and the pin of an external device.
+DEV_PIN		=> The pin of the external device, analyzed from the perspective of the own device's pin driver module.
+STM_PIN		=> The pin of the microcontroller, analyzed from the perspective of the GPIO circuit driver.
+
+=> CASE 1: STM_PIN changes from INPUT to OUTPUT
+	In this case, DEV_PIN has a logic level driver capability. If the DEV_PIN is PUSH-PULL or TOTEM-POLE, it will always force either a LOW or a HIGH logic level to the pin. Changing the STM_PIN to an OUTPUT (either PUSH-PULL or OPEN-DRAIN) under these conditions, may cause a short-circuit on the CONNECTION, since both drivers (STM and DEV) will be active and force some logic level.
+	Therefore, DEV_PIN must be OPEN DRAIN or OPEN COLLECTOR, and the driver will either force LOW or let the pin in HiZ (allowing the pull-resistors solve the issue). Changing the STM_PIN mode will only be allowed when the DEV_PIN is in HiZ. In this case, changing the STM_PIN MODE to OUTPUT will automatically apply the current OUTPUT VALUE to the pin, and a subsequent change on the OUTPUT VALUE could be understood by the device as a transition in the CONNECTION. It is, therefore, advisable to change the OUTPUT VALUE FIRST, and then the MODE, since the OUTPUT VALUE will only be applied to the STM_PIN when the mode change, avoiding this undesired transition.
+
+=> CASE 2: STM_PIN changes from OUTPUT to INPUT
+	In this case, the DEV_PIN driver must be either PUSH-PULL or OPEN-DRAIN and must be in HiZ, but the CONNECTION logic level is guaranteed by either the STM_PIN driver or by the pull-resistors. Changing the STM_PIN to an INPUT must have no undesirable effect on the CONNECTION because both drivers will be disabled and no short-circuit will occur. Since the OUTPUT VALUE is irrelevant in the INPUT mode, its only necessary to change the pin MODE and let the OUTPUT VALUE unchanged.
+
+
+FROM				TO					START	INTER	RESULT
+INPUT_PULL_UP		OUTPUT_PUSH_PULL	0
+INPUT_PULL_UP		OUTPUT_PUSH_PULL	1
+INPUT_PULL_DOWN		OUTPUT_PUSH_PULL	0
+INPUT_PULL_DOWN		OUTPUT_PUSH_PULL	1
+

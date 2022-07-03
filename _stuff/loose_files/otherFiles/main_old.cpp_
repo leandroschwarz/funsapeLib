@@ -1,0 +1,938 @@
+/* =============================================================================
+ * Project:			dataGrabber
+ * File name:		main.cpp
+ * Module:			Main source code file
+ * Authors:			__AUTHORS_TO_REPLACE__
+ * Build:			__BUILD_TO_REPLACE__
+ * Last edition:	__DATE_TO_REPLACE__
+ * ========================================================================== */
+
+// =============================================================================
+// Dependencies
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// STM32CubeMx and HAL library header files ------------------------------------
+
+#include "main.h"
+#include "adc.h"
+#include "dma.h"
+#include "i2c.h"
+#include "rtc.h"
+#include "spi.h"
+#include "tim.h"
+#include "usart.h"
+#include "usb_device.h"
+#include "gpio.h"
+
+// -----------------------------------------------------------------------------
+// FunSAPE Library header files ------------------------------------------------
+
+#include "funsapeLibGlobalDefines.hpp"
+#include "funsapeLibCircularBuffer.hpp"
+#include "funsapeLibDebug.hpp"
+
+// -----------------------------------------------------------------------------
+// FatFs Library header files --------------------------------------------------
+
+#include "ff.h"
+
+// =============================================================================
+// File exclusive - Constants
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// ADC related constants -------------------------------------------------------
+
+#define ECG_ADC1_BYTES_PER_CHANNEL		2				// Bytes per channel
+#define ECG_ADC1_CHANNELS_PER_SAMPLE	3				// Number of channels per sample
+#define ECG_ADC1_SAMPLES_PER_BUFFER		8				// Number of samples per buffer (Must be even)
+#define ECG_ADC1_CHANNELS_PER_BUFFER	(ECG_ADC1_SAMPLES_PER_BUFFER * ECG_ADC1_CHANNELS_PER_SAMPLE)
+
+#define BAT_ADC3_BYTES_PER_CHANNEL		2				// Bytes per channel
+#define BAT_ADC3_CHANNELS_PER_SAMPLE	3				// Number of channels per sample
+#define BAT_ADC3_SAMPLES_PER_BUFFER		2				// Number of samples per buffer (Must be even)
+#define BAT_ADC3_CHANNELS_PER_BUFFER	(BAT_ADC3_SAMPLES_PER_BUFFER * BAT_ADC3_CHANNELS_PER_SAMPLE)
+
+#define POWER_MAIN_BAT_RES_TOP			12
+#define POWER_MAIN_BAT_RES_BOTTOM		33
+#define POWER_STEP_UP_RES_TOP			18
+#define POWER_STEP_UP_RES_BOTTOM		15
+
+// -----------------------------------------------------------------------------
+// Debug constants -------------------------------------------------------------
+
+#define DEBUG_ALLOW_FULL				1
+#define DEBUG_ALLOW_VERBOSE				1
+
+// -----------------------------------------------------------------------------
+// Peripheral buffer sizes -----------------------------------------------------
+
+#define ECG_ADC1_DMA_BUFFER_SIZE		ECG_ADC1_CHANNELS_PER_BUFFER
+#define ECG_ADC1_DMA_BUFFER_SIZE_HALF	(ECG_ADC1_DMA_BUFFER_SIZE / 2)
+#define BAT_ADC3_DMA_BUFFER_SIZE		BAT_ADC3_CHANNELS_PER_BUFFER
+#define BAT_ADC3_DMA_BUFFER_SIZE_HALF	(BAT_ADC3_DMA_BUFFER_SIZE / 2)
+#define I2C1_BUFFER_SIZE				8				// EEPROM (X), RTC (8), PPG (6)
+#define I2C2_BUFFER_SIZE				6				// RESP (6)
+#define SPI1_BUFFER_SIZE				6				// MPU (6)
+#define SPI2_BUFFER_SIZE				512				// SD (512)
+#define USART1_RX_BUFFER_SIZE			10
+#define USART1_TX_BUFFER_SIZE			10
+#define USART2_RX_BUFFER_SIZE			10
+#define USART2_TX_BUFFER_SIZE			10
+#define USART3_RX_BUFFER_SIZE			2				// DMA (2)
+#define USART3_TX_BUFFER_SIZE			100				// BLOCKING (100)
+#define USB_RX_BUFFER_SIZE				2				// DMA (2)
+#define USB_TX_BUFFER_SIZE				100				// BLOCKING (100)
+
+// -----------------------------------------------------------------------------
+// Device buffer sizes ---------------------------------------------------------
+
+#define SD_CARD_BUFFER_SIZE				SPI2_BUFFER_SIZE
+#define SD_CARD_CIRCULAR_BUFFER_SIZE	2048
+#define ECG_CIRCULAR_BUFFER_SIZE		300
+
+// -----------------------------------------------------------------------------
+// Timeouts / debounces --------------------------------------------------------
+
+#define I2C1_TIMEOUT					10
+#define I2C2_TIMEOUT					10
+#define SPI1_TIMEOUT					10
+#define SPI2_TIMEOUT					10
+#define UART1_TIMEOUT					10
+#define UART2_TIMEOUT					10
+#define UART3_TIMEOUT					10
+#define ENCODER_BUTTON_DEBOUNCE			50
+#define ENCODER_CLOCK_DEBOUNCE			50
+
+// =============================================================================
+// File exclusive - New data types
+// =============================================================================
+
+typedef union {
+	uint32_t allFlags;
+	struct {
+		// Interrupt management
+		bool		intSystemVoltagesReady		: 1;
+
+		// Package control
+		bool		dataPackageCreateNew		: 1;
+
+		// Acquisition control
+		bool		acquisitionStartNew			: 1;
+		bool		acquisitionRunning			: 1;
+		bool		acquisitionStopping			: 1;
+
+		// SD Card control
+		bool		sdCardFileOpenned			: 1;
+		bool		sdCardMounted				: 1;
+
+		// Free to use
+		uint32_t	unusedFlags					: 25;
+	};
+} systemFlags_f;
+
+typedef struct {
+	uint16_t		rawRtcBattery;
+	uint16_t		rawMainBattery;
+	uint16_t		rawStepUpConverter;
+	uint32_t		rtcBattery;
+	uint32_t		mainBattery;
+	uint32_t		stepUpConverter;
+} systemVoltages_t;
+
+typedef struct {
+	uint32_t	ticksSinceLastEdge;
+	uint32_t	ticksSinceLastPress;
+	int16_t		value							: 14;
+	bool		isValueChanged					: 1;
+	bool		isButtonPressed					: 1;
+} encoderData_s;
+
+typedef enum {
+	HAL_INTERNAL_ERROR					= 1,
+
+	ADC1_DMA_CONFIG						= 2,
+	ADC3_DMA_CONFIG						= 3,
+	ECG_AD8232_CIRC_BUFF_POP_DATA		= 4,
+	ECG_AD8232_CIRC_BUFF_PUSH_DATA		= 5,
+	PPG__MAX30102_CIRC_BUFF_POP_DATA	= 6,
+	PPG__MAX30102_CIRC_BUFF_PUSH_DATA	= 7,
+	RESP_MAX30102_CIRC_BUFF_POP_DATA	= 8,
+	RESP_MAX30102_CIRC_BUFF_PUSH_DATA	= 9,
+	RESP_MPU9250_CIRC_BUFF_POP_DATA		= 10,
+	RESP_MPU9250_CIRC_BUFF_PUSH_DATA	= 11,
+	SD_CARD_MOUNT						= 12,
+	SD_CARD_OPEN_FILE					= 13,
+	SD_CARD_SAVE_FILE					= 14,
+	SD_CARD_WRITE_FILE					= 15,
+	SD_CIRC_BUFF_POP_DATA				= 16,
+	SD_CIRC_BUFF_PUSH_DATA				= 17,
+	TIMER3_CONFIG						= 18,
+	TIMER8_CONFIG						= 19,
+	UART_RX_CIRC_BUFFER_PUSH_DATA		= 20,
+	UART3_DMA_RX_CONFIG					= 21,
+} systemError_e;
+
+// =============================================================================
+// File exclusive - Macro-functions
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// System LED macrofunctions ---------------------------------------------------
+
+#define ledTurnOn()						HAL_GPIO_WritePin(NLED_GPIO_Port, NLED_Pin, GPIO_PIN_RESET)
+#define ledTurnOff()					HAL_GPIO_WritePin(NLED_GPIO_Port, NLED_Pin, GPIO_PIN_SET)
+#define ledToggle()						HAL_GPIO_TogglePin(NLED_GPIO_Port, NLED_Pin)
+
+// -----------------------------------------------------------------------------
+// System DEBUG pins macrofunctions --------------------------------------------
+
+#define debug0High()					HAL_GPIO_WritePin(DEBUG0_GPIO_Port, DEBUG0_Pin, GPIO_PIN_SET)
+#define debug0Low()						HAL_GPIO_WritePin(DEBUG0_GPIO_Port, DEBUG0_Pin, GPIO_PIN_RESET)
+#define debug0Toggle()					HAL_GPIO_TogglePin(DEBUG0_GPIO_Port, DEBUG0_Pin)
+#define debug1High()					HAL_GPIO_WritePin(DEBUG1_GPIO_Port, DEBUG1_Pin, GPIO_PIN_SET)
+#define debug1Low()						HAL_GPIO_WritePin(DEBUG1_GPIO_Port, DEBUG1_Pin, GPIO_PIN_RESET)
+#define debug1Toggle()					HAL_GPIO_TogglePin(DEBUG1_GPIO_Port, DEBUG1_Pin)
+#define debug2High()					HAL_GPIO_WritePin(DEBUG2_GPIO_Port, DEBUG2_Pin, GPIO_PIN_SET)
+#define debug2Low()						HAL_GPIO_WritePin(DEBUG2_GPIO_Port, DEBUG2_Pin, GPIO_PIN_RESET)
+#define debug2Toggle()					HAL_GPIO_TogglePin(DEBUG2_GPIO_Port, DEBUG2_Pin)
+#define debug3High()					HAL_GPIO_WritePin(DEBUG3_GPIO_Port, DEBUG3_Pin, GPIO_PIN_SET)
+#define debug3Low()						HAL_GPIO_WritePin(DEBUG3_GPIO_Port, DEBUG3_Pin, GPIO_PIN_RESET)
+#define debug3Toggle()					HAL_GPIO_TogglePin(DEBUG3_GPIO_Port, DEBUG3_Pin)
+#define debug4High()					HAL_GPIO_WritePin(DEBUG4_GPIO_Port, DEBUG4_Pin, GPIO_PIN_SET)
+#define debug4Low()						HAL_GPIO_WritePin(DEBUG4_GPIO_Port, DEBUG4_Pin, GPIO_PIN_RESET)
+#define debug4Toggle()					HAL_GPIO_TogglePin(DEBUG4_GPIO_Port, DEBUG4_Pin)
+#define debug5High()					HAL_GPIO_WritePin(DEBUG5_GPIO_Port, DEBUG5_Pin, GPIO_PIN_SET)
+#define debug5Low()						HAL_GPIO_WritePin(DEBUG5_GPIO_Port, DEBUG5_Pin, GPIO_PIN_RESET)
+#define debug5Toggle()					HAL_GPIO_TogglePin(DEBUG5_GPIO_Port, DEBUG5_Pin)
+#define debug6High()					HAL_GPIO_WritePin(DEBUG6_GPIO_Port, DEBUG6_Pin, GPIO_PIN_SET)
+#define debug6Low()						HAL_GPIO_WritePin(DEBUG6_GPIO_Port, DEBUG6_Pin, GPIO_PIN_RESET)
+#define debug6Toggle()					HAL_GPIO_TogglePin(DEBUG6_GPIO_Port, DEBUG6_Pin)
+#define debug7High()					HAL_GPIO_WritePin(DEBUG7_GPIO_Port, DEBUG7_Pin, GPIO_PIN_SET)
+#define debug7Low()						HAL_GPIO_WritePin(DEBUG7_GPIO_Port, DEBUG7_Pin, GPIO_PIN_RESET)
+#define debug7Toggle()					HAL_GPIO_TogglePin(DEBUG7_GPIO_Port, DEBUG7_Pin)
+
+// =============================================================================
+// File exclusive - Inline function definitions
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Debug related functions -----------------------------------------------------
+
+#if DEBUG_ALLOW_VERBOSE == 1
+inline void verboseStatus(uint16_t errorCode, const char *strMessage)
+{
+	char buff[1000];
+	do {
+		if(errorCode) {
+			strcpy(buff, "[FAILED] ");
+		} else {
+			strcpy(buff, "[  OK  ] ");
+		} strcat(buff, strMessage);
+		if(errorCode) {
+			sprintf(buff, "%s! Error = %u.\r", buff, errorCode);
+		} else {
+			strcat(buff, "!\r");
+		} HAL_UART_Transmit(&huart3, (uint8_t *)buff, strlen(buff), UART3_TIMEOUT);
+	} while(0);
+}
+#else
+inline void verboseStatus(uint16_t errorCode, const char *strMessage)
+{
+	return;
+}
+#endif
+
+// =============================================================================
+// Global variables
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// ADC variables ---------------------------------------------------------------
+
+CircularBuffer<uint16_t>				ecgCircBuffer(ECG_CIRCULAR_BUFFER_SIZE, true);
+uint16_t								ecgDmaBuffer[ECG_ADC1_DMA_BUFFER_SIZE];
+uint16_t								batDmaBuffer[BAT_ADC3_DMA_BUFFER_SIZE];
+
+// -----------------------------------------------------------------------------
+// Generic auxiliary variables -------------------------------------------------
+
+char									auxBuff[1000];
+char									auxBuff2[512];
+Error									funsapeStatus;
+HAL_StatusTypeDef						halStatus;
+uint32_t								ticksCounter = 0;
+systemFlags_f							systemFlags;
+systemVoltages_t						systemVoltages;
+vint16_t								auxTimer = 0;
+uint16_t								sampleIndex = 0;
+
+// -----------------------------------------------------------------------------
+// I2C variables ---------------------------------------------------------------
+
+char	 								i2c1Buffer[I2C1_BUFFER_SIZE];
+char	 								i2c2Buffer[I2C2_BUFFER_SIZE] __attribute__((unused));
+
+// -----------------------------------------------------------------------------
+// Import external variables ---------------------------------------------------
+
+extern __IO uint32_t					uwTick;
+extern HAL_TickFreqTypeDef				uwTickFreq;
+
+// -----------------------------------------------------------------------------
+// SD Card global variables ----------------------------------------------------
+
+char __attribute__((aligned(4)))		sdCardBuffer[SD_CARD_BUFFER_SIZE];
+CircularBuffer<uint8_t>					sdCardCircBuffer(SD_CARD_CIRCULAR_BUFFER_SIZE, true);
+FIL										sdCardFile;
+FRESULT									sdCardResult;
+FATFS									sdCardVolume;
+
+// -----------------------------------------------------------------------------
+// SPI variables ---------------------------------------------------------------
+
+uint8_t 								spi1Buffer[SPI1_BUFFER_SIZE] __attribute__((unused));
+uint8_t 								spi2Buffer[SPI2_BUFFER_SIZE] __attribute__((unused));
+
+// -----------------------------------------------------------------------------
+// USART variables -------------------------------------------------------------
+
+uint8_t									usart1RxDmaBuffer[USART1_RX_BUFFER_SIZE] __attribute__((unused));
+uint8_t 								usart1TxBuffer[USART1_TX_BUFFER_SIZE] __attribute__((unused));
+uint8_t									usart2RxDmaBuffer[USART2_RX_BUFFER_SIZE] __attribute__((unused));
+uint8_t 								usart2TxBuffer[USART2_TX_BUFFER_SIZE] __attribute__((unused));
+CircularBuffer<char>					usart3RxCircBuffer;
+uint8_t									usart3RxDmaBuffer[USART3_RX_BUFFER_SIZE];
+uint8_t 								usart3TxBuffer[USART3_TX_BUFFER_SIZE] __attribute__((unused));
+
+// -----------------------------------------------------------------------------
+// USB variables ---------------------------------------------------------------
+
+uint8_t									usbRxDmaBuffer[USB_RX_BUFFER_SIZE] __attribute__((unused));
+uint8_t 								usbTxBuffer[USB_TX_BUFFER_SIZE] __attribute__((unused));
+
+// -----------------------------------------------------------------------------
+// Encoder variables -----------------------------------------------------------
+
+encoderData_s encoder;
+
+// =============================================================================
+// General function declarations
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// STM32CubeMX functions -------------------------------------------------------
+
+void Error_Handler(void);
+void SystemClock_Config(void);
+
+// -----------------------------------------------------------------------------
+// SD Card functions -----------------------------------------------------------
+
+void disk_timerproc(void);
+
+// -----------------------------------------------------------------------------
+// System status and configuration functions -----------------------------------
+
+void myErrorHandler(uint16_t errorCode_p);
+void usartConfiguration(void);
+
+// =============================================================================
+// Main function
+// =============================================================================
+
+int main(void)
+{
+
+	// -------------------------------------------------------------------------
+	// Initialize variables
+	// -------------------------------------------------------------------------
+
+	systemFlags.allFlags = 0;
+	systemFlags.acquisitionStartNew = true;		// Temporary, just to facilitate testing
+	systemVoltages.rawRtcBattery = 0;
+	systemVoltages.rawMainBattery = 0;
+	systemVoltages.rawStepUpConverter = 0;
+	systemVoltages.rtcBattery = 0;
+	systemVoltages.mainBattery = 0;
+	systemVoltages.stepUpConverter = 0;
+
+	// -------------------------------------------------------------------------
+	// HAL Library initialization
+	// -------------------------------------------------------------------------
+
+	HAL_Init();
+	SystemClock_Config();
+	MX_ADC1_Init();
+	MX_ADC3_Init();
+	MX_DMA_Init();
+	MX_GPIO_Init();
+	MX_I2C1_Init();
+	MX_I2C2_Init();
+	MX_RTC_Init();
+	MX_SPI1_Init();
+	MX_SPI2_Init();
+	MX_TIM3_Init();
+	MX_TIM8_Init();
+	MX_USART1_UART_Init();
+	MX_USART2_UART_Init();
+	MX_USART3_UART_Init();
+	MX_USB_DEVICE_Init();
+
+	// -------------------------------------------------------------------------
+	// Trigger pulse for logic analyzer
+	// -------------------------------------------------------------------------
+
+	delayMs(100);
+	debug7High();
+	delayMs(10);
+	debug7Low();
+	delayMs(10);
+	debug7High();
+	delayMs(10);
+	debug7Low();
+
+	// -------------------------------------------------------------------------
+	// FunSAPE Library debug configuration
+	// -------------------------------------------------------------------------
+
+#if DEBUG_ALLOW_FULL == 1
+	debug.init(&huart3, false, false, true);
+#else
+	debug.init(&huart3);
+#endif
+
+	// -------------------------------------------------------------------------
+	// Peripheral configurations
+	// -------------------------------------------------------------------------
+
+	// -------------------------------------------------------------------------
+	// UART3 configuration (Verbose debug [115200 bps]) ------------------------
+	auxBuff[0] = '\r';
+	auxBuff[1] = '\r';
+	HAL_UART_Transmit(&huart3, (uint8_t *)auxBuff, 2, UART3_TIMEOUT);
+	halStatus = HAL_UART_Receive_DMA(&huart3, usart3RxDmaBuffer, 2);
+	verboseStatus((uint16_t)halStatus, "UART3 reception configured to use DMA");
+	debugMessage((uint16_t)halStatus);
+	if((uint16_t)halStatus) {
+		myErrorHandler(UART3_DMA_RX_CONFIG);
+	}
+
+	// -------------------------------------------------------------------------
+	// ADC1 configuration (ECG) ------------------------------------------------
+	halStatus = HAL_ADC_Start_DMA(&hadc1, (uint32_t *)(ecgDmaBuffer), ECG_ADC1_DMA_BUFFER_SIZE);
+	verboseStatus((uint16_t)halStatus, "ADC1 configured to use DMA");
+	debugMessage((uint16_t)halStatus);
+	if((uint16_t)halStatus) {
+		myErrorHandler(ADC1_DMA_CONFIG);
+	}
+
+	// -------------------------------------------------------------------------
+	// TIMER3 configuration (ADC1 Trigger) -------------------------------------
+	halStatus = HAL_TIM_Base_Start_IT(&htim3);
+	verboseStatus((uint16_t)halStatus, "TIMER3 configured");
+	debugMessage((uint16_t)halStatus);
+	if((uint16_t)halStatus) {
+		myErrorHandler(TIMER3_CONFIG);
+	}
+
+	// -------------------------------------------------------------------------
+	// ADC3 configuration (BAT) ------------------------------------------------
+	halStatus = HAL_ADC_Start_DMA(&hadc3, (uint32_t *)(batDmaBuffer), BAT_ADC3_DMA_BUFFER_SIZE);
+	verboseStatus((uint16_t)halStatus, "ADC3 configured to use DMA");
+	debugMessage((uint16_t)halStatus);
+	if((uint16_t)halStatus) {
+		myErrorHandler(ADC3_DMA_CONFIG);
+	}
+
+	// -------------------------------------------------------------------------
+	// TIMER8 configuration (ADC3 Trigger) -------------------------------------
+	halStatus = HAL_TIM_Base_Start_IT(&htim8);
+	verboseStatus((uint16_t)halStatus, "TIMER8 configured");
+	debugMessage((uint16_t)halStatus);
+	if((uint16_t)halStatus) {
+		myErrorHandler(TIMER8_CONFIG);
+	}
+
+	// -------------------------------------------------------------------------
+	// I2C1 configuration (EEPROM, RTC, PPG [100 kHz]) -------------------------
+	// TODO
+
+	// -------------------------------------------------------------------------
+	// I2C2 configuration (RESP [400 kHz]) -------------------------------------
+	// TODO
+
+	// -------------------------------------------------------------------------
+	// RTC configuration (internal peripheral) ---------------------------------
+	// TODO
+
+	// -------------------------------------------------------------------------
+	// SPI1 configuration (ACCEL [max 1 MHz]) ----------------------------------
+	// TODO
+
+	// -------------------------------------------------------------------------
+	// UART1 configuration (Free to Use [115200 bps]) --------------------------
+	// TODO
+
+	// -------------------------------------------------------------------------
+	// UART2 configuration (Bluetooth [115200 bps]) ----------------------------
+	// TODO
+
+	// -------------------------------------------------------------------------
+	// USB configuration (Full speed [12 Mbps]) --------------------------------
+	// TODO
+
+	// -------------------------------------------------------------------------
+	// Devices configurations
+	// -------------------------------------------------------------------------
+
+	// -------------------------------------------------------------------------
+	// Bluetooth configuration -------------------------------------------------
+	// TODO
+
+	// -------------------------------------------------------------------------
+	// MAX30102 configuration (PPG) --------------------------------------------
+	// TODO MAX30102-1
+
+	// -------------------------------------------------------------------------
+	// MAX30102 configuration (RESP) -------------------------------------------
+	// TODO MAX30102-2
+
+	// -------------------------------------------------------------------------
+	// MPU9250 configuration (RESP) --------------------------------------------
+	// TODO MPU9250-1
+	// TODO MPU9250-2
+	// TODO MPU9250-3
+	// TODO MPU9250-4
+
+	// -------------------------------------------------------------------------
+	// DS1307 configuration ----------------------------------------------------
+	// TODO
+
+	// -------------------------------------------------------------------------
+	// EEPROM configuration ---------------------------------------------------
+	// TODO
+
+	// -------------------------------------------------------------------------
+	// Encoder configuration ---------------------------------------------------
+	encoder.isButtonPressed = false;
+	encoder.isValueChanged = false;
+	encoder.value = 0;
+	encoder.ticksSinceLastEdge = 0;
+	encoder.ticksSinceLastPress = 0;
+
+	// -------------------------------------------------------------------------
+	// TFT display configuration -----------------------------------------------
+	// TODO
+
+	// -------------------------------------------------------------------------
+	// SD Card configuration ---------------------------------------------------
+
+	// SD card mounting
+	// sdCardResult = f_mount(&sdCardVolume, "", 1);
+	// verboseStatus((uint16_t)sdCardResult, "SD Card volume mounted");
+	// debugMessage((uint16_t)sdCardResult);
+	// if(sdCardResult) {
+	// 	myErrorHandler(SD_CARD_MOUNT);
+	// }
+
+	// =========================================================================
+	// Main loop - Start
+	// =========================================================================
+
+	while(1) {
+
+		////////////////////////////////////////////////////////////////////////
+		// FIXME: Code is stopping here for testing purpose
+		systemHalt();
+
+		// ---------------------------------------------------------------------
+		// Start a new acquisition
+		// ---------------------------------------------------------------------
+
+		if(systemFlags.acquisitionStartNew) {
+
+			// Abort previous acquisition
+			if(systemFlags.acquisitionRunning) {
+				// TODO
+				systemFlags.acquisitionRunning = false;
+			}
+
+			// Close file if it is still in use
+			if(systemFlags.sdCardFileOpenned) {
+				// TODO
+				// f_close(&sdCardFile);
+				systemFlags.sdCardFileOpenned = false;
+			}
+
+			// Search for last created file
+			char fileName[13];
+			uint16_t fileNumber = 1;
+			do {
+				sprintf(fileName, "file%04u.txt", fileNumber);
+				sdCardResult = f_open(&sdCardFile, fileName, (BYTE)(FA_WRITE | FA_CREATE_NEW));
+				if(!sdCardResult) {
+					break;
+				}
+			} while((++fileNumber) <= 9999);
+			systemFlags.sdCardFileOpenned = true;
+			verboseStatus((uint16_t)sdCardResult, "New file created");
+			debugMessage((uint16_t)sdCardResult);
+			if(sdCardResult) {
+				myErrorHandler(SD_CARD_OPEN_FILE);
+			}
+
+			// Saving empty file
+			sdCardResult = f_sync(&sdCardFile);
+			verboseStatus((uint16_t)sdCardResult, "Empty file saved");
+			debugMessage((uint16_t)sdCardResult);
+			if(sdCardResult) {
+				myErrorHandler(SD_CARD_SAVE_FILE);
+			}
+
+			// Clear all data buffers
+			sampleIndex = 0;
+			// TODO
+
+			// Starting devices
+			// TODO
+
+			// Configuring system flags before leave
+			systemFlags.acquisitionStartNew = false;
+			systemFlags.acquisitionRunning = true;
+
+		} // End of if(systemFlags.dataPackageCreateNew)
+
+		// ---------------------------------------------------------------------
+		// Checks if all circular buffers have enough elements
+		// ---------------------------------------------------------------------
+
+		if((ecgCircBuffer.getOccupation() >= 64) && 1 && 1) {
+			systemFlags.dataPackageCreateNew = true;
+		}
+
+		// ---------------------------------------------------------------------
+		// Send data package to SD Card circular buffer
+		// ---------------------------------------------------------------------
+
+		if(systemFlags.dataPackageCreateNew) {
+
+			// Create the package header
+			// TODO
+			// uint16_t packageIndex = 0;
+			// sdCardBuffer[packageIndex++] = 0x22;			// Start delimiter 1
+			// sdCardBuffer[packageIndex++] = 0x03;			// Start delimiter 2
+			// sdCardBuffer[packageIndex++] = 0x19;			// Start delimiter 3
+			// sdCardBuffer[packageIndex++] = 0x82;			// Start delimiter 4
+			// sdCardBuffer[packageIndex++] = 0xAA;			// Sample information 1
+			// sdCardBuffer[packageIndex++] = 0xBB;			// Sample information 2
+			// sdCardBuffer[packageIndex++] = 0xCC;			// Sample information 3
+			// sdCardBuffer[packageIndex++] = 0xDD;			// Sample information 4
+			// sdCardBuffer[packageIndex++] = 0xDD;			// Sample information 5
+			// sdCardBuffer[packageIndex++] = 0xCC;			// Sample information 6
+			// sdCardBuffer[packageIndex++] = 0xBB;			// Sample information 7
+			// sdCardBuffer[packageIndex++] = 0xAA;			// Sample information 8
+			// sdCardBuffer[packageIndex++] = (uint8_t)(sampleIndex & 0x00FF);			// Time index 1
+			// sdCardBuffer[packageIndex++] = (uint8_t)(sampleIndex >> 8);				// Time index 2
+			// sampleIndex++;
+
+			// // Pops data from ECG circular buffer
+			// ecgCircBuffer.popBuffer((uint16_t *)auxBuff, 64);
+			// funsapeStatus = ecgCircBuffer.getLastError();
+			// verboseStatus((uint16_t)funsapeStatus, "ECG CIRC => BUFFER");
+			// debugMessage((uint16_t)funsapeStatus);
+			// if((uint16_t)funsapeStatus) {
+			// 	myErrorHandler(ECG_AD8232_CIRC_BUFF_POP_DATA);
+			// }
+
+			// Write ECG data to package buffer
+			// TODO
+
+			// Pops data from MPU circular buffer
+			// TODO
+
+			// Write MPU data to package buffer
+			// TODO
+
+			// Pops data from PPG circular buffer
+			// TODO
+
+			// Write PPG data to package buffer
+			// TODO
+
+			// Create package footer
+			// sdCardBuffer[packageIndex++] = 0x7E;											// Checksum
+			// Temporary fixed in 0x7E to test
+
+			// Push package into SD circular buffer
+			// sdCardCircBuffer.pushBuffer((uint8_t *)auxBuff, 128);
+			// funsapeStatus = sdCardCircBuffer.getLastError();
+			// verboseStatus((uint16_t)funsapeStatus, "BUFFER => SD CIRC");
+			// debugMessage((uint16_t)funsapeStatus);
+			// if((uint16_t)funsapeStatus) {
+			// 	myErrorHandler(SD_CIRC_BUFF_PUSH_DATA);
+			// }
+
+			// Clear system flag before leave
+			systemFlags.dataPackageCreateNew = false;
+
+		} // End of if(systemFlags.dataPackageCreateNew)
+
+		// ---------------------------------------------------------------------
+		// Send data to SD card
+		// ---------------------------------------------------------------------
+
+		if(sdCardCircBuffer.getOccupation() >= 512) {
+			UINT auxUint;
+
+			// Pops data from SD circular buffer
+			sdCardCircBuffer.popBuffer((uint8_t *)auxBuff, 512);
+			funsapeStatus = sdCardCircBuffer.getLastError();
+			verboseStatus((uint16_t)funsapeStatus, "SD CIRC => BUFFER");
+			debugMessage((uint16_t)funsapeStatus);
+			if((uint16_t)funsapeStatus) {
+				myErrorHandler(SD_CIRC_BUFF_POP_DATA);
+			}
+
+			// Reopens the file for append
+			// TODO
+
+			// Write at SD card
+			sdCardResult = f_write(&sdCardFile, auxBuff2, 512, (UINT *)&auxUint);
+			verboseStatus((uint16_t)sdCardResult, "BUFFER => SD");
+			debugMessage((uint16_t)sdCardResult);
+			if((uint16_t)funsapeStatus) {
+				myErrorHandler(SD_CARD_WRITE_FILE);
+			}
+
+			// Save data into SD card
+			sdCardResult = f_sync(&sdCardFile);
+			verboseStatus((uint16_t)sdCardResult, "SAVE SD");
+			debugMessage((uint16_t)sdCardResult);
+			if((uint16_t)funsapeStatus) {
+				myErrorHandler(SD_CARD_SAVE_FILE);
+			}
+		} // End of if(sdCardCircBuffer.getOccupation() >= 512)
+
+		// ---------------------------------------------------------------------
+		// Evaluate voltage levels
+		// ---------------------------------------------------------------------
+
+		if(systemFlags.intSystemVoltagesReady) {
+			// Calculate CR2032 voltage
+			systemVoltages.rtcBattery = (uint32_t)systemVoltages.rawRtcBattery;
+			systemVoltages.rtcBattery *= 825;
+			systemVoltages.rtcBattery /= 1024;
+
+			// Calculate Main Battery voltage
+			systemVoltages.mainBattery = (uint32_t)systemVoltages.rawMainBattery;
+			systemVoltages.mainBattery *= 825;
+			systemVoltages.mainBattery *= (POWER_MAIN_BAT_RES_TOP + POWER_MAIN_BAT_RES_BOTTOM);
+			systemVoltages.mainBattery /= (1024 * POWER_MAIN_BAT_RES_BOTTOM);
+
+			// Calculate Step Up converter voltage
+			systemVoltages.stepUpConverter = (uint32_t)systemVoltages.rawStepUpConverter;
+			systemVoltages.stepUpConverter *= 825;
+			systemVoltages.stepUpConverter *= (POWER_STEP_UP_RES_TOP + POWER_STEP_UP_RES_BOTTOM);
+			systemVoltages.stepUpConverter /= (1024 * POWER_STEP_UP_RES_BOTTOM);
+
+			// Clear system flag before leave
+			systemFlags.intSystemVoltagesReady = false;
+
+		} // End of if(systemFlags.batMeasurementReady)
+
+	} // End of Main loop
+
+	return 0;
+}
+
+// =============================================================================
+// Private function definitions
+// =============================================================================
+
+void SystemClock_Config(void)
+{
+	RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+	RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+	RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
+
+	// Initializes the CPU, AHB and APB busses clocks
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI | RCC_OSCILLATORTYPE_HSE;
+	RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+	RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV2;
+	RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+	RCC_OscInitStruct.LSIState = RCC_LSI_ON;
+	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+	RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
+	if(HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+		Error_Handler();
+	}
+	// Initializes the CPU, AHB and APB busses clocks
+	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+
+	if(HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK) {
+		Error_Handler();
+	}
+	PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC | RCC_PERIPHCLK_ADC | RCC_PERIPHCLK_USB;
+	PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
+	PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV6;
+	PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
+	if(HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
+		Error_Handler();
+	}
+	HAL_RCC_MCOConfig(RCC_MCO, RCC_MCO1SOURCE_HSE, RCC_MCODIV_1);
+}
+
+// =============================================================================
+// Weak functions overriding
+// =============================================================================
+
+void HAL_IncTick(void)
+{
+	uwTick += uwTickFreq;
+	disk_timerproc();
+	ticksCounter++;
+	auxTimer++;
+}
+
+// =============================================================================
+// Callback function definitions
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// UART interrupt callbacks ----------------------------------------------------
+
+void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
+{
+	if(!usart3RxCircBuffer.push(usart3RxDmaBuffer[0])) {
+		myErrorHandler(UART_RX_CIRC_BUFFER_PUSH_DATA);
+	}
+
+	return;
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if(!usart3RxCircBuffer.push(usart3RxDmaBuffer[1])) {
+		myErrorHandler(UART_RX_CIRC_BUFFER_PUSH_DATA);
+	}
+
+	return;
+}
+
+// -----------------------------------------------------------------------------
+// ADC interrupt callbacks -----------------------------------------------------
+
+void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef *hadc)
+{
+	if(hadc->Instance == ADC1) {
+		if(!ecgCircBuffer.pushBuffer(&ecgDmaBuffer[0], ECG_ADC1_DMA_BUFFER_SIZE_HALF)) {
+			funsapeStatus = ecgCircBuffer.getLastError();
+			verboseStatus((uint16_t)funsapeStatus, "ERRO HALF");
+			debugMessage((uint16_t)funsapeStatus);
+			myErrorHandler(ECG_AD8232_CIRC_BUFF_PUSH_DATA);
+		}
+	} else if(hadc->Instance == ADC3) {
+		systemVoltages.rawRtcBattery = (uint16_t)batDmaBuffer[0];
+		systemVoltages.rawMainBattery = (uint16_t)batDmaBuffer[1];
+		systemVoltages.rawStepUpConverter = (uint16_t)batDmaBuffer[2];
+		systemFlags.intSystemVoltagesReady = true;
+	}
+
+	return;
+}
+
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
+{
+	if(hadc->Instance == ADC1) {
+		if(!ecgCircBuffer.pushBuffer(&ecgDmaBuffer[ECG_ADC1_DMA_BUFFER_SIZE_HALF], ECG_ADC1_DMA_BUFFER_SIZE_HALF)) {
+			funsapeStatus = ecgCircBuffer.getLastError();
+			verboseStatus((uint16_t)funsapeStatus, "ERRO FULL");
+			debugMessage((uint16_t)funsapeStatus);
+			myErrorHandler(ECG_AD8232_CIRC_BUFF_PUSH_DATA);
+		}
+	} else if(hadc->Instance == ADC3) {
+		systemVoltages.rawRtcBattery = (uint16_t)batDmaBuffer[0 + BAT_ADC3_DMA_BUFFER_SIZE_HALF];
+		systemVoltages.rawMainBattery = (uint16_t)batDmaBuffer[1 + BAT_ADC3_DMA_BUFFER_SIZE_HALF];
+		systemVoltages.rawStepUpConverter = (uint16_t)batDmaBuffer[2 + BAT_ADC3_DMA_BUFFER_SIZE_HALF];
+		systemFlags.intSystemVoltagesReady = true;
+	}
+
+	return;
+}
+
+// -----------------------------------------------------------------------------
+// TIMER interrupt callbacks ---------------------------------------------------
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	return;
+	if(htim->Instance == TIM3) {
+		// Nothing to do
+	} else if(htim->Instance == TIM8) {
+	}
+}
+// -----------------------------------------------------------------------------
+// EXTI interrupt callbacks ----------------------------------------------------
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	// Handling the encoder CLK interrupt
+	if(GPIO_Pin == GPIO_PIN_5) {
+		uint32_t currentTick = HAL_GetTick();
+
+		if((currentTick - encoder.ticksSinceLastEdge) > ENCODER_CLOCK_DEBOUNCE) {
+			if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_7)) {
+				encoder.value++;
+			} else {
+				encoder.value--;
+			}
+			encoder.ticksSinceLastEdge = currentTick;
+		}
+	}
+
+	// Handling the encoder BTN interrupt
+	else if(GPIO_Pin == GPIO_PIN_6) {
+		uint32_t currentTick = HAL_GetTick();
+
+		if((currentTick - encoder.ticksSinceLastPress) > ENCODER_BUTTON_DEBOUNCE) {
+			encoder.isButtonPressed = true;
+			encoder.ticksSinceLastPress = currentTick;
+		}
+	}
+
+	// Handling other pin interrupt
+	else if(GPIO_Pin == GPIO_PIN_8) {
+		// TODO Handle interrupt from the RTC SWO pin
+	}
+
+}
+
+// =============================================================================
+// General function definitions
+// =============================================================================
+
+void Error_Handler(void)
+{
+	myErrorHandler(HAL_INTERNAL_ERROR);
+}
+
+void myErrorHandler(uint16_t errorCode_p)
+{
+	ledTurnOff();
+	while(1) {
+		for(uint16_t i = 0; i < errorCode_p; i++) {
+			delayMs(200);
+			ledTurnOn();
+			delayMs(200);
+			ledTurnOff();
+		}
+		delayMs(1000);
+	}
+}

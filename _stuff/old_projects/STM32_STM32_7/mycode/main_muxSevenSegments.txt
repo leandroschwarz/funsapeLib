@@ -1,0 +1,92 @@
+
+
+#include "util/sevenSegments.hpp"
+
+
+uint16_t generalErrorCode = 0x12AB;
+uint8_t muxDisplayValue[4];
+uint8_t muxDisplayIndex;
+
+
+int main()
+{
+	// Extract values
+	do {
+		uint8_t aux8;
+		uint16_t aux16 = generalErrorCode;
+		for(uint8_t i = 0; i < 4; i++) {
+			aux8 = (uint8_t)(aux16 & 0x0F);
+			aux16 >>= 4;
+			muxDisplayValue[i] = hex2SevenSegments(aux8, COMMON_ANODE, Activation::OFF);
+		}
+	} while(0);
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	if(htim->Instance == TIM3) {
+
+		// Update display
+		do {
+			// Turn all displays off
+			HAL_GPIO_WritePin(DEBUG4_GPIO_Port, DEBUG4_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(DEBUG5_GPIO_Port, DEBUG5_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(DEBUG6_GPIO_Port, DEBUG6_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(DEBUG7_GPIO_Port, DEBUG7_Pin, GPIO_PIN_SET);
+
+			// Transfer data
+			uint8_t aux8 = muxDisplayValue[muxDisplayIndex];
+			for(uint8_t i = 0; i < 8; i++) {
+				if(isBitSet(aux8, i)) {
+					HAL_GPIO_WritePin(DEBUG1_GPIO_Port, DEBUG1_Pin, GPIO_PIN_SET);
+				} else {
+					HAL_GPIO_WritePin(DEBUG1_GPIO_Port, DEBUG1_Pin, GPIO_PIN_RESET);
+				}
+				asm("NOP");
+				asm("NOP");
+				asm("NOP");
+				asm("NOP");
+				asm("NOP");
+				HAL_GPIO_WritePin(DEBUG2_GPIO_Port, DEBUG2_Pin, GPIO_PIN_SET);
+				asm("NOP");
+				asm("NOP");
+				asm("NOP");
+				asm("NOP");
+				asm("NOP");
+				HAL_GPIO_WritePin(DEBUG2_GPIO_Port, DEBUG2_Pin, GPIO_PIN_RESET);
+				asm("NOP");
+				asm("NOP");
+				asm("NOP");
+				asm("NOP");
+				asm("NOP");
+			}
+			HAL_GPIO_WritePin(DEBUG3_GPIO_Port, DEBUG3_Pin, GPIO_PIN_SET);
+			asm("NOP");
+			asm("NOP");
+			asm("NOP");
+			asm("NOP");
+			asm("NOP");
+			HAL_GPIO_WritePin(DEBUG3_GPIO_Port, DEBUG3_Pin, GPIO_PIN_RESET);
+			asm("NOP");
+			asm("NOP");
+			asm("NOP");
+			asm("NOP");
+			asm("NOP");
+
+			// Turns display on
+			switch(muxDisplayIndex) {
+			case 0: HAL_GPIO_WritePin(DEBUG4_GPIO_Port, DEBUG4_Pin, GPIO_PIN_RESET); break;
+			case 1: HAL_GPIO_WritePin(DEBUG5_GPIO_Port, DEBUG5_Pin, GPIO_PIN_RESET); break;
+			case 2: HAL_GPIO_WritePin(DEBUG6_GPIO_Port, DEBUG6_Pin, GPIO_PIN_RESET); break;
+			case 3: HAL_GPIO_WritePin(DEBUG7_GPIO_Port, DEBUG7_Pin, GPIO_PIN_RESET); break;
+			}
+
+			// Change display
+			muxDisplayIndex = (muxDisplayIndex == 3) ? 0 : muxDisplayIndex + 1;
+			// muxDisplayIndex = 0;
+
+		} while(0);
+	}
+}
+
+

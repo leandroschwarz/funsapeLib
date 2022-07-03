@@ -1,0 +1,157 @@
+========================================================================
+=>	Interrupt function callbacks and interrupt handling in devices (for 
+	example: Max30102)
+========================================================================
+
+generalIrqHandler()
+
+When the MAX30102 INT pin triggers a microcontroller interrupt, the application
+	interrupt handler must call the generalIrqHandler() function(libray
+	defined), to read the device's interrupt status register and process the
+	received data. Each interrupt flag is tested and the appropriate function(s)
+	callback(s)(the application defined, if it exists, or the library weak
+	implementation, otherwise) is/are called.
+
+interruptSpecificCallback()
+
+This function is defined in the library as a weak function(its implementation
+	doesn't do anything usefull), in order to be overridden by its redefiniton
+	in the application code. Each device flag calls a different function
+	callback.
+
+========================================================================
+=>	Fixed point in q number format
+========================================================================
+
+Definition
+----------
+
+Q format numbers are notionally fixed point numbers, that is, they are stored
+	and operated upon as regular binary signed integers, thus allowing standard
+	integer hardware/ALU to perform rational number calculations. The number of
+	integer bits, fractional bits and the underlying word size are to be chosen
+	by the programmer on an application-specific basis – the programmer's
+	choices of the foregoing will depend on the range and resolution needed for
+	the numbers.
+
+Using this translation of decimal data, mathematical operations can be performed
+	efficiently with only a little loss of accuracy. For processors that have no
+	floating-point unit, fixed point implementation of algorithms will provide
+	improved performance.
+
+Note that, apart from using an implied scale factor, the Q format has nothing
+	new compared to the well-known concept of representing numbers on a digital
+	computer. As a result, we can use the Q format to represent signed two's
+	complement numbers, too. In this case, we only need to allocate the most
+	significant bit (MSB) to the sign and use the two's complement form for the
+	negative numbers.
+
+Notation
+--------
+
+There are two conflicting notations for fixed point. Both notations are written
+	as Qm.n, where:
+
+Q designates that the number is in the Q format notation – the Texas Instruments
+	representation for signed fixed-point numbers (the "Q" being reminiscent of
+	the standard symbol for the set of rational numbers).
+m. (optional, assumed to be zero or one) is the number of bits set aside to
+	designate the two's complement integer portion of the number, exclusive or
+	inclusive of the sign bit (therefore if m is not specified it is taken as
+	zero or one).
+n is the number of bits used to designate the fractional portion of the number,
+	i.e. the number of bits to the right of the binary point. (If n = 0, the Q
+	numbers are integers – the degenerate case).
+
+One convention includes the sign bit in the value of m, and the other convention
+	does not. The choice of convention can be determined by summing m+n. If the
+	value is equal to the register size, then the sign bit is included in the
+	value of m. If it is one less than the register size, the sign bit is not
+	included in the value of m.
+
+In addition, the letter U can be prefixed to the Q to indicate an unsigned
+	value, such as UQ5.11.
+
+Choosing a notation
+-------------------
+
+To choose the position of the binary point, we need to consider two main
+	factors:
+
+- The largest number that we may need to represent in a given algorithm;
+- The tolerable quantization noise.
+
+The former specifies how many bits must be used for the integer part and the
+	latter determines the length of the fractional part.
+
+Conversion
+----------
+
+Float to Q	To convert a number from floating point to Qm.n format, just
+	multiply the floating point number by 2^n and round the value to the nearest
+	integer.
+
+Q to Float	To convert a number from Qm.n format to floating point, just convert
+	the number to float as if it were an integer, then multiply it by 2^−n.
+
+Math operations
+---------------
+
+Math operations between Q types are taken just like a math operation between
+	integers, except that its important to keep track of the point position of
+	the operands and the result.
+
+Since addition and subtraction operations doesn't change the point position, 
+	then the only thing the programmer must consider is the operands Q types.
+Case 1:	both operands are from same Q type (Qm.n). Then, no additional
+	processing is required before execute the operation. The result will be
+	type Qm.n, as the input operands.
+Case 2:	operands are from different Q types (i.e. first operand is Qm.n type and
+	the second operand is Qx,y type). Then, the operand with the greater
+	fractional resolution must be converted to the Q type of the other operand
+	(right-shifted by the resolution diference and sign extended). For example,
+	to operate a Q20,12 type with a Q14,18 type, the Q14.18 type must have its
+	sign bit stored and erased from the number. After that, the number must be
+	right-shiffted 6 times (18 - 12 = 6) and the stored sign bit must be placed.
+	The resulting number is properly converted to a Q20.12 type and can be
+	operated normally. The result Q type will be the one with the least n value
+	(and greater m value).
+
+bool sign = false;
+if(value < 0){
+		sign = true;
+		value = -value;
+}
+
+<< 4
+value != sign << 15;
+
+
+
+
+
+Procedure for multiplication of fixed numbers is same as the multiplication of two binary numbers, except keeping track of the dot notation. This basic operation has its own set of advantages and disadvantages. The advantage of multiplication is that there is no restriction that the two operands has to be of the same format and the disadvantage is the result will be twice the number of bits of operands.
+
+Q6.10 * Q6.10 ⇒ Q12.20 (32-bit)
+Qx1.y1 * Qx2.y2 ⇒ Qx1+x2.y1+y2
+
+Let’s understand the movement of dot (which separates integer & fraction)
+
+A = 25 ⇒ 011001.0000000000
+B = 25 ⇒ 011001.0000000000
+A*B = 625 ⇒ 001001110001.00000000000000000000
+
+As 25 can be representable in Q6.10 format but 625 can’t be represent in Q6.10 format, hence one has to know about the range of input & output before setting the Q-format. If required, in between one can opt for a change in the Q-format in the middle of the calculation but he will have to keep a track of later operations.
+
+In the above example, if the output has to be truncated from 32 to 16 bits; then one has to either saturate the data or change the Q-format. Saturating is like dead-end which is not potentially good in some applications so it is better to change the Q-format or scale the data to the same input format level and multiply back at the end of the module.
+
+For high range inputs - where precision is not desperately needed - there is one method that can be used. Where after multiplication, the data is downscaled by( 2^6) because of extra added 6 MSB bits hence result of 625 turns to 9.765 which can be represented in Q6.10 format and then feed it to the next process (applicable to the linear functions or linear systems only). And after processing, scale the output back by same amount at the end of your entire program. In this way, one can prevent the overhead of Q format changes.
+
+https://github.com/johnmcfarlane/fixed_point
+https://embeddedartistry.com/blog/2017/08/25/c11-fixed-point-arithmetic-library/
+http://www.superkits.net/whitepapers/Fixed%20Point%20Representation%20&%20Fractional%20Math.pdf
+https://www.pathpartnertech.com/representing-decimal-data-in-q-format/
+https://www.allaboutcircuits.com/technical-articles/fixed-point-representation-the-q-format-and-addition-examples/
+https://en.wikipedia.org/wiki/Q_(number_format)
+
+------------------------------------------------------------------------

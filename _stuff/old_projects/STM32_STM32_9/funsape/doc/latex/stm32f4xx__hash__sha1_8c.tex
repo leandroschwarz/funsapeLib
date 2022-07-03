@@ -1,0 +1,53 @@
+\hypertarget{stm32f4xx__hash__sha1_8c}{}\section{\+\_\+hide/\+M\+P\+U/\+S\+T\+M32\+F4/stm32f4xx\+\_\+hash\+\_\+sha1.c File Reference}
+\label{stm32f4xx__hash__sha1_8c}\index{\+\_\+hide/\+M\+P\+U/\+S\+T\+M32\+F4/stm32f4xx\+\_\+hash\+\_\+sha1.\+c@{\+\_\+hide/\+M\+P\+U/\+S\+T\+M32\+F4/stm32f4xx\+\_\+hash\+\_\+sha1.\+c}}
+
+
+This file provides high level functions to compute the H\+A\+S\+H S\+H\+A1 and H\+M\+A\+C S\+H\+A1 Digest of an input message. It uses the \hyperlink{stm32f4xx__hash_8c}{stm32f4xx\+\_\+hash.\+c}/.h drivers to access the S\+T\+M32\+F4xx H\+A\+S\+H peripheral.  
+
+
+{\ttfamily \#include \char`\"{}stm32f4xx\+\_\+hash.\+h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{group___h_a_s_h_gaa15d9e8e64ae5a78035edb854014c012}{}\#define {\bfseries S\+H\+A1\+B\+U\+S\+Y\+\_\+\+T\+I\+M\+E\+O\+U\+T}~((uint32\+\_\+t) 0x00010000)\label{group___h_a_s_h_gaa15d9e8e64ae5a78035edb854014c012}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+Error\+Status \hyperlink{group___h_a_s_h___group6_ga2728c02c36de6d800e1ede56ea7789cb}{H\+A\+S\+H\+\_\+\+S\+H\+A1} (uint8\+\_\+t $\ast$Input, uint32\+\_\+t Ilen, uint8\+\_\+t Output\mbox{[}20\mbox{]})
+\begin{DoxyCompactList}\small\item\em Compute the H\+A\+S\+H S\+H\+A1 digest. \end{DoxyCompactList}\item 
+Error\+Status \hyperlink{group___h_a_s_h___group6_ga2e38e900ca7838c1cea17cef19953a5e}{H\+M\+A\+C\+\_\+\+S\+H\+A1} (uint8\+\_\+t $\ast$Key, uint32\+\_\+t Keylen, uint8\+\_\+t $\ast$Input, uint32\+\_\+t Ilen, uint8\+\_\+t Output\mbox{[}20\mbox{]})
+\begin{DoxyCompactList}\small\item\em Compute the H\+M\+A\+C S\+H\+A1 digest. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This file provides high level functions to compute the H\+A\+S\+H S\+H\+A1 and H\+M\+A\+C S\+H\+A1 Digest of an input message. It uses the \hyperlink{stm32f4xx__hash_8c}{stm32f4xx\+\_\+hash.\+c}/.h drivers to access the S\+T\+M32\+F4xx H\+A\+S\+H peripheral. 
+
+\begin{DoxyAuthor}{Author}
+M\+C\+D Application Team 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+V1.\+0.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+30-\/\+September-\/2011 \begin{DoxyVerb}* 
+*          ===================================================================
+*                                   How to use this driver
+*          ===================================================================
+*          1. Enable The HASH controller clock using 
+*            RCC_AHB2PeriphClockCmd(RCC_AHB2Periph_HASH, ENABLE); function.
+*
+*          2. Calculate the HASH SHA1 Digest using HASH_SHA1() function.
+*
+*          3. Calculate the HMAC SHA1 Digest using HMAC_SHA1() function.
+*
+*  \end{DoxyVerb}
+
+\end{DoxyDate}
+\begin{DoxyAttention}{Attention}
+
+\end{DoxyAttention}
+T\+H\+E P\+R\+E\+S\+E\+N\+T F\+I\+R\+M\+W\+A\+R\+E W\+H\+I\+C\+H I\+S F\+O\+R G\+U\+I\+D\+A\+N\+C\+E O\+N\+L\+Y A\+I\+M\+S A\+T P\+R\+O\+V\+I\+D\+I\+N\+G C\+U\+S\+T\+O\+M\+E\+R\+S W\+I\+T\+H C\+O\+D\+I\+N\+G I\+N\+F\+O\+R\+M\+A\+T\+I\+O\+N R\+E\+G\+A\+R\+D\+I\+N\+G T\+H\+E\+I\+R P\+R\+O\+D\+U\+C\+T\+S I\+N O\+R\+D\+E\+R F\+O\+R T\+H\+E\+M T\+O S\+A\+V\+E T\+I\+M\+E. A\+S A R\+E\+S\+U\+L\+T, S\+T\+M\+I\+C\+R\+O\+E\+L\+E\+C\+T\+R\+O\+N\+I\+C\+S S\+H\+A\+L\+L N\+O\+T B\+E H\+E\+L\+D L\+I\+A\+B\+L\+E F\+O\+R A\+N\+Y D\+I\+R\+E\+C\+T, I\+N\+D\+I\+R\+E\+C\+T O\+R C\+O\+N\+S\+E\+Q\+U\+E\+N\+T\+I\+A\+L D\+A\+M\+A\+G\+E\+S W\+I\+T\+H R\+E\+S\+P\+E\+C\+T T\+O A\+N\+Y C\+L\+A\+I\+M\+S A\+R\+I\+S\+I\+N\+G F\+R\+O\+M T\+H\+E C\+O\+N\+T\+E\+N\+T O\+F S\+U\+C\+H F\+I\+R\+M\+W\+A\+R\+E A\+N\+D/\+O\+R T\+H\+E U\+S\+E M\+A\+D\+E B\+Y C\+U\+S\+T\+O\+M\+E\+R\+S O\+F T\+H\+E C\+O\+D\+I\+N\+G I\+N\+F\+O\+R\+M\+A\+T\+I\+O\+N C\+O\+N\+T\+A\+I\+N\+E\+D H\+E\+R\+E\+I\+N I\+N C\+O\+N\+N\+E\+C\+T\+I\+O\+N W\+I\+T\+H T\+H\+E\+I\+R P\+R\+O\+D\+U\+C\+T\+S.
+
+\subsubsection*{\begin{center}\copyright{} C\+O\+P\+Y\+R\+I\+G\+H\+T 2011 S\+T\+Microelectronics\end{center} }

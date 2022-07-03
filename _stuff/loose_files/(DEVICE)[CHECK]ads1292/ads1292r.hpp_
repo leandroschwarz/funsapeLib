@@ -1,0 +1,281 @@
+
+#ifndef __ADS1292R_HPP
+#define __ADS1292R_HPP
+
+#include "stm32f1xx.h"
+#include "spi.h"
+
+#define customDelay()		do {		\
+		uint32_t i = 100;				\
+		while(i--) {					\
+			asm("NOP");					\
+		}								\
+	} while(0)
+
+class Ads1292r
+{
+public:
+	enum class DataRatio {
+		RATIO_125_SPS					= 0,
+		RATIO_250_SPS					= 1,
+		RATIO_500_SPS					= 2,
+		RATIO_1000_SPS					= 3,
+		RATIO_2000_SPS					= 4,
+		RATIO_4000_SPS					= 5,
+		RATIO_8000_SPS					= 6,
+	};
+	enum class ReferenceSelection {
+		REFERENCE_2420_MV				= 0,
+		REFERENCE_4033_MV				= 1,
+	};
+	enum class TestSignalFrequency {
+		TEST_SIGNAL_DC					= 0,
+		TEST_SIGNAL_1_HZ				= 1,
+	};
+	enum class LeadOffComparatorThreshold {
+		AT_95_0_PERCENT					= 0,
+		AT_92_5_PERCENT					= 1,
+		AT_90_0_PERCENT					= 2,
+		AT_87_5_PERCENT					= 3,
+		AT_85_0_PERCENT					= 4,
+		AT_80_0_PERCENT					= 5,
+		AT_75_0_PERCENT					= 6,
+		AT_70_0_PERCENT					= 7,
+	};
+	enum class LeadOffCurrentMagnitude {
+		CURRENT_6_NA					= 0,
+		CURRENT_22_NA					= 1,
+		CURRENT_6_UA					= 2,
+		CURRENT_22_UA					= 3,
+	};
+	enum class LeadOffFrequency {
+		LEAD_OFF_DC						= 0,
+		LEAD_OFF_FDR_4					= 1,
+	};
+	enum class PgaGain {
+		GAIN_6							= 0,
+		GAIN_1							= 1,
+		GAIN_2							= 2,
+		GAIN_3							= 3,
+		GAIN_4							= 4,
+		GAIN_8							= 5,
+		GAIN_12							= 6,
+	};
+	enum class InputSelectionCh1 {
+		NORMAL_ELECTRODE				= 0,
+		INPUT_SHORTED					= 1,
+		RLD_MEASURE						= 2,
+		MVDD							= 3,
+		TEMPERATURE_SENSOR				= 4,
+		TEST_SIGNAL						= 5,
+		RLD_DRP							= 6,
+		RLD_DRM							= 7,
+		RLD_DRPM						= 8,
+		ROUTE_IN3P_AND_1N3N				= 9,
+	};
+	enum class InputSelectionCh2 {
+		NORMAL_ELECTRODE				= 0,
+		INPUT_SHORTED					= 1,
+		RLD_MEASURE						= 2,
+		VDD_2							= 3,
+		TEMPERATURE_SENSOR				= 4,
+		TEST_SIGNAL						= 5,
+		RLD_DRP							= 6,
+		RLD_DRM							= 7,
+		RLD_DRPM						= 8,
+		ROUTE_IN3P_AND_1N3N				= 9,
+	};
+	enum class ChopFrenquency {
+		FMOD_16							= 0,
+		FMOD_2							= 2,
+		FMOD_4							= 3,
+	};
+	enum class ClockDivision {
+		FCLK_4							= 0,
+		FCLK_16							= 1,
+	};
+	enum class RespirationPhase {
+		PHASE_0							= 0,
+		PHASE_11_25_OR_22_50			= 1,
+		PHASE_22_50_OR_45_00			= 2,
+		PHASE_33_75_OR_67_50			= 3,
+		PHASE_45_00_OR_90_00			= 4,
+		PHASE_56_25_OR_122_50			= 5,
+		PHASE_65_50_OR_135_00			= 6,
+		PHASE_78_75_OR_157_50			= 7,
+		PHASE_90_00						= 8,
+		PHASE_101_25					= 9,
+		PHASE_112_50					= 10,
+		PHASE_123_75					= 11,
+		PHASE_135_00					= 12,
+		PHASE_146_25					= 13,
+		PHASE_157_50					= 14,
+		PHASE_168_75					= 15,
+	};
+	enum class RespirationFrequency {
+		FREQ_32_KHZ						= 0,
+		FREQ_64_KHZ						= 1,
+	};
+	enum class RldReferenceSource {
+		EXTERNAL						= 0,
+		INTERNAL						= 1,
+	};
+	enum class GpioControl {
+		OUTPUT							= 0,
+		INPUT							= 1,
+	};
+	typedef struct {
+		int32_t sDaqVals[8];
+		bool leadoffDetected = true;
+		int32_t sresultTempResp;
+	} ads1292OutputValues_t;
+
+private:
+	enum class Command {
+		WakeUp							= 0x02,
+		StadBy							= 0x04,
+		Reset							= 0x06,
+		StartConversion					= 0x08,
+		StopConversion					= 0x0A,
+		OffsetCalibration				= 0x1A,
+		ContinuousModeEnabled			= 0x10,
+		ContinuousModeDisabled			= 0x11,
+		ReadData						= 0x12,
+	};
+
+public:
+	Ads1292r(
+			void (* actFunc_p)(void),
+			void (* deactFunc_p)(void)
+	);
+	bool init(void);
+	bool getId(void);
+	bool readDataEnabled(void);
+	bool checkConfiguration(void);
+	bool readDataMode(bool enabled_p);
+	bool getData(ads1292OutputValues_t *ecgRespirationValues);
+	bool _readData(void);
+
+
+private:
+	void	(*_activateDevice)(void);
+	void	(*_deactivateDevice)(void);
+	bool	_sendCommand(uint8_t command_p);
+	bool	_readReg(uint8_t address_p, uint8_t *dataBuffer_p, uint8_t dataSize_p);
+	bool	_writeReg(uint8_t address_p, uint8_t *dataBuffer_p, uint8_t dataSize_p);
+
+	bool						_continuousConversionDisabled;
+	DataRatio					_channelOversamplingRatio;
+	bool						_leadOffComparatorEnabled;
+	bool						_referenceBufferEnabled;
+	ReferenceSelection			_referenceSelection;
+	bool						_outputClockOscillatorPinEnabled;
+	bool						_testSignalEnabled;
+	TestSignalFrequency			_testSignalFrequency;
+	LeadOffComparatorThreshold	_leadOffComparatorThreshold;
+	LeadOffCurrentMagnitude		_leadOffCurrentMagnitude;
+	LeadOffFrequency			_leadOffFrequency;
+	bool						_powerDownChannel_1;
+	bool						_powerDownChannel_2;
+	PgaGain						_pgaGainChannel_1;
+	PgaGain						_pgaGainChannel_2;
+	InputSelectionCh1			_inputSelectionChannel_1;
+	InputSelectionCh2			_inputSelectionChannel_2;
+	ChopFrenquency				_chopFrenquency;
+	bool						_rldBufferEnabled;
+	bool						_rldLeadOffSenseEnabled;
+	bool						_rldConnectedToIn2N;
+	bool						_rldConnectedToIn2P;
+	bool						_rldConnectedToIn1N;
+	bool						_rldConnectedToIn1P;
+	bool						_flip2Enabled;
+	bool						_flip1Enabled;
+	bool						_leadOffCh2NegativeDetectionEnabled;
+	bool						_leadOffCh2PositiveDetectionEnabled;
+	bool						_leadOffCh1NegativeDetectionEnabled;
+	bool						_leadOffCh1PositiveDetectionEnabled;
+	ClockDivision				_clockDivision;
+	bool						_rldLeadOffDetected;
+	bool						_in2NLeadOffDetected;
+	bool						_in2PLeadOffDetected;
+	bool						_in1NLeadOffDetected;
+	bool						_in1PLeadOffDetected;
+	bool						_respirationDemodulationCircuitEnabled;
+	bool						_respirationModulationCircuitEnabled;
+	RespirationPhase			_repirationPhase;
+	bool						_repirationExternalClockEnabled;
+	bool						_calibrationOffsetEnabled;
+	RespirationFrequency		_respirationControlFrequency;
+	RldReferenceSource			_rldReferenceSource;
+	GpioControl					_gpio1Control;
+	GpioControl					_gpio2Control;
+	bool						_gpio1Value;
+	bool						_gpio2Value;
+
+	uint8_t _txBuffer[14];
+	uint8_t _rxBuffer[14];
+
+
+};
+
+#define ID_REG							0x00
+#define CONFIG1_REG						0x01
+#	define CONFIG1_REG_SINGLE_SHOT_BIT			7
+#	define CONFIG1_REG_DR_BIT					0
+#define CONFIG2_REG						0x02
+#	define	CONFIG2_REG_PDB_LOFF_COMP_BIT		6
+#	define	CONFIG2_REG_PDB_REFBUF_BIT			5
+#	define	CONFIG2_REG_VREF_4V_BIT				4
+#	define	CONFIG2_REG_CLK_EN_BIT				3
+#	define	CONFIG2_REG_INT_TEST_BIT			1
+#	define	CONFIG2_REG_TEST_FREQ_BIT			0
+#define LOFF_REG						0x03
+#	define LOFF_REG_COMP_TH_BIT					5
+#	define LOFF_REG_ILEAD_OFF_BIT				2
+#	define LOFF_REG_FLEAD_OFF_BIT				0
+#define CH1SET_REG						0x04
+#	define CH1SET_REG_PD_BIT					7
+#	define CH1SET_REG_GAIN_BIT					4
+#	define CH1SET_REG_MUX_BIT					0
+#define CH2SET_REG						0x05
+#	define CH2SET_REG_PD_BIT					7
+#	define CH2SET_REG_GAIN_BIT					4
+#	define CH2SET_REG_MUX_BIT					0
+#define RLD_SENS_REG					0x06
+#	define RLD_SENS_REG_CHOP_BIT				6
+#	define RLD_SENS_REG_PDB_RLD_BIT				5
+#	define RLD_SENS_REG_RLD_LOFF_SENSE_BIT		4
+#	define RLD_SENS_REG_RLD2N_BIT				3
+#	define RLD_SENS_REG_RLD2P_BIT				2
+#	define RLD_SENS_REG_RLD1N_BIT				1
+#	define RLD_SENS_REG_RLD1P_BIT				0
+#define LOFF_SENS_REG					0x07
+#	define LOFF_SENS_REG_FLIP2_BIT				5
+#	define LOFF_SENS_REG_FLIP1_BIT				4
+#	define LOFF_SENS_REG_LOFF2N_BIT				3
+#	define LOFF_SENS_REG_LOFF2P_BIT				2
+#	define LOFF_SENS_REG_LOFF1N_BIT				1
+#	define LOFF_SENS_REG_LOFF1P_BIT				0
+#define LOFF_STAT_REG					0x08
+#	define LOFF_STAT_REG_CLK_DIV_BIT			6
+#	define LOFF_STAT_REG_RLD_STAT_BIT			4
+#	define LOFF_STAT_REG_IN2N_OFF_BIT			3
+#	define LOFF_STAT_REG_IN2P_OFF_BIT			2
+#	define LOFF_STAT_REG_IN1N_OFF_BIT			1
+#	define LOFF_STAT_REG_IN1P_OFF_BIT			0
+#define RESP1_REG						0x09
+#	define RESP1_REG_RESP_DEMOD_EN1_BIT			7
+#	define RESP1_REG_RESP_MOD_EN_BIT			6
+#	define RESP1_REG_RESP_PH_BIT				2
+#	define RESP1_REG_RESP_CTRL_BIT				0
+#define RESP2_REG						0x0A
+#	define RESP2_REG_CALIB_ON_BIT				7
+#	define RESP2_REG_RESP_FREQ_BIT				2
+#	define RESP2_REG_RLDREF_INT_BIT				1
+#define GPIO_REG						0x0B
+#	define GPIO_REG_GPIOC2_BIT					3
+#	define GPIO_REG_GPIOC1_BIT					2
+#	define GPIO_REG_GPIOD2_BIT					1
+#	define GPIO_REG_GPIOD1_BIT					0
+
+#endif
